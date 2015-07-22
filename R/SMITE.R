@@ -655,7 +655,7 @@ setMethod(
         
         p_ref<-slot(slot(object, "score_data"), "pval_data")[[ref_index]]
         logit_ref<-log(p_ref/(1-p_ref))
-        if(!names(dev.cur())%in%c("RstudioGD","pdf")){
+        if(!names(dev.cur())%in%c("RStudioGD","pdf")){
           dev.new(height=7,width=14)
         }
         par(mfrow=c(1, 2))

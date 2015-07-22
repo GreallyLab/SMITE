@@ -434,7 +434,11 @@ setMethod(f="plotDensityPval",
               y_range<-range(dens_range[,2])
               y_range[2]<-y_range[2]+diff(y_range)*.1
               
-              par(mar=c(4,4,4,10), xpd=FALSE)
+            if(!names(dev.cur())%in%c("RStudioGD")){par(mar=c(4,4,4,10), xpd=FALSE)
+            }
+            else{
+                par(mar=c(4,4,4,4))
+            }
               plot.new()
               plot.window(xlim=x_range, ylim=y_range)
               axis(1)

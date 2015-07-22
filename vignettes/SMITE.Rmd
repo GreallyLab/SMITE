@@ -28,7 +28,7 @@ Before inputting epigenetic and expression data into the **SMITE** algorithms, e
 
 Start by loading in a DNA methylation dataset(Chr, Start, Stop, effect size, p-value for each CpG). This data was generated using the HELP-tagging assay and shows the difference of mean 5'-cytosine methylation between triplicate \textit{Toxoplasma} infected and uninfected Human Foreskin Fibroblasts (HFF). The p-value was generated using t-tests (DNA methylation ~ Infection).      
 
-To curate the DNA methylation dataset, it is necessary to remove uninformative loci (`NAs`) and p-values=0 since logarithms of p-values are employed within the code.  We replace any p-values=0 with the minimum p-value in the dataset using the provided `replaceZeros` function. We also remove CpGs for which the p-value is `NA`.  The curated datasets available through [Github](https://github.com/GreallyLab/SMITE) have already been processed but were not included in the package because of size restrictions.
+To curate the DNA methylation dataset, it is necessary to remove uninformative loci (`NAs`) and p-values=0 since logarithms of p-values are employed within the code.  We replace any p-values=0 with the minimum p-value in the dataset using the provided `replaceZeros` function. We also remove CpGs for which the p-value is `NA`.  The curated datasets available through [Github](https://github.com/GreallyLab/SMITEdatasets) have already been processed but were not included in the package because of size restrictions.
 
 ```{r, tidy=TRUE, tidy.opts=list(blank=FALSE, width.cutoff=60), eval=TRUE}
 ## Load methylation data ##

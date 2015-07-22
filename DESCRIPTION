@@ -14,7 +14,7 @@ Description: This package builds on the Epimods framework which facilitates
 License: GPL (>=2)
 Depends: 
         R (>= 3.0.0),Biobase, igraph , GenomicRanges
-Imports: scales, plyr, Hmisc, AnnotationDbi, org.Hs.eg.db,ggplot2,reactome.db, KEGG.db, BioNet, goseq, methods
+Imports: scales, plyr, Hmisc, AnnotationDbi, org.Hs.eg.db,ggplot2,reactome.db, KEGG.db, BioNet, goseq, methods, IRanges
 Suggests: knitr
 VignetteBuilder: knitr
 biocViews: 

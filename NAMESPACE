@@ -39,6 +39,7 @@ importFrom("igraph", simplify,clusters,
 
 import(GenomicRanges, AnnotationDbi, org.Hs.eg.db,ggplot2,
        Biobase,methods)
+importFrom("IRanges", IRanges)
 importFrom( "KEGG.db",KEGGEXTID2PATHID, KEGGPATHID2NAME) 
 importFrom( "reactome.db",reactomeEXTID2PATHID, reactomePATHID2NAME)
 importFrom("BioNet",runFastHeinz, subNetwork, rmSelfLoops)
