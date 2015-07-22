@@ -86,17 +86,17 @@ N. Ari Wijetunga
 SMITE vignette
 }
 \examples{
-## Please see vignette for more detailed usage information ##
+## Note: Commented out below. See vignette for more detailed usage information##
 
 ## Load genome bed file ##
-data(hg19_genes_bed)
+#data(hg19_genes_bed)
 
 ##load an other track, in this case h3k4me1
-data(histone_h3k4me1)
+#data(histone_h3k4me1)
 
 ## Create a PvalueAnnotation with defaults for promoter size##
-test_annotation<-makePvalueAnnotation( data=hg19_genes, 
-otherdata=list(h3k4me1=h3k4me1), gene_name_col=5,other_d=5000)
+#test_annotation<-makePvalueAnnotation( data=hg19_genes, 
+#otherdata=list(h3k4me1=h3k4me1), gene_name_col=5,other_d=5000)
 
 }
 \keyword{ SMITE }

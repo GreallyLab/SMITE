@@ -69,7 +69,8 @@ options(stringsAsFactors=FALSE)
 #create a pvalue object that will count the effect of the h3k4me1 as
 #bidirectional
 #test_annotation<-makePvalueObject(test_annotation, 
-#effect_directions=c(methylation_promoter="decrease",methylation_body="decrease",
+#effect_directions=c(methylation_promoter="decrease",methylation_body=
+#"decrease",
 #methylation_h3k4me1="bidirectional"))
 
 

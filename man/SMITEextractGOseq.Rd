@@ -69,18 +69,21 @@ SMITEextractModules
 SMITEplotModule
 }
 \examples{
+
+## Commented out below.  See vignette for more details ##
+
 ##load sample data with only PvalueObject filled in##
-data(test_annotation_score_data)
+#data(test_annotation_score_data)
 
 ## show goseq analysis for module 1 ##
-SMITEextractGOseq(test_annotation,1)
+#SMITEextractGOseq(test_annotation,1)
 
 ## show goseq analysis for module 1 and 2 ##
-SMITEextractGOseq(test_annotation,1:2)
+#SMITEextractGOseq(test_annotation,1:2)
 
 ## search for term ##
 
-SMITEsearchGOseq(test_annotation,"Cell cycle")
+#SMITEsearchGOseq(test_annotation,"Cell cycle")
 }
 
 \keyword{ goseq }

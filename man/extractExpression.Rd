@@ -30,25 +30,25 @@ N. Ari Wijetunga
 annotateExpression
 }
 \examples{
-## Please see vignette for more detailed usage information ##
+## Note: Commented out here.  See vignette for more detailed usage information #
 
 ## Load genome bed file ##
-data(hg19_genes_bed)
+#data(hg19_genes_bed)
 
 ## Load curated expression bed file ##
-data(curated_expressiondata)
+#data(curated_expressiondata)
 
 ## Create a PvalueAnnotation with defaults for promoter size##
-test_annotation<-makePvalueAnnotation( data=hg19_genes, gene_name_col=5)
+#test_annotation<-makePvalueAnnotation( data=hg19_genes, gene_name_col=5)
 
 ## Load Expression data into PvalueAnnotation ##
-test_annotation<-annotateExpression(test_annotation, expression_curated)
+#test_annotation<-annotateExpression(test_annotation, expression_curated)
 
 ## Extract entire ExpressionSet with expression data ##
-slot(test_annotation,"expression")
+#slot(test_annotation,"expression")
 
 ## Extract expression data summary ##
-head(extractExpression(test_annotation))
+#head(extractExpression(test_annotation))
 
 
 }

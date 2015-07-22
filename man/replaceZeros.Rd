@@ -33,16 +33,17 @@ N. Ari Wijetunga
 }
 
 \examples{
+##Note: Commented out below.  See vignette for more details ##
 
-data (methylationdata)
+#data (methylationdata)
 
-head(methylation)
+#head(methylation)
 
-head(which(methylation[,5]==0))
+#head(which(methylation[,5]==0))
 
-methylation<-replaceZeros(methylation,5)
+#methylation<-replaceZeros(methylation,5)
 
-head(which(methylation[,5]==0))
+#head(which(methylation[,5]==0))
 
 }
 
