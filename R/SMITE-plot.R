@@ -136,14 +136,14 @@ setMethod(
                 #no goseq
                 if(goseq==FALSE){
                     #yes legend
-                if(legend==TRUE){if(!names(dev.cur())%in%c("RstudioGD","pdf"))
+                if(legend==TRUE){if(!names(dev.cur())%in%c("RStudioGD","pdf"))
                 {dev.new(height=10, width=12)}}
                 #no legend#
-                else{if(!names(dev.cur())%in%c("RstudioGD","pdf"))
+                else{if(!names(dev.cur())%in%c("RStudioGD","pdf"))
                         {dev.new(height=8, width=8)}}
             }
                     #yes goseq and legend #
-            else{if(!names(dev.cur())%in%c("RstudioGD","pdf"))
+            else{if(!names(dev.cur())%in%c("RStudioGD","pdf"))
                 {dev.new(height=10, width=16)}
             }
         }
@@ -153,7 +153,7 @@ setMethod(
             legend=FALSE
             goseq=FALSE
             suppressDetails=TRUE
-            if(!names(dev.cur())%in%c("RstudioGD","pdf")){
+            if(!names(dev.cur())%in%c("RStudioGD","pdf")){
                 dev.new(height=10, width=20)}
             par(mfrow=c(1,2))
         }
