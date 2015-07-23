@@ -41,7 +41,7 @@ removeModification
 ##NOTE: Comment out in exmaple see vignette for more detailed usage ##
 
 ## Load genome bed file ##
-#data(hg19_genes_bed)
+data(hg19_genes_bed)
 
 ## Load curated DNA methylation bed file ##
 #data(methylationdata)
@@ -50,7 +50,7 @@ removeModification
 
 
 ## Create a PvalueAnnotation with defaults for promoter size##
-#test_annotation<-makePvalueAnnotation( data=hg19_genes, gene_name_col=5)
+test_annotation<-makePvalueAnnotation( data=hg19_genes, gene_name_col=5)
 
 ## Load DNA methylation into PvalueAnnotation ##
 #test_annotation<-annotateModification(test_annotation, 

@@ -42,9 +42,9 @@ extractModSummary
 
 ## Load curated DNA methylation bed file ##
 
-#data(methylationdata)
-#methylation<-methylation[-which(is.na(methylation[,5])),]
-#methylation<-replaceZeros(methylation,5)
+data(methylationdata)
+methylation<-methylation[-which(is.na(methylation[,5])),]
+methylation<-replaceZeros(methylation,5)
 
 #meth1<-methylation
 

@@ -67,6 +67,6 @@ plotDensityPval
 \examples{
 data(test_annotation_score_data)
 
-test_annotation<-normalizePval(test_annotation)
+#test_annotation<-normalizePval(test_annotation)
 
 }

@@ -44,8 +44,8 @@ makePvalueAnnotation
 #NOTE: Commented out in example, please see vignette for more details##
 options(stringsAsFactors=FALSE)
 
-#data(methylationdata)
-#methylation<-methylation[-which(is.na(methylation[,5])),]
+data(methylationdata)
+methylation<-methylation[-which(is.na(methylation[,5])),]
 #methylation<-replaceZeros(methylation,5)
 
 

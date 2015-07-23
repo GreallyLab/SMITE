@@ -98,8 +98,8 @@ SMITEextractModules
 \examples{
 data(test_annotation_score_data)
 
-SMITEplotModule(test_annotation, which.network=2)
+#SMITEplotModule(test_annotation, which.network=2)
 
-SMITEplotModule(test_annotation, which.network=2,suppressDetails=TRUE)
+#SMITEplotModule(test_annotation, which.network=2,suppressDetails=TRUE)
 
 }

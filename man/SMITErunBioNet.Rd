@@ -62,7 +62,7 @@ data(test_annotation_score_data)
 ## NOTE: commented out for example.  See vignette for better explanation ##
 
 #load reactome network with gene symbols ##
-load(system.file("data","Reactome.Symbol.Igraph.rda", package="SMITE"))
+#load(system.file("data","Reactome.Symbol.Igraph.rda", package="SMITE"))
 
 ## run BioNet ##
 #test_annotation<-SMITErunBioNet(test_annotation,network = REACTOME)

@@ -81,7 +81,7 @@ data(test_annotation_score_data)
 SMITEsearchGOseq(test_annotation,"Cell cycle")
 
 ## show goseq analysis for module 1 ##
-SMITEextractGOseq(test_annotation,1)
+#SMITEextractGOseq(test_annotation,1)
 
 }
 

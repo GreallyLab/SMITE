@@ -87,7 +87,7 @@ SMITEplotModule
 \examples{
 data(test_annotation_score_data)
 
-load(system.file("data","Reactome.Symbol.Igraph.rda", package="SMITE"))
+#load(system.file("data","Reactome.Symbol.Igraph.rda", package="SMITE"))
  
 ## NOTE: commented out for example.  See vignette for better explanation ##
 #test_annotation<-SMITErunSpinglass(test_annotation, REACTOME,maxsize=50, 
