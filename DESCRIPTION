@@ -19,4 +19,4 @@ Suggests: knitr
 VignetteBuilder: knitr
 biocViews: 
         DifferentialMethylation,DifferentialExpression,SystemsBiology,
-        NetworkEnrichment,GenomeAnnotation,Network
+        NetworkEnrichment,GenomeAnnotation,Network, Sequencing, RNASeq

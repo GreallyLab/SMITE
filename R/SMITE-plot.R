@@ -148,7 +148,7 @@ setMethod(
             }
         }
         }
-        #compare plot is T
+        #compare plot is TRUE
         else{
             legend=FALSE
             goseq=FALSE
