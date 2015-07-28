@@ -1,2 +1,5 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
+^README.md
+^SMITE_0.99.0.tar.gz
+^.Rhistory
