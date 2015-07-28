@@ -52,6 +52,7 @@ createPvalueObject
 }
 \examples{
 
+data(curated_expressiondata)
 data(test_annotation_score_data)
 ## Load Expression data into PvalueAnnotation ##
 test_annotation<-annotateExpression(test_annotation, expression_curated)
