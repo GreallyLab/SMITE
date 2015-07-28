@@ -178,9 +178,9 @@ We can use keywords such as "cell cycle" to find within the goseq output which m
 ## search goseq output for keywords ##
 SMITEsearchGOseq(test_annotation,"cell cycle")
 ## Draw a network ##
-SMITEplotModule(test_annotation, which.network=6,layout="fr", label_scale=T)
+SMITEplotModule(test_annotation, which.network=6,layout="fr", label_scale=TRUE)
 ```
 ```{r, tidy=TRUE, tidy.opts=list(blank=FALSE, width.cutoff=60), eval=TRUE, fig.width=12,fig.height=6}
 ## Draw a network with goseq analysis ##
-SMITEplotModule(test_annotation, which.network=1,layout="fr", goseq=TRUE,label_scale = F)
+SMITEplotModule(test_annotation, which.network=1,layout="fr", goseq=TRUE,label_scale = FALSE)
 ```
