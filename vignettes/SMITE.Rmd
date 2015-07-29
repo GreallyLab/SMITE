@@ -1,7 +1,7 @@
 ---
 title: '**SMITE** Vignette'
 author: "Andrew Johnston, N. Ari Wijetunga, and John M. Greally"
-date: "July 22, 2015"
+date: "July 28, 2015"
 output: pdf_document
 fontsize: 12pt
 vignette: >
