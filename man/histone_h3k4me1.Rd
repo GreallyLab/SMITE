@@ -23,6 +23,9 @@ BED file.
 This is a BED file that specifices the consensus locations of three H3K4me1 
 ChIP-seq experiments performed on normal adult liver.
 }
+\value{
+A dataframe in BED format (chromosome, start, end).
+}
 \source{
 GSM669972, GSM621654, GSM537706
 

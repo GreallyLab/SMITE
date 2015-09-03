@@ -19,6 +19,11 @@ effect and p-value with gene names as rownames.
       analysis}
   }
 }
+\value{
+A dataframe with rownames as genes in Refseq format and columns for effects
+and pvalues derived from negative binomial testing of DESeq normalized 
+values from RNA-seq.
+}
 \details{
 This gene expression dataset is a randomized version of the Toxoplasma dataset 
 used to benchmark 

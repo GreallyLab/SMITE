@@ -16,7 +16,9 @@ conversion functionality in SMITE
     \item{column1}{a character vector of RefSeqGene IDs}
   }
 }
-
+\value{
+A dataframe with genes in Refseq format for conversion testing.
+}
 
 \examples{
 

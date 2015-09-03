@@ -24,6 +24,9 @@ This is a PvalueAnnotation which has had all of the pre-scoring data
 removed so that it is only usefule for using functions beginning with SMITE
 and SMITE plotting functions.
 }
+\value{
+A PvalueAnnotation with the score_data slot containing toy scores
+}
 
 \examples{
 data(test_annotation_score_data)

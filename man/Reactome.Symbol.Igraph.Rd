@@ -21,9 +21,14 @@ interaction database.
 The provided igraph file was created using the igraph package and the 
 interaction file provided from the reference. 
 }
+\value{
+An Igraph network  based off of REACTOME interactions
+}
+
 \source{
 REACTOME
 }
+
 \references{
 http://www.reactome.org/pages/download-data/
 }

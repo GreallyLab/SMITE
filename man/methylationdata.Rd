@@ -31,7 +31,11 @@ SMITE.  It still has NAs and p-values=0.}
 Manuscript in preparation.  Please see 
 https://github.com/GreallyLab 
 for more details.}
-
+\value{
+A dataframe in BED format (chromosome, start, end) with additional columns for
+and effect direction and p-value derived from T-tests of HELP-tagging DNA
+methylation data.
+}
 \examples{
 data(methylationdata)
 

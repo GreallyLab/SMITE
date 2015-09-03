@@ -23,6 +23,10 @@ A gene anntation BED file containing columns for RefSeq name and Gene Symbol
 \details{
 A BED files taken from the table browser.
 }
+\value{
+A dataframe in BED format (chromosome, start, end) with additional columns for
+gene name as Refseq and gene symbol and strand.
+}
 \source{
 Karolchik D, Hinrichs AS, Furey TS, Roskin KM, Sugnet CW, Haussler D, Kent WJ. 
 The UCSC Table Browser data retrieval tool. Nucleic Acids Res. 2004 Jan 1;32
