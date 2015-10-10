@@ -11,8 +11,8 @@ in order to establish for each gene the gene promoter, body and associated
 intervals.
 }
 \usage{
-makePvalueAnnotation(data, otherdata = NULL, other_d = 10000, 
-promoter_upstream = 1000, promoter_downstream = 1000, strand_col = NULL, 
+makePvalueAnnotation(data, other_data = NULL, other_tss_distance = 10000, 
+promoter_upstream_ditance = 1000, promoter_downstream_distance = 1000, strand_col = NULL, 
 gene_name_col = NULL)
 }
 \arguments{
@@ -25,23 +25,23 @@ for the interaction network.  Duplicated gene names and associated gene
 annotations are removed.
 
 }
-  \item{otherdata}{
+  \item{other_data}{
 A list of BED files corresponding to each additional interval file to be 
 associated with genes.  The function will use the other_d variable and the gene 
 transcription start site (TSS) to find for each gene all intervals
-within [tss-other_d, tss+other_d].
+within [tss-other_tss_distance, tss+other_tss_distance].
 }
-  \item{other_d}{
+  \item{other_tss_distance}{
 A vector specifying for each element of otherdata a distance from the gene
 TSS to consider that interval as related to a gene.  If the length of other_d
 does not match the length of the otherdata list, then the first value is used
 for all datasets in the otherdata list. DEFAULTS to 10,000 base pairs.
 }
-  \item{promoter_upstream}{
+  \item{promoter_upstream_distance}{
 A numeric specifying how far upstream from the gene TSS is considered part of
 the gene promoter. DEFAULTS to 1,000 base pairs.
 }
-  \item{promoter_downstream}{
+  \item{promoter_downstream_distance}{
 A numeric specifying how far downstream from the gene TSS is considered part of
 the gene promoter.  Gene bodies subtract the promoter_downstream region.
 DEFAULTS to 1,000 base pairs.

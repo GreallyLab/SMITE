@@ -46,15 +46,14 @@ options(stringsAsFactors=FALSE)
 
 data(methylationdata)
 methylation<-methylation[-which(is.na(methylation[,5])),]
-#methylation<-replaceZeros(methylation,5)
-
+#methylation[,5]<-replace(methylation[,5],methylation[,5]==0, min(subset(methylation[,5], methylation[,5]!=0), na.rm=T))
 
 #data(curated_expressiondata)
 #data(hg19_genes_bed)
 #data(histone_h3k4me1)
 
 #test_annotation<-makePvalueAnnotation( data=hg19_genes, 
-#otherdata=list(h3k4me1=h3k4me1), gene_name_col=5,other_d=5000)
+#other_data=list(h3k4me1=h3k4me1), gene_name_col=5,other_tss_distance=5000)
 
 #fill in expression data
 #test_annotation<-annotateExpression(test_annotation, expression_curated)

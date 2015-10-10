@@ -46,8 +46,7 @@ data(hg19_genes_bed)
 ## Load curated DNA methylation bed file ##
 #data(methylationdata)
 #methylation<-methylation[-which(is.na(methylation[,5])),]
-#methylation<-replaceZeros(methylation,5)
-
+#methylation[,5]<-replace(methylation[,5],methylation[,5]==0, min(subset(methylation[,5], methylation[,5]!=0), na.rm=T))
 
 ## Create a PvalueAnnotation with defaults for promoter size##
 test_annotation<-makePvalueAnnotation( data=hg19_genes, gene_name_col=5)

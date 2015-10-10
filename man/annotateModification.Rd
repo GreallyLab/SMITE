@@ -137,7 +137,7 @@ options(stringsAsFactors=FALSE)
 ## Load DNA methylation bed file ##
 #data(methylationdata)
 #methylation<-methylation[-which(is.na(methylation[,5])),]
-#methylation<-replaceZeros(methylation,5)
+#methylation[,5]<-replace(methylation[,5],methylation[,5]==0, min(subset(methylation[,5], methylation[,5]!=0), na.rm=T))
 
 ## Load DNA methylation into PvalueAnnotation modCorr=F for example##
 ## NOTE: Commented out below.  See vignette for better example ##

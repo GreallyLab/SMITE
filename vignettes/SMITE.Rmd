@@ -28,14 +28,14 @@ Before inputting epigenetic and expression data into the **SMITE** algorithms, e
 
 Start by loading in a DNA methylation dataset(Chr, Start, Stop, effect size, p-value for each CpG). This data was generated using the HELP-tagging assay and shows the difference of mean 5'-cytosine methylation between triplicate \textit{Toxoplasma} infected and uninfected Human Foreskin Fibroblasts (HFF). The p-value was generated using t-tests (DNA methylation ~ Infection).      
 
-To curate the DNA methylation dataset, it is necessary to remove uninformative loci (`NAs`) and p-values=0 since logarithms of p-values are employed within the code.  We replace any p-values=0 with the minimum p-value in the dataset using the provided `replaceZeros` function. We also remove CpGs for which the p-value is `NA`.  The curated datasets available through [Github](https://github.com/GreallyLab/SMITEdatasets) have already been processed but were not included in the package because of size restrictions.
+To curate the DNA methylation dataset, it is necessary to remove uninformative loci (`NAs`) and p-values=0 since logarithms of p-values are employed within the code.  We replace any p-values=0 with the minimum p-value in the dataset. We also remove CpGs for which the p-value is `NA`.  The curated datasets available through [Github](https://github.com/GreallyLab/SMITEdatasets) have already been processed but were not included in the package because of size restrictions.
 
 ```{r, tidy=TRUE, tidy.opts=list(blank=FALSE, width.cutoff=60), eval=TRUE}
 ## Load methylation data ##
 data(methylationdata)
 
 ## Replace zeros with minimum non-zero p-value ##
-methylation<-replaceZeros(outdata = methylation, column = 5)
+methylation[,5]<-replace(methylation[,5],methylation[,5]==0, min(subset(methylation[,5], methylation[,5]!=0), na.rm=T))
 
 ## Remove NAs from p-value column ##
 methylation<-methylation[-which(is.na(methylation[,5])),] 
@@ -52,7 +52,7 @@ genes[,1]<-convertGeneIds(a=genes[,1], a_type="refseq",b_type="symbol")
 
 Next, we load in the example expression dataset (genes, effect, p-value) generated via RNA-seq on the same HFF samples. Because of size restrictions, we could not include an unprocessed dataset. We have, however, provided an unprocessed dataset on [Github](https://github.com/GreallyLab/SMITEdatasets) for users to apply the following lines of codes to in order to better see how to pre-process their data. In the curated data, the rownames are gene symbols  and the other columns include effect size (log fold change) and p-value from a negative binomial test in DESeq.   
 
-After gene id conversion (example shown above), we remove expression data for genes where a gene symbol was not found (`NAs`). We then take the lowest (most significant) pvalue for genes that had more than 1 entry. Finally, we replace p-values of zeros with the lowest p-value in the dataset using our `replaceZeros` command.  
+After gene id conversion (example shown above), we remove expression data for genes where a gene symbol was not found (`NAs`). We then take the lowest (most significant) pvalue for genes that had more than 1 entry. Finally, we replace p-values of zeros with the lowest p-value in the dataset.  
 
 ```{r, tidy=TRUE, tidy.opts=list(blank=FALSE, width.cutoff=60), eval=FALSE}
 ## This is just an example of how to pre-process data ##
@@ -61,7 +61,7 @@ expression<-split(expression, expression[,1])
 expression<-lapply(expression, function(i){if(nrow(as.data.frame(i))>1){i<-i[which(i[,3]==min(i[,3],na.rm=T))[1],]}; return(i)}) 
 expression<-do.call(rbind, expression)
 expression<-expression[,-1]
-expression<-replaceZeros(expression, 2)
+expression[,2]<-replace(expression[,2],expression[,2]==0, min(subset(expression[,2], expression[,2]!=0), na.rm=T))
 ```
 
 ```{r, warning=FALSE, tidy=TRUE, tidy.opts=list(blank=FALSE, width.cutoff=60), eval=TRUE}
@@ -93,7 +93,7 @@ head(h3k4me1)
 In `makePvalueAnnotation`, we create a `GRangesList` object where each gene is associated with a promoter region (+/- 1000bp from TSS), gene body region (TSS+1000bp to TES), and putative "enhancers" using H3K4me1 ChIP-seq peaks (+/- 5000bp from TSS).  Note: These are the sizes of regions of the genome for which we are interested in calculating scores, but the user can easily alter the parameters. Additionally, the argument otherdata can be an unlimited list of bed files that will be associated with genes and then scored in functional modules. The argument other_d is the distance from the TSS that will be used to associate each otherdata dataset with a gene.  If different distances are required for otherdata, then you must provide a distance for each dataset.
 
 ```{r, tidy=TRUE, tidy.opts=list(blank=FALSE, width.cutoff=50), eval=TRUE}
-test_annotation<-makePvalueAnnotation(data=hg19_genes, otherdata=list(h3k4me1=h3k4me1), gene_name_col=5,other_d=5000, promoter_upstream=1000, promoter_downstream=1000) 
+test_annotation<-makePvalueAnnotation(data=hg19_genes, other_data=list(h3k4me1=h3k4me1), gene_name_col=5,other_tss_distance=5000, promoter_upstream_distance=1000, promoter_downstream_distance=1000) 
 ```
 
 Having created a `PvalueAnnotation`, we can now load in the expression and methylation dataset.  First we load the expression data.  If `effect_col` and `pval_col` are not provided, the program will attempt to find them using the column names, but its probably safer to just provide the arguments.  

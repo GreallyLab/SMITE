@@ -6,13 +6,6 @@ setGeneric(
     }
 )
 
-## replace zeros in a column with the min non zero value
-setGeneric(
-    name="replaceZeros", 
-    def=function(outdata, column)
-    {standardGeneric("replaceZeros")}
-)
-
 setGeneric(
     name="annotationOutput", 
     def=function(object){standardGeneric("annotationOutput")}
@@ -25,8 +18,8 @@ setGeneric(
 
 setGeneric(
     name="makePvalueAnnotation", 
-    def=function(data, otherdata=NULL, other_d=10000, 
-                 promoter_upstream=1000, promoter_downstream=1000, 
+    def=function(data, other_data=NULL, other_tss_distance=10000, 
+                 promoter_upstream_distance=1000, promoter_downstream_distance=1000, 
                  strand_col=NULL, gene_name_col=NULL)
     {
         standardGeneric("makePvalueAnnotation")

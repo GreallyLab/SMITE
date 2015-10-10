@@ -44,7 +44,7 @@ extractModSummary
 
 data(methylationdata)
 methylation<-methylation[-which(is.na(methylation[,5])),]
-methylation<-replaceZeros(methylation,5)
+methylation[,5]<-replace(methylation[,5],methylation[,5]==0, min(subset(methylation[,5], methylation[,5]!=0), na.rm=T))
 
 #meth1<-methylation
 
