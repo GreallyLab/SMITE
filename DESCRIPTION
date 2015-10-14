@@ -1,7 +1,7 @@
 Package: SMITE
 Type: Package
 Title: Significance-based Modules Integrating the Transcriptome and Epigenome
-Version: 0.99.2
+Version: 0.99.4
 Date: 2015-01-15
 Author: Neil Ari Wijetunga
 Maintainer: N. Ari Wijetunga <Neil.Wijetunga@med.einstein.yu.edu>
@@ -20,3 +20,5 @@ VignetteBuilder: knitr
 biocViews: 
         DifferentialMethylation,DifferentialExpression,SystemsBiology,
         NetworkEnrichment,GenomeAnnotation,Network, Sequencing, RNASeq
+URL: https://github.com/GreallyLab/SMITE
+BugReports: https://github.com/GreallyLab/SMITE/issues
