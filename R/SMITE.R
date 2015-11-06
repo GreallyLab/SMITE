@@ -253,12 +253,10 @@ setMethod(
             stop("P-values must be between 0 and 1")
         }
         
-        if(any(expdata[, pval_col] < .0000001)){
-            expdata[which(expdata[, pval_col] < .0000001), pval_col] <- .0000001
-        }
-        if(any(expdata[, pval_col] > .9999999)){
-            expdata[which(expdata[, pval_col] > .9999999), pval_col] <- .9999999
-        }
+        expdata[,pval_col]<-replace(expdata[,pval_col],expdata[,pval_col]<.0000001,.0000001)
+        expdata[,pval_col]<-replace(expdata[,pval_col],expdata[,pval_col]>.9999999,.9999999)
+        
+       
         
         slot(annotation, "expression") =
             ExpressionSet(as.matrix(expdata), featureNames=rownames(expdata))
@@ -410,9 +408,7 @@ setMethod(
                         
                         each_pval <- 1-pnorm(abs(solve(chol_d) %*% qnorm(
                             1-each_pval/2)))
-                        if(any(each_pval == 0)){
-                            each_pval[which(each_pval == 0)] <- 0.000000001
-                        }
+                        each_pval<-replace(each_pval, each_pval == 0 , 0.000000001)
                         each_pval <- each_pval*2
                     } 
                     
@@ -487,11 +483,12 @@ setMethod(
             
             trans_p <- cbind(trans=qnorm(1-each_feature[, 2]/2), 
                            join(cats, cats_table, by="cats"))
-            if(any(is.infinite(trans_p[, 1]))){
-                trans_p[which(is.infinite(trans_p[, 1])), 1] <- max(
-                    subset(trans_p,!is.infinite(trans_p[, 1]))[,1])
-            }
-            
+                
+            trans_p[,1]<-replace(trans_p[, 1],is.infinite(trans_p[, 1]), 
+                        max(subset(trans_p,!is.infinite(trans_p[, 1])),na.rm=T))
+                
+                
+              
             num_list <- split(trans_p$trans, trans_p$cats)
             rand_list <- sapply(1:length(num_list), function(i){
                 as.matrix(sapply(1:500, function(j){ 
@@ -856,11 +853,9 @@ setMethod(
         })
         
         scoresout <- (1-pnorm(as.numeric(scoresout)))*2
-        if(any(scoresout == 0, na.rm=TRUE)){
-            scoresout[which(scoresout == 0)] <- min(subset(scoresout, !(
-                scoresout == 0)), na.rm=TRUE)
-        }
-        scoresout <- (-2*log(scoresout))
+        iscoresout<-replace(scoresout, scoresout == 0 ,  min(subset(scoresout, 
+                 !(scoresout == 0)), na.rm=TRUE))
+                scoresout <- (-2*log(scoresout))
         rand_mat <- as.matrix(sapply(1:100, function(j){
             sample(scoresout, replace=TRUE)
             }))
@@ -941,10 +936,10 @@ setMethod(
         rm(temp1)
         gc()
         W_vec <- (-2*log(1-pchisq(as.vector(W),4)))
-        if(any(is.infinite(W_vec))){
-            W_vec[which(is.infinite(W_vec))] <- 
-                max(subset(W_vec[!is.infinite(W_vec)))
-        }
+        
+        
+            W_vec<-replace(W_vec, is.infinite(W_vec), max(subset(W_vec,!is.infinite(W_vec))) )
+            
         W <- matrix(W_vec, nrow=nrow(W))
         rm(W_vec)
         rownames(W) <- genes_in_network
@@ -995,8 +990,9 @@ setMethod(
                 atperm = sample(stat_scores, nrow(B) , replace=TRUE)
                 temp1 = apply(B, 1, function(v) v*atperm)
                 W <- (temp1 + t(temp1));
-                W <- apply(W, 2, function(i){ i[which(i>0)]<-
-                                                (-2*log(1-pchisq(subset(i,i>0),4))); i})
+                W <- apply(W, 2, function(i){ 
+                    replace(i, i>0, (-2*log(1-pchisq(subset(i,i>0),4))))
+                    })
                 sum(W)/2
             })
             v
