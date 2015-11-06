@@ -61,7 +61,7 @@ N. Ari Wijetunga
 }
 \seealso{
 makePvalueObject
-SMITEscorePval
+scorePval
 plotDensityPval
 }
 \examples{

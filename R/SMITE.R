@@ -669,8 +669,8 @@ setMethod(
         temp_pval_data <- slot(slot(object,"score_data"),"pval_data")
         names_temp_pval_data <- colnames(temp_pval_data)
         
-        if(nrow(temp_pval_data==0){stop(
-            "Run makePvalueObject function first.")
+        if(nrow(temp_pval_data==0)){
+            stop("Run makePvalueObject function first.")
         }
         if(!any(grepl(ref,names_temp_pval_data))){
                stop("paste(Reference is not one of the available:", 
@@ -764,7 +764,7 @@ setMethod(
 )
 
 setMethod(
-    f="SMITEscorePval", 
+    f="scorePval", 
     signature="PvalueAnnotation", 
     definition=function(object, weights){ 
         
@@ -877,7 +877,7 @@ setMethod(
 ) 
 
 setMethod(
-    f="SMITErunSpinglass", 
+    f="runSpinglass", 
     signature="PvalueAnnotation", 
     definition=function(object, network, random_alpha = 0.05, gam = 0.5, 
                         node_alpha = 0.05, maxsize = 500, minsize = 8,
@@ -900,7 +900,7 @@ setMethod(
         genes_in_network <- subset(slot(slot(object, "score_data"), "genes"), 
                                    slot(slot(object, "score_data"), "genes") %in% 
                                        V(network)$name)
-        scores_in_network <- SMITEextractScores(object)[genes_in_network]
+        scores_in_network <- extractScores(object)[genes_in_network]
         
         ##should be FALSE, but just in case check for NAs 
         if(any(is.na(scores_in_network))){
@@ -1054,7 +1054,7 @@ setMethod(
 
 
 setMethod(
-    f="SMITErunBioNet", 
+    f="runBioNet", 
     signature="PvalueAnnotation", 
     definition=function(object, network, alpha = 0.05)
     {
@@ -1066,7 +1066,7 @@ setMethod(
             message("Overwriting existing modules.")
         }
         
-        scores <- SMITEhighScores(object, alpha=alpha)
+        scores <- highScores(object, alpha=alpha)
         pval.v <- exp(scores/(-2))
         g <- subNetwork(names(pval.v), network)
         g <- rmSelfLoops(g)
@@ -1103,7 +1103,7 @@ setMethod(
 )
 
 setMethod(
-    f="SMITErunGOseq", 
+    f="runGOseq", 
     signature="PvalueAnnotation", 
     definition=function(object, p_thresh=0.05, coverage, type="reactome")
     {
@@ -1210,7 +1210,7 @@ setMethod(
 
 
 setMethod(
-    f="SMITEsearchGOseq", 
+    f="searchGOseq", 
     signature="PvalueAnnotation", 
     definition=function(object, searchstring, wholeword=FALSE){
         options(stringsAsFactors=FALSE)
@@ -1266,7 +1266,7 @@ setMethod(
 )
 
 setMethod(
-    f="SMITEextractGOseq", 
+    f="extractGOseq", 
     signature="PvalueAnnotation", 
     definition=function(object, which.network=NULL){  
         temp <- slot(slot(object, "score_data"), "module_output")$goseqOut
@@ -1327,11 +1327,11 @@ setMethod(
 )
 
 setMethod(
-    f="SMITEextractScores", 
+    f="extractScores", 
     signature="PvalueAnnotation", 
     definition=function(annotation){
         if(nrow(slot(slot(annotation,"score_data"),"scores")) == 0){
-            stop("Run SMITEscorePval function first.")
+            stop("Run scorePval function first.")
         }
         temp <- slot(slot(annotation,"score_data"),"scores")
         names_temp <- rownames(temp)
@@ -1344,11 +1344,11 @@ setMethod(
 
 
 setMethod(
-    f="SMITEhighScores", 
+    f="highScores", 
     signature="PvalueAnnotation", 
     definition=function(annotation,alpha=0.05){
         if(nrow(slot(slot(annotation,"score_data"),"scores")) == 0){
-            stop("Run SMITEscorePval function first.")
+            stop("Run scorePval function first.")
         }
         if(any(alpha < 0, alpha > 1)){
             stop("alpha must be between 0 and 1")
@@ -1401,7 +1401,7 @@ setMethod(
 )
 
 setMethod(
-    f="SMITEextractModules", 
+    f="extractModules", 
     signature="PvalueAnnotation", 
     definition=function(annotation,whichModule=NULL){
         if(length(slot(slot(annotation, "score_data"), 

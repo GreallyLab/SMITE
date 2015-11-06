@@ -83,21 +83,21 @@ data(histone_h3k4me1)
  
 ##run Spinglass using REACTOME network
 
-#test_annotation<-SMITErunSpinglass(test_annotation, REACTOME,maxsize=50, 
+#test_annotation<-runSpinglass(test_annotation, REACTOME,maxsize=50, 
 #niter=10)
 
 ##run goseq on individual modules to determine bias 
 
-#test_annotation<-SMITErunGOseq(test_annotation,
+#test_annotation<-runGOseq(test_annotation,
 #coverage=read.table(system.file("extdata", 
 #"hg19_symbol_hpaii.sites.inbodyand2kbupstream.bed.gz", package="SMITE")),
 #type="kegg")
 
 ##search go seq output for keywords
-#SMITEsearchGOseq(test_annotation,"Cell")
+#searchGOseq(test_annotation,"Cell")
 
 ##Draw a network
-#SMITEplotModule(test_annotation, which.network=6,layout="fr")
+#plotModule(test_annotation, which.network=6,layout="fr")
 
 ##sample final file ##
 data(test_annotation_score_data)

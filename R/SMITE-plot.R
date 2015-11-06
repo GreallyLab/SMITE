@@ -63,7 +63,7 @@ setMethod(
 		  
 		  
 setMethod(
-    f="SMITEplotModule", 
+    f="plotModule", 
     signature="PvalueAnnotation", 
     definition=function(object, p_thresh=0.05, which.network=1, goseq=FALSE, 
                         layout="fr", legend=TRUE, namestyle="symbol",
@@ -97,7 +97,7 @@ setMethod(
             eid <- slot(slot(object, "score_data"), 
                  "module_output")$modules[[n_plot]]
             g <- slot(slot(object, "score_data"), "module_output")$network
-            stat <- SMITEextractScores(object)
+            stat <- extractScores(object)
             pval <- exp(stat/(-2))
         
             if(class(g)=="graphNEL"){

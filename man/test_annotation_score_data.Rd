@@ -31,7 +31,7 @@ A PvalueAnnotation with the score_data slot containing toy scores
 \examples{
 data(test_annotation_score_data)
 plotDensityPval(test_annotation)
-head(SMITEextractScores(test_annotation))
+head(extractScores(test_annotation))
 
 }
 \keyword{datasets}

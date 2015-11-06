@@ -1,6 +1,6 @@
-\name{SMITEextractModules}
-\alias{SMITEextractModules}
-\alias{SMITEextractModules,PvalueAnnotation-method}
+\name{extractModules}
+\alias{extractModules}
+\alias{extractModules,PvalueAnnotation-method}
 \title{
 View specific modules within a PvalueAnnotation
 }
@@ -8,7 +8,7 @@ View specific modules within a PvalueAnnotation
 Having identfied modules within a Pvalue annotation, this function allows the user to display 1 or more of the module genes.
 }
 \usage{
-SMITEextractModules(annotation, whichModule = NULL)
+extractModules(annotation, whichModule = NULL)
 }
 \arguments{
   \item{annotation}{
@@ -25,15 +25,15 @@ A list with each element containing the requested modules
 N. Ari Wijetunga
 }
 \seealso{
-SMITEplotModule
-SMITErunGOseq
-SMITEextractGOseq
-SMITErunSpinglass
-SMITErunBioNet
+plotModule
+runGOseq
+extractGOseq
+runSpinglass
+runBioNet
 }
 \examples{
 data(test_annotation_score_data)
 
-SMITEextractModules(test_annotation, 1)
+extractModules(test_annotation, 1)
 
 }

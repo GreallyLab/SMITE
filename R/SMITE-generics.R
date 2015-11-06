@@ -97,35 +97,35 @@ setGeneric(
 
 
 setGeneric(
-    name="SMITEscorePval", 
+    name="scorePval", 
     def=function(object, weights)
     {
-        standardGeneric("SMITEscorePval")
+        standardGeneric("scorePval")
     }
 )
 
 setGeneric(
-    name="SMITErunSpinglass", 
+    name="runSpinglass", 
     def=function(object, network, random_alpha = 0.05, gam = 0.5, 
                  node_alpha = 0.05, maxsize = 500, minsize = 8, niter = 1000,
                  simplify=TRUE)
     {
-        standardGeneric("SMITErunSpinglass")
+        standardGeneric("runSpinglass")
     }
 )
 
 
 
 setGeneric(
-    name="SMITErunBioNet", 
+    name="runBioNet", 
     def=function(object, network, alpha = 0.05)
     {
-        standardGeneric("SMITErunBioNet")
+        standardGeneric("runBioNet")
     }
 )
 
 setGeneric(
-    name="SMITEplotModule", 
+    name="plotModule", 
     def=function(object, p_thresh=0.05, which.network=1, goseq=FALSE, 
                  layout="fr",legend=TRUE, namestyle="symbol", 
                  suppressDetails=FALSE, 
@@ -134,35 +134,35 @@ setGeneric(
                  exp_low_col="chartreuse1", exp_mid_col="gray90", 
                  label_scale=TRUE,comparePlot=FALSE, pdfOut=NULL)
     {
-        standardGeneric("SMITEplotModule")
+        standardGeneric("plotModule")
     }
 )
 
 
 setGeneric(
-    name="SMITErunGOseq", 
+    name="runGOseq", 
     def=function(object, p_thresh=0.05, coverage, type="reactome")
     {
-        standardGeneric("SMITErunGOseq")
+        standardGeneric("runGOseq")
     }
 )
 
 
 setGeneric(
-    name="SMITEsearchGOseq", 
+    name="searchGOseq", 
     def=function(object, searchstring, wholeword=FALSE)
     {
-        standardGeneric("SMITEsearchGOseq")
+        standardGeneric("searchGOseq")
     }
 )
 
 
 
 setGeneric(
-    name="SMITEextractGOseq", 
+    name="extractGOseq", 
     def=function(object, which.network=NULL)
     {
-        standardGeneric("SMITEextractGOseq")
+        standardGeneric("extractGOseq")
     }
 )
 
@@ -201,10 +201,10 @@ setGeneric(
 )
 
 setGeneric(
-    name="SMITEextractScores", 
+    name="extractScores", 
     def=function(annotation)
     {
-        standardGeneric("SMITEextractScores")
+        standardGeneric("extractScores")
     }
 )
 
@@ -219,18 +219,18 @@ setGeneric(
 
 
 setGeneric(
-    name="SMITEextractModules", 
+    name="extractModules", 
     def=function(annotation,whichModule=NULL)
     {
-        standardGeneric("SMITEextractModules")
+        standardGeneric("extractModules")
     }
 )
 
 setGeneric(
-    name="SMITEhighScores", 
+    name="highScores", 
     def=function(annotation,alpha=0.05)
     {
-        standardGeneric("SMITEhighScores")
+        standardGeneric("highScores")
     }
 )
 

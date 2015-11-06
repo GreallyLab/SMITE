@@ -1,19 +1,19 @@
-\name{SMITEextractGOseq}
-\alias{SMITEextractGOseq}
-\alias{SMITEsearchGOseq}
-\alias{SMITEsearchGOseq,PvalueAnnotation-method}
-\alias{SMITEextractGOseq,PvalueAnnotation-method}
+\name{extractGOseq}
+\alias{extractGOseq}
+\alias{searchGOseq}
+\alias{searchGOseq,PvalueAnnotation-method}
+\alias{extractGOseq,PvalueAnnotation-method}
 \title{
  View the GOseq pathway analysis after having run Goseq, or search for a term.
 }
 \description{
-Having defined at least one genomic module using SMITErunSpinglass or 
-SMITErunBioNet, this function allows you to interrogate the enriched terms for a
+Having defined at least one genomic module using runSpinglass or 
+runBioNet, this function allows you to interrogate the enriched terms for a
 specific module or combination of modules.
 }
 \usage{
-SMITEextractGOseq(object, which.network = NULL)
-SMITEsearchGOseq(object, searchstring, wholeword = FALSE)
+extractGOseq(object, which.network = NULL)
+searchGOseq(object, searchstring, wholeword = FALSE)
 }
 \arguments{
   \item{object}{
@@ -62,11 +62,11 @@ N. Ari  Wijetunga
 }
 
 \seealso{
-SMITErunGOseq
-SMITErunSpinglass
-SMITErunBioNet
-SMITEextractModules
-SMITEplotModule
+runGOseq
+runSpinglass
+runBioNet
+extractModules
+plotModule
 }
 \examples{
 
@@ -76,14 +76,14 @@ SMITEplotModule
 data(test_annotation_score_data)
 
 ## show goseq analysis for module 1 ##
-SMITEextractGOseq(test_annotation,1)
+extractGOseq(test_annotation,1)
 
 ## show goseq analysis for module 1 and 2 ##
-#SMITEextractGOseq(test_annotation,1:2)
+#extractGOseq(test_annotation,1:2)
 
 ## search for term ##
 
-#SMITEsearchGOseq(test_annotation,"Cell cycle")
+#searchGOseq(test_annotation,"Cell cycle")
 }
 
 \keyword{ goseq }

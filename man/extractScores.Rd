@@ -1,6 +1,6 @@
-\name{SMITEextractScores}
-\alias{SMITEextractScores}
-\alias{SMITEextractScores,PvalueAnnotation-method}
+\name{extractScores}
+\alias{extractScores}
+\alias{extractScores,PvalueAnnotation-method}
 \title{
 Extract scores for all genes
 }
@@ -8,7 +8,7 @@ Extract scores for all genes
 A function to obtain all gene scores
 }
 \usage{
-SMITEextractScores(annotation)
+extractScores(annotation)
 }
 \arguments{
   \item{annotation}{
@@ -24,14 +24,14 @@ A named vector containing all gene scores
 N. Ari Wijetunga
 }
 \seealso{
-SMITEscorePval
-SMITEextractModules
-SMITEhighScores
+scorePval
+extractModules
+highScores
 }
 \examples{
 data(test_annotation_score_data)
 
-out<-SMITEextractScores(test_annotation)
+out<-extractScores(test_annotation)
 
 head(out)
 
