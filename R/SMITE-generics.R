@@ -52,9 +52,9 @@ setGeneric(
 
 setGeneric(
     name="annotateModification", 
-    def=function(annotation, modData, weight_by=NULL, 
-                 weight_by_method="Stouffer", modInclude=NULL, modCorr=TRUE, 
-                 modType="methylation", verbose=FALSE)
+    def=function(annotation, mod_data, weight_by=NULL, 
+                 weight_by_method="Stouffer", mod_included=NULL, mod_corr=TRUE, 
+                 mod_type="methylation", verbose=FALSE)
     {
         standardGeneric("annotateModification")
     }

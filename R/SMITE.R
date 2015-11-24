@@ -24,28 +24,36 @@ setMethod(
 ##SMITE Functions
 
 setMethod(
-    f="makePvalueAnnotation", 
-    signature="data.frame", 
+    f="makePvalueAnnotation",  
     definition=function(data, other_data=NULL, other_tss_distance=10000, 
                         promoter_upstream_distance=1000, promoter_downstream_distance=1000, 
                         strand_col=NULL, gene_name_col=NULL)
     {
-        ##if the strand coloumn was not specified auto-detect
+        ##create a Granges data object
+        if(!inherits(data,"GRanges")){
+		if(inherits(gene_name_col, NULL)){
+		stop("Gene name column must be specified if GRanges not given")
+		}
+		##if the strand column was not specified auto-detect
         if(is.null(strand_col)){strand_col<-which(data[1, ]%in%c("+", "-"))[1]}
         
-        data_grange <- GRanges(seqnames=data[, 1], 
+		data_grange <- GRanges(seqnames=data[, 1], 
                              ranges=IRanges(start=data[, 2], end=data[, 3]), 
-                             genenames=data[, gene_name_col], 
+                             name=data[, gene_name_col], 
                              strand=data[, strand_col])
         
-        if(any(duplicated(mcols(data_grange)$genenames)))
+		}
+		else {
+		data_grange <- data
+		data_grange$score <- NULL}
+        if(any(duplicated(data_grange$name)))
         {
             message("Genes are duplicated.  Removing duplicates")
             data_grange <-
-                subset(data_grange,!duplicated(mcols(data_grange)$genenames))
+                subset(data_grange,!duplicated(data_grange$name))
         }
         
-        mcols(data_grange)$feature <- "original"
+        data_grange$feature <- "original"
         
         if(!is.null(other_data)){
             if(is.null(names(other_data))){
@@ -67,14 +75,21 @@ setMethod(
         }
         
         tss <- shift(flank(data_grange, width=2), 1)
-        mcols(tss)$feature <- "tss"
+        tss$feature <- "tss"
         
         if(!is.null(other_data)){
             other <- do.call(c, sapply(1:length(other_data), function(i){
-                tempother<-c(GRanges(seqnames=other_data[[i]][, 1], 
+			    
+				if(!inherits(other_data[[i]], "GRanges")){
+                temp_other<-c(GRanges(seqnames=other_data[[i]][, 1], 
                                      ranges=IRanges(start=other_data[[i]][, 2], 
-                                                    end=other_data[[i]][, 3])))
-                temp_other<-unique(temp_other)
+									 end=other_data[[i]][, 3])))
+                }
+				else { 
+				temp_other <- other_data[[i]] 
+				mcols(temp_other) <- NULL
+				}
+				temp_other <- unique(temp_other)
                 
                 
                 suppressWarnings(
@@ -83,9 +98,9 @@ setMethod(
                                                  start=TRUE), temp_other)
                 )
                 temp_other <- temp_other[as.numeric(subjectHits(overlap))]
-                mcols(temp_other)$genenames <-
-                    mcols(data_grange)$genenames[queryHits(overlap)]
-                mcols(temp_other)$feature <- otherdata_names[i]
+                temp_other$name <-
+                    data_grange$name[queryHits(overlap)]
+                temp_other$feature <- otherdata_names[i]
                 temp_other
             })
             )
@@ -96,12 +111,12 @@ setMethod(
         end(promoters_upstream) <- end(promoters_upstream)+1
         
         promoters <- punion(promoters_upstream, promoters_downstream)
-        mcols(promoters)$genenames <- mcols(data_grange)$genenames
-        mcols(promoters)$feature <- "promoter"
+        promoters$name <- data_grange$name
+        promoters$feature <- "promoter"
         
         body <- psetdiff(data_grange, promoters_downstream)
-        mcols(body)$genenames <- mcols(data_grange)$genenames
-        mcols(body)$feature <- "body"
+        body$name <- data_grange$name
+        body$feature <- "body"
         
         
         if(!is.null(other_data)){
@@ -112,10 +127,9 @@ setMethod(
             suppressWarnings(combined_data <- 
                                  c(data_grange, promoters, body, tss))
         }
-        combined_data <- split(combined_data, mcols(combined_data)$genenames)
+        combined_data <- split(combined_data, combined_data$name)
         slot(combined_data, "metadata")$params <-
             c(
-                gene_name_col=gene_name_col, 
                 promoter_upstream_distance_tss=promoter_upstream_distance, 
                 promoter_downstream_distance_tss=promoter_downstream_distance, 
                 other_annotation_distance_tss=other_tss_distance
@@ -252,22 +266,19 @@ setMethod(
         if(any(expdata[,pval_col] < 0, expdata[,pval_col] > 1)){
             stop("P-values must be between 0 and 1")
         }
-        
-        expdata[,pval_col]<-replace(expdata[,pval_col],expdata[,pval_col]<.0000001,.0000001)
-        expdata[,pval_col]<-replace(expdata[,pval_col],expdata[,pval_col]>.9999999,.9999999)
-        
+        temp_pval_col <- expdata[,pval_col]
+        temp_pval_col <- replace(temp_pval_col , temp_pval_col < .0000001,.0000001)
+        temp_pval_col <- replace(temp_pval_col , temp_pval_col > .9999999,.9999999)
+        expdata[,pval_col] <- temp_pval_col
        
-        
-        slot(annotation, "expression") =
-            ExpressionSet(as.matrix(expdata), featureNames=rownames(expdata))
-        phenoData(slot(annotation, "expression")) =
+        expression_output <- ExpressionSet(as.matrix(expdata), featureNames=rownames(expdata))
+        phenoData(expression_output) =
             new("AnnotatedDataFrame", 
-                data=as.data.frame(exprs(slot(annotation, 
-                                              "expression"))[, 
+                data = as.data.frame(exprs(expression_output)[, 
                                                             c(effect_col, pval_col)]))
-        varLabels(slot(annotation, "expression")) <- c("expression_effect", 
+        varLabels(expression_output) <- c("expression_effect", 
                                                       "expression_pvalue")
-        
+        slot(annotation, "expression") <- expression_output
         annotation
         })
 
@@ -276,68 +287,68 @@ setMethod(
 setMethod(
     f="annotateModification", 
     signature="PvalueAnnotation",
-    definition=function(annotation, modData, weight_by=NULL, 
-                        weight_by_method="Stouffer", modInclude=NULL, 
-                        modCorr=TRUE, modType="methylation", verbose=FALSE){
-        if(modType %in% names(slot(annotation,"modifications")@metadata$elements))
+    definition=function(annotation, mod_data, weight_by=NULL, 
+                        weight_by_method="Stouffer", mod_included=NULL, 
+                        mod_corr=TRUE, mod_type="methylation", verbose=FALSE){
+        if(mod_type %in% names(slot(annotation,"modifications")@metadata$elements))
         {
-            stop("Provided data set is already loaded as modType")
+            stop("Provided data set is already loaded as mod_type")
         } 
         
+		unique_feature_names <- unique(
+                unlist(slot(annotation, "annotation"))$feature)
+				
         ##no weights provided
         if(missing(weight_by)){
-            weight_by <- rep("pval", length(unique(mcols(
-                unlist(
-                    slot(annotation, "annotation")))$feature)[!unique(mcols(
-                        unlist(slot(annotation, "annotation")))$feature) %in% 
+		    
+            weight_by <- rep("pval", length( unique_feature_names[!unique_feature_names %in% 
                             c("original", "tss")]))
         }
         
-        ##no modInclude or weight names
+        ##no mod_included or weight names
         if(is.null(names(weight_by))){
-            if(is.null(modInclude)){
-                modInclude=unique(mcols(unlist(
-                    slot(annotation, "annotation")))$feature)[!unique(mcols(
-                        unlist(slot(annotation, "annotation")))$feature) %in%
+            if(is.null(mod_included)){
+                mod_included = unique_feature_names[!unique_feature_names %in%
                             c("original", "tss")]
             }
-            names(weight_by) <- modInclude
+            names(weight_by) <- mod_included
         }
         
         ##weight names were provided
         if(!is.null(names(weight_by))){   
-            modInclude <- names(weight_by)
+            mod_included <- names(weight_by)
             
-            if(!all(modInclude%in%unique(mcols(unlist(
-                slot(annotation, "annotation")))$feature))){
+            if(!all(mod_included%in%unique_feature_names)){
                 
                 stop("Provided weight names must match those in 
                      unique(mcols(unlist(annotation@annotation))$feature)")
             } 
         }
         
-        if(any(!c(-1,1) %in% unique(sign(modData[,4])))){
+        if(any(!c(-1,1) %in% unique(sign(mod_data[,4])))){
             message("WARNING: Effects should provide a direction, 
                 but these effects are all in the same direction.")
         }
         
-        if(any(modData[,5]<0,modData[,5]>1)){
+        if(any(mod_data[,5]<0,mod_data[,5]>1)){
             stop("P-values must be between 0 and 1")
         }
         
         
-        mod_grange <- GRanges(seqnames=modData[, 1], ranges=IRanges(
-            start=modData[, 2], end=modData[, 3]), effect=modData[, 4], 
-            pval=modData[, 5], type=modType)
-        temp_annotation <- unlist(slot(annotation, "annotation"))
-        overlap_sub <- findOverlaps(temp_annotation, mod_grange)
+        mod_grange <- GRanges(seqnames=mod_data[, 1], ranges=IRanges(
+            start=mod_data[, 2], end=mod_data[, 3]), effect=mod_data[, 4], 
+            pval=mod_data[, 5], type=mod_type)
+        
+		temp_annotation <- unlist(slot(annotation, "annotation"))
+        
+		overlap_sub <- findOverlaps(temp_annotation, mod_grange)
         out <- mod_grange[subjectHits(overlap_sub)]
         mcols(out) <- cbind(mcols(temp_annotation[as.numeric(
             queryHits(overlap_sub))]), mcols(out))
-        out <- split(out, mcols(out)$genenames)
-        temp_annotation <- split(temp_annotation, mcols(temp_annotation)$genenames)
+        out <- split(out, out$name)
+        temp_annotation <- split(temp_annotation, temp_annotation$name)
         
-        if(modCorr == TRUE){
+        if(mod_corr == TRUE){
             if(verbose == TRUE){ 
                 message("Computing correlation matrices")
             }
@@ -348,7 +359,7 @@ setMethod(
             mod_grange_corr$pval2 <- c(mod_grange, mod_grange)$pval
             cutpoints <- cut2(mod_grange_corr$distance, g=500, onlycuts=TRUE)
             cutpoints[length(cutpoints)] <- 250000000
-            mod_grange_corr$cat <- cut(mod_grange_corr$distance, breaks=cutpoints)
+            mod_grange_corr$cat <- (cut(mod_grange_corr$distance, breaks=cutpoints))
             mod_grange_corr <- split(mod_grange_corr, mod_grange_corr$cat)
             mod_grange_corr2 <- lapply(mod_grange_corr, function(j)
             { 
@@ -358,40 +369,39 @@ setMethod(
                 })))
                 
             })
-            final_corr <- do.call(rbind, mod_grange_corr2)
-            final_corr <- data.frame(final_corr, row.names(final_corr))
+            correlations <- as.data.frame(do.call(rbind, mod_grange_corr2))
+            final_corr <- data.frame(correlations, as.character(names(  mod_grange_corr2 )), stringsAsFactors=F)
             final_corr <- rbind(c(.9, paste("(-1, ", cutpoints[1], "]", 
                                           sep="")), final_corr)
             rm(mod_grange_corr)
         }
-        mylist <- sapply(modInclude, function(i){
+        combined_pvalues_list <- sapply(mod_included, function(i){
             if(verbose == TRUE){
                 message(paste("Combining p-values over:", i))
             }
-            temp <- subset(unlist(out), mcols(unlist(out))$feature == i)
+            temp <- subset(unlist(out), unlist(out)$feature == i)
             
             
-            ref_data <- slot(annotation, "annotation")[names(temp)]
+            ref_data <- unlist(slot(annotation, "annotation"))
             ref_data <-
-                subset(unlist(slot(annotation, "annotation")),
-                       mcols(unlist(
-                           slot(annotation, "annotation")))$feature == "tss")
-            ref_data <- ref_data[mcols(temp)$genenames]
-            suppressWarnings(mcols(temp)$distance <- distance(ref_data, 
+                subset(ref_data,
+                       ref_data$feature == "tss")
+            ref_data <- ref_data[temp$name]
+            suppressWarnings(temp$distance <- distance(ref_data, 
                                                             temp)+2)
-            temp <- split(temp, mcols(temp)$genenames)
+            temp <- split(temp, temp$name)
             forreturn <- lapply(temp, function(each){
                 each_length <- length(each)
                 each_effect <- each$effect[order(each$pval)]
                 each_pval <- each$pval[order(each$pval)]
                 distances <- each$distance[order(each$pval)]
                 if(length(each_pval > 1)){
-                    if(modCorr == TRUE){
+                    if(mod_corr == TRUE){
                         corr_mat <- matrix(as.numeric(final_corr[match(cut(
                             as.matrix(dist(start(each)[order(each$pval)])), 
                             breaks=c(-1, cutpoints)), final_corr[, 2]), 1]), 
                             ncol=each_length)
-                        diag(corr_mat) < -1
+                        diag(corr_mat) <- 1
                         chol_d <- try(chol(corr_mat), silent=TRUE)
                         if(is(chol_d, "try-error"))
                         {
@@ -477,19 +487,19 @@ setMethod(
         if(verbose == TRUE){ 
             message("Quantile permuting scores")
         }
-        mylist <- lapply(mylist, function(each_feature){		
-            cats <- data.frame(cats=as.numeric(cut2(each_feature[, 3], g=100)))
-            cats_table <- data.frame(table(cats))
+        combined_pvalues_list <- lapply(combined_pvalues_list, function(each_feature){		
+            categories <- data.frame(categories=as.numeric(cut2(each_feature[, 3], g=100)))
+            categories_table <- data.frame(table(categories))
             
             trans_p <- cbind(trans=qnorm(1-each_feature[, 2]/2), 
-                           join(cats, cats_table, by="cats"))
+                           join(categories, categories_table, by="categories"))
                 
             trans_p[,1]<-replace(trans_p[, 1],is.infinite(trans_p[, 1]), 
                         max(subset(trans_p,!is.infinite(trans_p[, 1])),na.rm=T))
                 
                 
               
-            num_list <- split(trans_p$trans, trans_p$cats)
+            num_list <- split(trans_p$trans, trans_p$categories)
             rand_list <- sapply(1:length(num_list), function(i){
                 as.matrix(sapply(1:500, function(j){ 
                     sample(num_list[[as.numeric(i)]], replace=TRUE)
@@ -514,7 +524,7 @@ setMethod(
         
         newmods <- c(unlist(slot(annotation, "modifications")), unlist(out))
         names(newmods) <- NULL
-        newmods <- split(newmods, mcols(newmods)$genenames)
+        newmods <- split(newmods, newmods$name)
         
         final <- suppressWarnings(as.data.frame(c(list(names=names(out)), 
                                                 lapply(mylist, function(x){
@@ -522,8 +532,8 @@ setMethod(
                                                     }))))
         rownames(final) <- final[, 1]
         final <- final[, -1]
-        colnames(final) <- paste(modType, apply(expand.grid(c("effect", "pvalue"),
-                                                            modInclude),
+        colnames(final) <- paste(mod_type, apply(expand.grid(c("effect", "pvalue"),
+                                                            mod_included),
                                                 1, function(i){
                                                         paste(i[2], i[1], sep="_")
                                                     }), sep="_")
@@ -538,13 +548,13 @@ setMethod(
             rownames(newmetadata$m_summary) <- newmetadata$m_summary[, 1]
             newmetadata$m_summary<-newmetadata$m_summary[, -1]
         }
-        newmetadata[["elements"]][[modType]]$weight_by <- weight_by
-        newmetadata[["elements"]][[modType]]$weight_by_method <- weight_by_method
-        newmetadata$elementnames <- c(newmetadata$elementnames, paste(modType, 
-                                                                    modInclude, sep="_"))
-        slot(annotation, "modifications") <- newmods
-        slot(slot(annotation, "modifications"), "metadata") <- newmetadata
-        
+        newmetadata[["elements"]][[mod_type]]$weight_by <- weight_by
+        newmetadata[["elements"]][[mod_type]]$weight_by_method <- weight_by_method
+        newmetadata$elementnames <- c(newmetadata$elementnames, paste(mod_type, 
+                                                                    mod_included, sep="_"))
+       
+	    slot(newmods, "metadata") <- newmetadata
+	   slot(annotation, "modifications") <- newmods
         annotation
         })
 
@@ -552,37 +562,37 @@ setMethod(
 setMethod(
     f="removeModification", 
     signature="PvalueAnnotation", 
-    definition=function(annotation, modType="methylation"){
+    definition=function(annotation, mod_type="methylation"){
         
-        if(!modType%in%names(slot(annotation,
+        if(!mod_type%in%names(slot(annotation,
                                   "modifications")@metadata$elements)){
-            stop("Provided modType is not in the annotation")
+            stop("Provided mod_type is not in the annotation")
         }
         
         temp_meta <- slot(slot(annotation,"modifications"),"metadata")
         temp <- unlist(slot(annotation,"modifications"))
         names(temp) <- NULL
-        temp <- subset(temp,!(temp$type == modType))
+        temp <- subset(temp,!(temp$type == mod_type))
         slot(temp,"metadata") <- temp_meta
         slot(temp,"metadata")$m_summary <-
             slot(temp,"metadata")$m_summary[, 
-                                            -grep(modType, colnames(slot(temp,"metadata")$m_summary))]
+                                            -grep(mod_type, colnames(slot(temp,"metadata")$m_summary))]
         
         if(ncol(slot(temp,"metadata")$m_summary) == 0){
             slot(temp,"metadata")$m_summary <- NULL
         }
         
         slot(temp,"metadata")$elements[which(
-            names(slot(temp,"metadata")$elements) == modType)] <- NULL
+            names(slot(temp,"metadata")$elements) == mod_type)] <- NULL
         
         
         slot(temp,"metadata")$elementnames <-      
             slot(temp,"metadata")$elementnames[
                 -which(do.call(rbind, lapply(strsplit(
                     slot(temp,"metadata")$elementnames, "_"),
-                    function(i)i[1]))[, 1] %in% modType)]
+                    function(i)i[1]))[, 1] %in% mod_type)]
         temp_meta <- slot(temp,"metadata")
-        slot(annotation,"modifications") <- split(temp, temp$genenames)
+        slot(annotation,"modifications") <- split(temp, temp$name)
         slot(slot(annotation,"modifications"),"metadata") <- temp_meta
         annotation
     }
@@ -1283,11 +1293,11 @@ setMethod(
 setMethod(
     f="extractModification", 
     signature="PvalueAnnotation", 
-    definition=function(annotation, modType=NULL){
-        if(!is.null(modType)){
-            if(!modType%in%names(slot(annotation,
+    definition=function(annotation, mod_type=NULL){
+        if(!is.null(mod_type)){
+            if(!mod_type%in%names(slot(annotation,
                                       "modifications")@metadata$elements)){
-                stop("Provided modType is not in the annotation")
+                stop("Provided mod_type is not in the annotation")
             } 
         }
         
@@ -1295,8 +1305,8 @@ setMethod(
         temp <- unlist(slot(annotation,"modifications"))
         names(temp) <- NULL
         
-        if(is.null(modType)){modType <- unique(temp$type)}
-        temp<-subset(temp, temp$type %in% modType)
+        if(is.null(mod_type)){mod_type <- unique(temp$type)}
+        temp<-subset(temp, temp$type %in% mod_type)
         slot(temp, "metadata") <- temp_meta
         temp
     }
