@@ -6,7 +6,7 @@
 setMethod(
     f="stoufferTest", 
     signature="vector", 
-    definition=function(p, w)
+    definition=function(p, w) #ARI p and w are shitty variable names, not sure what w is
     {
         if(is.null(w)){
             w <- rep(1, length(p))/length(p)
@@ -28,15 +28,17 @@ setMethod(
     signature="data.frame", 
     definition=function(data, other_data=NULL, other_tss_distance=10000, 
                         promoter_upstream_distance=1000, promoter_downstream_distance=1000, 
-                        strand_col=NULL, gene_name_col=NULL)
+                        strand_column=NULL, gene_name_column=NULL)
     {
         ##if the strand coloumn was not specified auto-detect
-        if(is.null(strand_col)){strand_col<-which(data[1, ]%in%c("+", "-"))[1]}
+        if(is.null(strand_column)){
+            strand_column <- which(data[1, ]%in%c("+", "-"))[1]
+        }
         
         data_grange <- GRanges(seqnames=data[, 1], 
                              ranges=IRanges(start=data[, 2], end=data[, 3]), 
-                             genenames=data[, gene_name_col], 
-                             strand=data[, strand_col])
+                             genenames=data[, gene_name_column], 
+                             strand=data[, strand_column])
         
         if(any(duplicated(mcols(data_grange)$genenames)))
         {
@@ -71,10 +73,10 @@ setMethod(
         
         if(!is.null(other_data)){
             other <- do.call(c, sapply(1:length(other_data), function(i){
-                tempother<-c(GRanges(seqnames=other_data[[i]][, 1], 
+                tempother <- c(GRanges(seqnames=other_data[[i]][, 1], 
                                      ranges=IRanges(start=other_data[[i]][, 2], 
                                                     end=other_data[[i]][, 3])))
-                temp_other<-unique(temp_other)
+                temp_other <- unique(temp_other)
                 
                 
                 suppressWarnings(
@@ -115,7 +117,7 @@ setMethod(
         combined_data <- split(combined_data, mcols(combined_data)$genenames)
         slot(combined_data, "metadata")$params <-
             c(
-                gene_name_col=gene_name_col, 
+                gene_name_column=gene_name_column, 
                 promoter_upstream_distance_tss=promoter_upstream_distance, 
                 promoter_downstream_distance_tss=promoter_downstream_distance, 
                 other_annotation_distance_tss=other_tss_distance
@@ -133,25 +135,25 @@ setMethod(
 
 setMethod(
     f="convertGeneIds", 
-    signature(a="character", a_type="character", b_type="character"), 
-    definition=function(a, a_type, b_type, delim=NULL, verbose=FALSE)
+    signature(Gene_Id_column="character", ID_type="character", ID_convert_to="character"), 
+    definition=function(Gene_Id_column, ID_type, ID_convert_to, delim=NULL, verbose=FALSE)
     {
-        if(any(duplicated(a))){stop(
+        if(any(duplicated(Gene_Id_column))){stop(
             "Cannot convert duplicated ids. Please remove duplicates.")
         }
         
         if(!is.null(delim)){
-            a <- do.call(rbind, strsplit(a, delim))[, 2]
+            Gene_Id_column <- do.call(rbind, strsplit(Gene_Id_column, delim))[, 2]
         } 
         
-        genes_old <- unique(as.character(a))
-        a <- cbind(a, 1:length(a))
+        genes_old <- unique(as.character(Gene_Id_column))
+        Gene_Id_column <- cbind(Gene_Id_column, 1:length(Gene_Id_column))
         
-        if(a_type == "refseq"){
+        if(ID_type == "refseq"){
             genes_old <- subset(genes_old, genes_old %in% 
                                     (AnnotationDbi::ls(org.Hs.eg.db::org.Hs.egREFSEQ2EG)))
             
-            if(b_type == "symbol"){
+            if(ID_convert_to == "symbol"){
                 
                 eg <- unlist(AnnotationDbi::mget(genes_old,
                                                  org.Hs.eg.db::org.Hs.egREFSEQ2EG))
@@ -162,11 +164,11 @@ setMethod(
         }        
         
         else 
-            if(a_type == "ensembleprot"){
+            if(ID_type == "ensembleprot"){
                 genes_old <- subset(genes_old, genes_old %in% 
                                     (AnnotationDbi::ls(org.Hs.eg.db::org.Hs.egENSEMBLPROT2EG)))
             
-                if(b_type == "symbol"){
+                if(ID_convert_to == "symbol"){
                 eg <- unlist(AnnotationDbi::mget(genes_old, 
                                                  org.Hs.eg.db::org.Hs.egREFSEQ2EG))
                 symbol <- unlist(AnnotationDbi::mget(eg, 
@@ -175,11 +177,11 @@ setMethod(
             }
         }
         else 
-            if(a_type == "uniprot"){
+            if(ID_type == "uniprot"){
                 genes_old <- subset(genes_old, genes_old %in%
                                         (AnnotationDbi::ls(org.Hs.eg.db::org.Hs.egUNIPROT)))
                 
-                if(b_type == "symbol"){
+                if(ID_convert_to == "symbol"){
                     eg <- unlist(AnnotationDbi::mget(genes_old, 
                                                      org.Hs.eg.db::org.Hs.egREFSEQ2EG))
                     symbol <- unlist(AnnotationDbi::mget(eg, 
@@ -188,10 +190,10 @@ setMethod(
                 }
             }
         else 
-            if(a_type == "ensemble"){
+            if(ID_type == "ensemble"){
                 genes_old <- subset(genes_old, genes_old %in%
                                         (AnnotationDbi::ls(org.Hs.eg.db::org.Hs.egENSEMBL2EG)))
-                if(b_type == "symbol"){
+                if(ID_convert_to == "symbol"){
                     eg <- unlist(AnnotationDbi::mget(genes_old, 
                                                      org.Hs.eg.db::org.Hs.egENSEMBL2EG))
                     symbol <- unlist(AnnotationDbi::mget(eg, 
@@ -200,8 +202,8 @@ setMethod(
                 }
             }
         else
-            if(a_type == "entrez"){
-                if(b_type == "symbol"){
+            if(ID_type == "entrez"){
+                if(ID_convert_to == "symbol"){
                     
                     symbol <- unlist(AnnotationDbi::mget(genes_old, 
                                                          org.Hs.eg.db::org.Hs.egSYMBOL))
@@ -209,10 +211,10 @@ setMethod(
                 }
             }
         else
-            if(a_type == "symbol"){
+            if(ID_type == "symbol"){
                 genes_old <- subset(genes_old, genes_old %in%
                                         (AnnotationDbi::ls(org.Hs.eg.db::org.Hs.egALIAS2EG)))
-                if(b_type == "entrez"){
+                if(ID_convert_to == "entrez"){
                     eg <- unlist(AnnotationDbi::mget(genes_old, 
                                                      org.Hs.eg.db::org.Hs.egALIAS2EG))
                     out <- cbind(names(eg), eg)
@@ -220,7 +222,7 @@ setMethod(
                 
             }
         
-        out <- merge(a, out, by=1, all.x=TRUE)
+        out <- merge(Gene_Id_column, out, by=1, all.x=TRUE)
         out <- out[order(as.numeric(out[, 2])), ]
         out <- subset(out,!duplicated(out[,1]))
         
@@ -238,23 +240,26 @@ setMethod(
             }
         }
         
-        if(any(!c(-1,1) %in% unique(sign(expdata[,effect_col])))){
+        if(any(!c(-1,1) %in% unique(sign(expdata[, effect_col])))){
             message("WARNING: Effects should provide a direction, but these effects
             are all in the same direction.")
         }
         
         if(is.null(pval_col)){
             
-            pval_col=grep("pval|p.val|p_val|sig", tolower(colnames(expdata)))
+            pval_col <- grep("pval|p.val|p_val|sig", tolower(colnames(expdata)))
+            
             if(length(effect_col) != 1){
                 stop("Cannot determine p.value column. Please specify with arg:effect_col")}
         }
-        if(any(expdata[,pval_col] < 0, expdata[,pval_col] > 1)){
+        if(any(expdata[, pval_col] < 0, expdata[, pval_col] > 1)){
             stop("P-values must be between 0 and 1")
         }
         
-        expdata[,pval_col]<-replace(expdata[,pval_col],expdata[,pval_col]<.0000001,.0000001)
-        expdata[,pval_col]<-replace(expdata[,pval_col],expdata[,pval_col]>.9999999,.9999999)
+        expdata[, pval_col] <- replace(expdata[,pval_col],
+                                    expdata[, pval_col] < .0000001,.0000001)
+        expdata[, pval_col] <- replace(expdata[,pval_col],
+                                    expdata[, pval_col] > .9999999,.9999999)
         
        
         
@@ -290,16 +295,16 @@ setMethod(
                 unlist(
                     slot(annotation, "annotation")))$feature)[!unique(mcols(
                         unlist(slot(annotation, "annotation")))$feature) %in% 
-                            c("original", "tss")]))
+                            c("original", "tss")])) #ARI too much slot stuff?
         }
         
         ##no modInclude or weight names
         if(is.null(names(weight_by))){
             if(is.null(modInclude)){
-                modInclude=unique(mcols(unlist(
+                modInclude <- unique(mcols(unlist(
                     slot(annotation, "annotation")))$feature)[!unique(mcols(
                         unlist(slot(annotation, "annotation")))$feature) %in%
-                            c("original", "tss")]
+                            c("original", "tss")] #ARI too much slot stuff?
             }
             names(weight_by) <- modInclude
         }
@@ -321,7 +326,7 @@ setMethod(
                 but these effects are all in the same direction.")
         }
         
-        if(any(modData[,5]<0,modData[,5]>1)){
+        if(any(modData[,5] < 0,modData[,5] > 1)){
             stop("P-values must be between 0 and 1")
         }
         
@@ -334,7 +339,7 @@ setMethod(
         out <- mod_grange[subjectHits(overlap_sub)]
         mcols(out) <- cbind(mcols(temp_annotation[as.numeric(
             queryHits(overlap_sub))]), mcols(out))
-        out <- split(out, mcols(out)$genenames)
+        out <- split(out, mcols(out)$genenames)   #ARI out, final, forreturn - figure out names
         temp_annotation <- split(temp_annotation, mcols(temp_annotation)$genenames)
         
         if(modCorr == TRUE){
@@ -375,7 +380,7 @@ setMethod(
             ref_data <-
                 subset(unlist(slot(annotation, "annotation")),
                        mcols(unlist(
-                           slot(annotation, "annotation")))$feature == "tss")
+                           slot(annotation, "annotation")))$feature == "tss") #What's 
             ref_data <- ref_data[mcols(temp)$genenames]
             suppressWarnings(mcols(temp)$distance <- distance(ref_data, 
                                                             temp)+2)
@@ -389,7 +394,7 @@ setMethod(
                     if(modCorr == TRUE){
                         corr_mat <- matrix(as.numeric(final_corr[match(cut(
                             as.matrix(dist(start(each)[order(each$pval)])), 
-                            breaks=c(-1, cutpoints)), final_corr[, 2]), 1]), 
+                            breaks=c(-1, cutpoints)), final_corr[, 2]), 1]), #ARI I think we're supposed to get rid of cutpoints as a variable
                             ncol=each_length)
                         diag(corr_mat) < -1
                         chol_d <- try(chol(corr_mat), silent=TRUE)
@@ -478,7 +483,7 @@ setMethod(
             message("Quantile permuting scores")
         }
         mylist <- lapply(mylist, function(each_feature){		
-            cats <- data.frame(cats=as.numeric(cut2(each_feature[, 3], g=100)))
+            cats <- data.frame(cats=as.numeric(cut2(each_feature[, 3], g=100))) #ARI cats? like concatonated?
             cats_table <- data.frame(table(cats))
             
             trans_p <- cbind(trans=qnorm(1-each_feature[, 2]/2), 
@@ -512,9 +517,9 @@ setMethod(
             message("Scores have been adjusted")
         }
         
-        newmods <- c(unlist(slot(annotation, "modifications")), unlist(out))
-        names(newmods) <- NULL
-        newmods <- split(newmods, mcols(newmods)$genenames)
+        newMods <- c(unlist(slot(annotation, "modifications")), unlist(out))
+        names(newMods) <- NULL
+        newMods <- split(newMods, mcols(newMods)$genenames)
         
         final <- suppressWarnings(as.data.frame(c(list(names=names(out)), 
                                                 lapply(mylist, function(x){
@@ -528,22 +533,22 @@ setMethod(
                                                         paste(i[2], i[1], sep="_")
                                                     }), sep="_")
         
-        newmetadata <- slot(slot(annotation, "modifications"), "metadata")
-        if(is.null(newmetadata$m_summary)){
-            newmetadata$m_summary <- final
+        newMetadata <- slot(slot(annotation, "modifications"), "metadata")
+        if(is.null(newMetadata$m_summary)){
+            newMetadata$m_summary <- final
         } 
         else{
-            newmetadata$m_summary <- merge(newmetadata$m_summary, final, by=0, 
+            newMetadata$m_summary <- merge(newMetadata$m_summary, final, by=0, 
                                          all=TRUE)
-            rownames(newmetadata$m_summary) <- newmetadata$m_summary[, 1]
-            newmetadata$m_summary<-newmetadata$m_summary[, -1]
+            rownames(newMetadata$m_summary) <- newMetadata$m_summary[, 1]
+            newMetadata$m_summary<-newMetadata$m_summary[, -1]
         }
-        newmetadata[["elements"]][[modType]]$weight_by <- weight_by
-        newmetadata[["elements"]][[modType]]$weight_by_method <- weight_by_method
-        newmetadata$elementnames <- c(newmetadata$elementnames, paste(modType, 
+        newMetadata[["elements"]][[modType]]$weight_by <- weight_by
+        newMetadata[["elements"]][[modType]]$weight_by_method <- weight_by_method
+        newMetadata$elementnames <- c(newMetadata$elementnames, paste(modType, 
                                                                     modInclude, sep="_"))
-        slot(annotation, "modifications") <- newmods
-        slot(slot(annotation, "modifications"), "metadata") <- newmetadata
+        slot(annotation, "modifications") <- newMods
+        slot(slot(annotation, "modifications"), "metadata") <- newMetadata
         
         annotation
         })
@@ -930,9 +935,11 @@ setMethod(
         genes_in_network <- names(scores_in_network)
         stat_scores <- as.numeric(scores_in_network)
         pval_scores <- exp(scores_in_network/(-2))
-        
+        #adjaceny n x n matrix with either 0 or 1
         temp1 <- apply(network.adj, 1, function(v) v*stat_scores)
-        W <- (temp1 + t(temp1))
+        #same adjaceny but instead of 1's it will now have the score that reflects the weight
+        W <- (temp1 + t(temp1)) # matrix of genes in network
+        #summing with the transpose will take two connected genes and add there scores
         rm(temp1)
         gc()
         W_vec <- (-2*log(1-pchisq(as.vector(W),4)))
