@@ -38,16 +38,15 @@ setMethod(
             if(is.null(strand_col)){
                 strand_col <- which(data[1, ] %in% c("+", "-"))[1]
             }
-        
-		    data_grange <- GRanges(seqnames=data[, 1], 
-                             ranges=IRanges(start=data[, 2], end=data[, 3]), 
-                             name=data[, gene_name_col], 
-                             strand=data[, strand_col])
-		}
-		else {
-		data_grange <- data
-		data_grange$score <- NULL
-		}
+            data_grange <- GRanges(seqnames=data[, 1],
+                                   ranges=IRanges(start=data[, 2], end=data[, 3]),
+                                   name=data[, gene_name_col], 
+                                   strand=data[, strand_col])
+        }
+        else {
+            data_grange <- data
+            data_grange$score <- NULL
+        }
         if(any(duplicated(data_grange$name)))
         {
             message("Genes are duplicated.  Removing duplicates")
