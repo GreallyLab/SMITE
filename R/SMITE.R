@@ -24,38 +24,30 @@ setMethod(
 ##SMITE Functions
 
 setMethod(
-    f="makePvalueAnnotation", 
     f="makePvalueAnnotation",  
     definition=function(data, other_data=NULL, other_tss_distance=10000, 
                         promoter_upstream_distance=1000, promoter_downstream_distance=1000, 
-                        strand_column=NULL, gene_name_column=NULL)
+                        strand_col=NULL, gene_name_col=NULL) 
     {
-        ##if the strand coloumn was not specified auto-detect
-        if(is.null(strand_column)){
-            strand_column <- which(data[1, ]%in%c("+", "-"))[1]
-        }
-        data_grange <- GRanges(seqnames=data[, 1], 
         ##create a Granges data object
         if(!inherits(data,"GRanges")){
-		if(inherits(gene_name_col, NULL)){
-		stop("Gene name column must be specified if GRanges not given")
-		}
-		##if the strand column was not specified auto-detect
-        if(is.null(strand_col)){strand_col<-which(data[1, ]%in%c("+", "-"))[1]}
+		    if(inherits(gene_name_col, NULL)){
+		        stop("Gene name column must be specified if GRanges not given")
+		    }
+		    ##if the strand column was not specified auto-detect
+            if(is.null(strand_col)){
+                strand_col <- which(data[1, ] %in% c("+", "-"))[1]
+            }
         
-		data_grange <- GRanges(seqnames=data[, 1], 
+		    data_grange <- GRanges(seqnames=data[, 1], 
                              ranges=IRanges(start=data[, 2], end=data[, 3]), 
-                             genenames=data[, gene_name_column], 
-                             strand=data[, strand_column])
-=======
                              name=data[, gene_name_col], 
                              strand=data[, strand_col])
->>>>>>> 5113962585c588de4e664108542522762a1db69f
-        
 		}
 		else {
 		data_grange <- data
-		data_grange$score <- NULL}
+		data_grange$score <- NULL
+		}
         if(any(duplicated(data_grange$name)))
         {
             message("Genes are duplicated.  Removing duplicates")
@@ -89,12 +81,6 @@ setMethod(
         
         if(!is.null(other_data)){
             other <- do.call(c, sapply(1:length(other_data), function(i){
-<<<<<<< HEAD
-                tempother <- c(GRanges(seqnames=other_data[[i]][, 1], 
-                                     ranges=IRanges(start=other_data[[i]][, 2], 
-                                                    end=other_data[[i]][, 3])))
-                temp_other <- unique(temp_other)
-=======
 			    
 				if(!inherits(other_data[[i]], "GRanges")){
                 temp_other<-c(GRanges(seqnames=other_data[[i]][, 1], 
@@ -106,7 +92,6 @@ setMethod(
 				mcols(temp_other) <- NULL
 				}
 				temp_other <- unique(temp_other)
->>>>>>> 5113962585c588de4e664108542522762a1db69f
                 
                 
                 suppressWarnings(
@@ -147,10 +132,6 @@ setMethod(
         combined_data <- split(combined_data, combined_data$name)
         slot(combined_data, "metadata")$params <-
             c(
-<<<<<<< HEAD
-                gene_name_column=gene_name_column, 
-=======
->>>>>>> 5113962585c588de4e664108542522762a1db69f
                 promoter_upstream_distance_tss=promoter_upstream_distance, 
                 promoter_downstream_distance_tss=promoter_downstream_distance, 
                 other_annotation_distance_tss=other_tss_distance
@@ -168,19 +149,19 @@ setMethod(
 
 setMethod(
     f="convertGeneIds", 
-    signature(Gene_Id_column="character", ID_type="character", ID_convert_to="character"), 
-    definition=function(Gene_Id_column, ID_type, ID_convert_to, delim=NULL, verbose=FALSE)
+    signature(Gene_IDs="character", ID_type="character", ID_convert_to="character"), 
+    definition=function(Gene_IDs, ID_type, ID_convert_to, delim=NULL, verbose=FALSE)
     {
-        if(any(duplicated(Gene_Id_column))){stop(
+        if(any(duplicated(Gene_IDs))){stop(
             "Cannot convert duplicated ids. Please remove duplicates.")
         }
         
         if(!is.null(delim)){
-            Gene_Id_column <- do.call(rbind, strsplit(Gene_Id_column, delim))[, 2]
+            Gene_IDs <- do.call(rbind, strsplit(Gene_IDs, delim))[, 2]
         } 
         
-        genes_old <- unique(as.character(Gene_Id_column))
-        Gene_Id_column <- cbind(Gene_Id_column, 1:length(Gene_Id_column))
+        genes_old <- unique(as.character(Gene_IDs))
+        Gene_IDs <- cbind(Gene_IDs, 1:length(Gene_IDs))
         
         if(ID_type == "refseq"){
             genes_old <- subset(genes_old, genes_old %in% 
@@ -199,16 +180,16 @@ setMethod(
         else 
             if(ID_type == "ensembleprot"){
                 genes_old <- subset(genes_old, genes_old %in% 
-                                    (AnnotationDbi::ls(org.Hs.eg.db::org.Hs.egENSEMBLPROT2EG)))
-            
+                                        (AnnotationDbi::ls(org.Hs.eg.db::org.Hs.egENSEMBLPROT2EG)))
+                
                 if(ID_convert_to == "symbol"){
-                eg <- unlist(AnnotationDbi::mget(genes_old, 
-                                                 org.Hs.eg.db::org.Hs.egREFSEQ2EG))
-                symbol <- unlist(AnnotationDbi::mget(eg, 
-                                                     org.Hs.eg.db::org.Hs.egSYMBOL))
-                out <- cbind(names(eg), symbol)
+                    eg <- unlist(AnnotationDbi::mget(genes_old, 
+                                                     org.Hs.eg.db::org.Hs.egREFSEQ2EG))
+                    symbol <- unlist(AnnotationDbi::mget(eg, 
+                                                         org.Hs.eg.db::org.Hs.egSYMBOL))
+                    out <- cbind(names(eg), symbol)
+                }
             }
-        }
         else 
             if(ID_type == "uniprot"){
                 genes_old <- subset(genes_old, genes_old %in%
@@ -255,7 +236,7 @@ setMethod(
                 
             }
         
-        out <- merge(Gene_Id_column, out, by=1, all.x=TRUE)
+        out <- merge(Gene_IDs, out, by=1, all.x=TRUE)
         out <- out[order(as.numeric(out[, 2])), ]
         out <- subset(out,!duplicated(out[,1]))
         
@@ -280,32 +261,23 @@ setMethod(
         
         if(is.null(pval_col)){
             
-            pval_col <- grep("pval|p.val|p_val|sig", tolower(colnames(expdata)))
-            
+            pval_col <- grep("pval|p.val|p_val|sig", tolower(colnames(expdata))) #ARI Changed = to <-, I hope that's OK
             if(length(effect_col) != 1){
-                stop("Cannot determine p.value column. Please specify with arg:effect_col")}
+                stop("Cannot determine p.value column. Please specify with arg:effect_col")
+            }
         }
         if(any(expdata[, pval_col] < 0, expdata[, pval_col] > 1)){
             stop("P-values must be between 0 and 1")
         }
-<<<<<<< HEAD
-        
-        expdata[, pval_col] <- replace(expdata[,pval_col],
-                                    expdata[, pval_col] < .0000001,.0000001)
-        expdata[, pval_col] <- replace(expdata[,pval_col],
-                                    expdata[, pval_col] > .9999999,.9999999)
-        
-=======
-        temp_pval_col <- expdata[,pval_col]
-        temp_pval_col <- replace(temp_pval_col , temp_pval_col < .0000001,.0000001)
-        temp_pval_col <- replace(temp_pval_col , temp_pval_col > .9999999,.9999999)
-        expdata[,pval_col] <- temp_pval_col
->>>>>>> 5113962585c588de4e664108542522762a1db69f
+        temp_pval_col <- expdata[, pval_col]
+        temp_pval_col <- replace(temp_pval_col, temp_pval_col < .0000001,.0000001)
+        temp_pval_col <- replace(temp_pval_col, temp_pval_col > .9999999,.9999999)
+        expdata[, pval_col] <- temp_pval_col
        
         expression_output <- ExpressionSet(as.matrix(expdata), featureNames=rownames(expdata))
-        phenoData(expression_output) =
+        phenoData(expression_output) <- #ARI changed = to <-
             new("AnnotatedDataFrame", 
-                data = as.data.frame(exprs(expression_output)[, 
+                data=as.data.frame(exprs(expression_output)[, 
                                                             c(effect_col, pval_col)]))
         varLabels(expression_output) <- c("expression_effect", 
                                                       "expression_pvalue")
@@ -327,36 +299,19 @@ setMethod(
         } 
         
 		unique_feature_names <- unique(
-                unlist(slot(annotation, "annotation"))$feature)
+            unlist(slot(annotation, "annotation"))$feature)
 				
         ##no weights provided
-        if(missing(weight_by)){
-<<<<<<< HEAD
-            weight_by <- rep("pval", length(unique(mcols(
-                unlist(
-                    slot(annotation, "annotation")))$feature)[!unique(mcols(
-                        unlist(slot(annotation, "annotation")))$feature) %in% 
-                            c("original", "tss")])) #ARI too much slot stuff?
-=======
-		    
-            weight_by <- rep("pval", length( unique_feature_names[!unique_feature_names %in% 
+        if(missing(weight_by)){ 
+            weight_by <- rep("pval", length(unique_feature_names[!unique_feature_names %in% 
                             c("original", "tss")]))
->>>>>>> 5113962585c588de4e664108542522762a1db69f
         }
         
         ##no mod_included or weight names
         if(is.null(names(weight_by))){
-<<<<<<< HEAD
-            if(is.null(modInclude)){
-                modInclude <- unique(mcols(unlist(
-                    slot(annotation, "annotation")))$feature)[!unique(mcols(
-                        unlist(slot(annotation, "annotation")))$feature) %in%
-                            c("original", "tss")] #ARI too much slot stuff?
-=======
             if(is.null(mod_included)){
-                mod_included = unique_feature_names[!unique_feature_names %in%
+                mod_included <- unique_feature_names[!unique_feature_names %in% #ARI changed = to <-
                             c("original", "tss")]
->>>>>>> 5113962585c588de4e664108542522762a1db69f
             }
             names(weight_by) <- mod_included
         }
@@ -364,24 +319,18 @@ setMethod(
         ##weight names were provided
         if(!is.null(names(weight_by))){   
             mod_included <- names(weight_by)
-            
-            if(!all(mod_included%in%unique_feature_names)){
-                
+            if(!all(mod_included %in% unique_feature_names)){  
                 stop("Provided weight names must match those in 
                      unique(mcols(unlist(annotation@annotation))$feature)")
             } 
         }
         
-        if(any(!c(-1,1) %in% unique(sign(mod_data[,4])))){
+        if(any(!c(-1, 1) %in% unique(sign(mod_data[, 4])))){
             message("WARNING: Effects should provide a direction, 
                 but these effects are all in the same direction.")
         }
         
-<<<<<<< HEAD
-        if(any(modData[,5] < 0,modData[,5] > 1)){
-=======
-        if(any(mod_data[,5]<0,mod_data[,5]>1)){
->>>>>>> 5113962585c588de4e664108542522762a1db69f
+        if(any(mod_data[, 5] < 0,mod_data[, 5] > 1)){
             stop("P-values must be between 0 and 1")
         }
         
@@ -392,17 +341,13 @@ setMethod(
         
 		temp_annotation <- unlist(slot(annotation, "annotation"))
         
-		overlap_sub <- findOverlaps(temp_annotation, mod_grange)
-        out <- mod_grange[subjectHits(overlap_sub)]
-        mcols(out) <- cbind(mcols(temp_annotation[as.numeric(
-            queryHits(overlap_sub))]), mcols(out))
-<<<<<<< HEAD
-        out <- split(out, mcols(out)$genenames)   #ARI out, final, forreturn - figure out names
-        temp_annotation <- split(temp_annotation, mcols(temp_annotation)$genenames)
-=======
-        out <- split(out, out$name)
+		overlap_mods <- findOverlaps(temp_annotation, mod_grange)
+        mod_grange_overlaps <- mod_grange[subjectHits(overlap_mods)]
+        mcols(mod_grange_overlaps) <- cbind(mcols(
+            temp_annotation[as.numeric(
+            queryHits(overlap_mods))]), mcols(mod_grange_overlaps))
+        mod_grange_overlaps <- split(mod_grange_overlaps, mod_grange_overlaps$name)
         temp_annotation <- split(temp_annotation, temp_annotation$name)
->>>>>>> 5113962585c588de4e664108542522762a1db69f
         
         if(mod_corr == TRUE){
             if(verbose == TRUE){ 
@@ -413,21 +358,19 @@ setMethod(
             mod_grange_corr$distance <- distance(c(mod_grange, mod_grange), 
                                                mod_grange_corr)
             mod_grange_corr$pval2 <- c(mod_grange, mod_grange)$pval
-            cutpoints <- cut2(mod_grange_corr$distance, g=500, onlycuts=TRUE)
-            cutpoints[length(cutpoints)] <- 250000000
-            mod_grange_corr$cat <- (cut(mod_grange_corr$distance, breaks=cutpoints))
+            quantile_distances_mod_corr <- cut2(mod_grange_corr$distance, g=500, onlycuts=TRUE) #doesn't cut make 
+            quantile_distances_mod_corr[length(quantile_distances_mod_corr)] <- 250000000
+            mod_grange_corr$cat <- (cut(mod_grange_corr$distance, breaks=quantile_distances_mod_corr))
             mod_grange_corr <- split(mod_grange_corr, mod_grange_corr$cat)
-            mod_grange_corr2 <- lapply(mod_grange_corr, function(j)
-            { 
+            mod_grange_corr2 <- lapply(mod_grange_corr, function(j){ 
                 mean((sapply(1:100, function(i){
                     index <- sample(1:length(j), replace=TRUE);
                     cor(qnorm(1-j$pval[index]), qnorm(1-j$pval2[index]))
-                })))
-                
+                })))                
             })
             correlations <- as.data.frame(do.call(rbind, mod_grange_corr2))
             final_corr <- data.frame(correlations, as.character(names(  mod_grange_corr2 )), stringsAsFactors=F)
-            final_corr <- rbind(c(.9, paste("(-1, ", cutpoints[1], "]", 
+            final_corr <- rbind(c(.9, paste("(-1, ", quantile_distances_mod_corr[1], "]", 
                                           sep="")), final_corr)
             rm(mod_grange_corr)
         }
@@ -435,23 +378,15 @@ setMethod(
             if(verbose == TRUE){
                 message(paste("Combining p-values over:", i))
             }
-            temp <- subset(unlist(out), unlist(out)$feature == i)
+            temp <- subset(unlist(mod_grange_overlaps), unlist(mod_grange_overlaps)$feature == i)
             
             
             ref_data <- unlist(slot(annotation, "annotation"))
             ref_data <-
-<<<<<<< HEAD
-                subset(unlist(slot(annotation, "annotation")),
-                       mcols(unlist(
-                           slot(annotation, "annotation")))$feature == "tss") #What's 
-            ref_data <- ref_data[mcols(temp)$genenames]
-            suppressWarnings(mcols(temp)$distance <- distance(ref_data, 
-=======
                 subset(ref_data,
                        ref_data$feature == "tss")
             ref_data <- ref_data[temp$name]
             suppressWarnings(temp$distance <- distance(ref_data, 
->>>>>>> 5113962585c588de4e664108542522762a1db69f
                                                             temp)+2)
             temp <- split(temp, temp$name)
             forreturn <- lapply(temp, function(each){
@@ -463,7 +398,7 @@ setMethod(
                     if(mod_corr == TRUE){
                         corr_mat <- matrix(as.numeric(final_corr[match(cut(
                             as.matrix(dist(start(each)[order(each$pval)])), 
-                            breaks=c(-1, cutpoints)), final_corr[, 2]), 1]), #ARI I think we're supposed to get rid of cutpoints as a variable
+                            breaks=c(-1, quantile_distances_mod_corr)), final_corr[, 2]), 1]), 
                             ncol=each_length)
                         diag(corr_mat) <- 1
                         chol_d <- try(chol(corr_mat), silent=TRUE)
@@ -490,7 +425,7 @@ setMethod(
                         
                         if(weight_by[i] == "distance"){
                             ##mean is weighted by distance
-                            out_mean = weighted.mean(each_effect,
+                            out_mean <- weighted.mean(each_effect, #ARI changed = to <-
                                                     w=(1/log(distances)))
                             ##Stouffer test is weighted by distance
                             out_pval <- stoufferTest(each_pval, w=(1/log(distances)))
@@ -498,12 +433,12 @@ setMethod(
                         else if(weight_by[i] %in%
                                       c("pval", "p.value", "pvalue", "p_val")){
                             ##mean is weight by pvalue
-                            out_mean = weighted.mean(each_effect, w=-log(each_pval))
+                            out_mean <- weighted.mean(each_effect, w=-log(each_pval)) #ARI changed = to <-
                             out_pval <- stoufferTest(each_pval, w=NULL)
                         } 
                         else {
                             ##mean is not weighted
-                            out_mean = mean(each_effect, na.rm=TRUE)
+                            out_mean <- mean(each_effect, na.rm=TRUE) #ARI changed = to <-
                             out_pval <- stoufferTest(each_pval, w=NULL)    
                         }
                               
@@ -515,7 +450,7 @@ setMethod(
                             index <- index[which(
                                 abs(each_effect[index]) == max(abs(each_effect[index])))][1]
                         }
-                        out_mean = each_effect[index]
+                        out_mean <- each_effect[index] #ARI changed = to <-
                         out_pval <- 1-(1-each_pval[index])^length(each_pval)
                         
                     } 
@@ -526,10 +461,10 @@ setMethod(
                             index <- index[which(abs(each_effect[index]) == max(
                                 abs(each_effect[index])))][1]
                         }
-                        out_mean = each_effect[index]
+                        out_mean <- each_effect[index] #ARI changed = to <-
                         out_pval <- (1-pbinom(q=length(which(each_pval<0.05)), 
                                             size=each_length, prob=0.05))
-                    } else if(weight_by_method%in%
+                    } else if(weight_by_method %in%
                                   c("Fisher", "fisher", "chisq", "chi")){
                         out_pval <- 1-pchisq(-2*sum(log(each_pval)), each_length*2)
                         out_mean <- mean(sign(each_effect), na.rm=TRUE)
@@ -551,24 +486,18 @@ setMethod(
         if(verbose == TRUE){ 
             message("Quantile permuting scores")
         }
-<<<<<<< HEAD
-        mylist <- lapply(mylist, function(each_feature){		
-            cats <- data.frame(cats=as.numeric(cut2(each_feature[, 3], g=100))) #ARI cats? like concatonated?
-            cats_table <- data.frame(table(cats))
-=======
         combined_pvalues_list <- lapply(combined_pvalues_list, function(each_feature){		
             categories <- data.frame(categories=as.numeric(cut2(each_feature[, 3], g=100)))
             categories_table <- data.frame(table(categories))
->>>>>>> 5113962585c588de4e664108542522762a1db69f
             
             trans_p <- cbind(trans=qnorm(1-each_feature[, 2]/2), 
                            join(categories, categories_table, by="categories"))
                 
-            trans_p[,1]<-replace(trans_p[, 1],is.infinite(trans_p[, 1]), 
-                        max(subset(trans_p,!is.infinite(trans_p[, 1])),na.rm=T))
+            trans_p[, 1] <- replace(trans_p[, 1],is.infinite(trans_p[, 1]),
+                                    max(subset(trans_p, !is.infinite(
+                                        trans_p[, 1])), na.rm=T))
                 
                 
-              
             num_list <- split(trans_p$trans, trans_p$categories)
             rand_list <- sapply(1:length(num_list), function(i){
                 as.matrix(sapply(1:500, function(j){ 
@@ -577,13 +506,13 @@ setMethod(
             })
             new_pval <- apply(trans_p, 1, function(i){ 
                 length(which(
-                    rand_list[[as.numeric(i[2])]] > as.numeric(i[1])))/(500*as.numeric(
-                        i[3]))
+                    rand_list[[as.numeric(i[2])]] > as.numeric(i[1])))/
+                    (500*as.numeric(i[3]))
             })
             new_pval <- replace(new_pval, new_pval == 0, 
                                 min(subset(new_pval, new_pval != 0), na.rm=T))
             
-            each_feature[,2] <- new_pval 
+            each_feature[, 2] <- new_pval 
             each_feature <- as.data.frame(each_feature)
             each_feature
         })
@@ -592,58 +521,46 @@ setMethod(
             message("Scores have been adjusted")
         }
         
-<<<<<<< HEAD
-        newMods <- c(unlist(slot(annotation, "modifications")), unlist(out))
-        names(newMods) <- NULL
-        newMods <- split(newMods, mcols(newMods)$genenames)
-=======
-        newmods <- c(unlist(slot(annotation, "modifications")), unlist(out))
+        newmods <- c(unlist(slot(annotation, "modifications")), unlist(mod_grange_overlaps))
         names(newmods) <- NULL
         newmods <- split(newmods, newmods$name)
->>>>>>> 5113962585c588de4e664108542522762a1db69f
         
-        final <- suppressWarnings(as.data.frame(c(list(names=names(out)), 
-                                                lapply(mylist, function(x){
-                                                    x[match(names(out), rownames(x)), 1:2]
+        final <- #ARI change final to better variable, don't replace all. 
+            suppressWarnings(as.data.frame(c(list(names=names(mod_grange_overlaps)),
+                                             lapply(mylist, function(x){
+                                                    x[match(names(
+                                                        mod_grange_overlaps),
+                                                        rownames(x)), 1:2]
                                                     }))))
         rownames(final) <- final[, 1]
         final <- final[, -1]
-        colnames(final) <- paste(mod_type, apply(expand.grid(c("effect", "pvalue"),
-                                                            mod_included),
-                                                1, function(i){
-                                                        paste(i[2], i[1], sep="_")
+        colnames(final) <- paste(mod_type, 
+                                 apply(expand.grid(c("effect", "pvalue"),
+                                                   mod_included),1, function(i){
+                                                        paste(i[2], i[1], 
+                                                              sep="_")
                                                     }), sep="_")
         
-        newMetadata <- slot(slot(annotation, "modifications"), "metadata")
-        if(is.null(newMetadata$m_summary)){
-            newMetadata$m_summary <- final
+        newmetadata <- slot(slot(annotation, "modifications"), "metadata")
+        if(is.null(newmetadata$m_summary)){
+            newmetadata$m_summary <- final
         } 
         else{
-            newMetadata$m_summary <- merge(newMetadata$m_summary, final, by=0, 
+            newmetadata$m_summary <- merge(newmetadata$m_summary, final, by=0, 
                                          all=TRUE)
-            rownames(newMetadata$m_summary) <- newMetadata$m_summary[, 1]
-            newMetadata$m_summary<-newMetadata$m_summary[, -1]
+            rownames(newmetadata$m_summary) <- newmetadata$m_summary[, 1]
+            newmetadata$m_summary<-newmetadata$m_summary[, -1]
         }
-<<<<<<< HEAD
-        newMetadata[["elements"]][[modType]]$weight_by <- weight_by
-        newMetadata[["elements"]][[modType]]$weight_by_method <- weight_by_method
-        newMetadata$elementnames <- c(newMetadata$elementnames, paste(modType, 
-                                                                    modInclude, sep="_"))
-        slot(annotation, "modifications") <- newMods
-        slot(slot(annotation, "modifications"), "metadata") <- newMetadata
-        
-=======
         newmetadata[["elements"]][[mod_type]]$weight_by <- weight_by
         newmetadata[["elements"]][[mod_type]]$weight_by_method <- weight_by_method
         newmetadata$elementnames <- c(newmetadata$elementnames, paste(mod_type, 
                                                                     mod_included, sep="_"))
        
 	    slot(newmods, "metadata") <- newmetadata
-	   slot(annotation, "modifications") <- newmods
->>>>>>> 5113962585c588de4e664108542522762a1db69f
+	    slot(annotation, "modifications") <- newmods
         annotation
-        })
-
+    }
+)
 
 setMethod(
     f="removeModification", 
@@ -660,9 +577,9 @@ setMethod(
         names(temp) <- NULL
         temp <- subset(temp,!(temp$type == mod_type))
         slot(temp,"metadata") <- temp_meta
+        temp_meta_colnams <- colnames(slot(temp,"metadata")$m_summary)
         slot(temp,"metadata")$m_summary <-
-            slot(temp,"metadata")$m_summary[, 
-                                            -grep(mod_type, colnames(slot(temp,"metadata")$m_summary))]
+            slot(temp,"metadata")$m_summary[, -grep(mod_type, temp_meta_colnams)]
         
         if(ncol(slot(temp,"metadata")$m_summary) == 0){
             slot(temp,"metadata")$m_summary <- NULL
@@ -677,6 +594,7 @@ setMethod(
                 -which(do.call(rbind, lapply(strsplit(
                     slot(temp,"metadata")$elementnames, "_"),
                     function(i)i[1]))[, 1] %in% mod_type)]
+        
         temp_meta <- slot(temp,"metadata")
         slot(annotation,"modifications") <- split(temp, temp$name)
         slot(slot(annotation,"modifications"),"metadata") <- temp_meta
@@ -685,7 +603,7 @@ setMethod(
 )
 
 setMethod(
-    f="makePvalueObject", 
+    f="makePvalueObject", #ARI could you elaborate on what a Pvalue object is? it looks like it's really to Make Pvalue scores for each modification interaction? Object is pretty vague. 
     signature="PvalueAnnotation", 
     definition=function(object, effect_directions=NULL) {
         
@@ -717,12 +635,12 @@ setMethod(
         
         totalfactor <- length(effect_directions)
         
-        signsindex <- merge(cbind(c("increase", "decrease", "bidirectional"),
+        signs_index <- merge(cbind(c("increase", "decrease", "bidirectional"),
                                 c(1, -1, 2)), 
                           cbind(effect_directions, 1:totalfactor), by=1)
-        signsindex <- signsindex[order(signsindex[, 3]), ]
-        rownames(signsindex) <- NULL
-        colnames(signsindex) <- c("expression_relationship", "B_coeff","name")
+        signs_index <- signs_index[order(signs_index[, 3]), ]
+        rownames(signs_index) <- NULL
+        colnames(signs_index) <- c("expression_relationship", "B_coeff","name")
         
         temp1 <- annotationOutput(object)
         genenames <- temp1[, 1]
@@ -742,14 +660,14 @@ setMethod(
                                                  grep(i, colnames(data))
                                              }))]
         }
-        signsindex[, 3] <- names(effect_directions)
+        signs_index[, 3] <- names(effect_directions)
         slot(object, "score_data") <- new(Class="PvalueObject", 
                                         pval_data=data[, grep("pval",
                                                               colnames(data))], 
                                         effect_data=data[, grep("effect", 
                                                                 colnames(data))], 
                                         genes=genenames, 
-                                        signsindex=signsindex)
+                                        signsindex=signs_index)
         object
     }
 )
@@ -760,12 +678,12 @@ setMethod(
 setMethod(
     f="normalizePval", 
     signature="PvalueAnnotation", 
-    definition=function(object, trans, ref="expression_pvalue", 
+    definition=function(object, trans, ref="expression_pvalue", #ARI isn't object a PValueAnnotation S4?
                         method="rescale"){
         temp_pval_data <- slot(slot(object,"score_data"),"pval_data")
         names_temp_pval_data <- colnames(temp_pval_data)
         
-        if(nrow(temp_pval_data==0)){
+        if(nrow(temp_pval_data == 0)){
             stop("Run makePvalueObject function first.")
         }
         if(!any(grepl(ref,names_temp_pval_data))){
@@ -781,7 +699,7 @@ setMethod(
         logit_ref <- log(p_ref/(1-p_ref))
         
         if(!names(dev.cur()) %in% c("RStudioGD","pdf")){
-            dev.new(height=7,width=14)
+            dev.new(height=7, width=14)
         }
         
         par(mfrow=c(1, 2))
@@ -790,25 +708,25 @@ setMethod(
         if(method %in% c("Box-Cox", "box-cox", "boxcox", "Boxcox")){
             if(missing(trans)){
                 message(paste("Auto-detecting best transformation"))
-                expos <- c()
+                expos <- c() #ARI what's expos?
                 for(x in subset(names_temp_pval_data,
                                    !names_temp_pval_data %in% ref)){
                        
-                    p_temp<-temp_pval_object[[x]]
+                    p_temp <- temp_pval_object[[x]]
                     if(!all(is.na(p_temp))){
                         logit_temp <- log(p_temp/(1-p_temp))
-                        each <- t(sapply(c(seq(.05, .95, .05), rev(1/seq(.05,
-                                                                          .95, .05))),
-                                          function(i){
-                                              c(i, wilcox.test(logit_ref,
+                        each <- t(sapply(c(seq(.05, .95, .05), #ARI each what? VNC (Variable Name Change)
+                                           rev(1/seq(.05, .95, .05))),
+                                           function(i){
+                                               c(i,wilcox.test(logit_ref,
                                                                as.numeric(logit_temp)*i)$p_value)
-                                              }))
-                           each <- each[which(each[, 2] == max(each[, 2]))[1], 1]
-                           p_temp <-
+                                               }))
+                        each <- each[which(each[, 2] == max(each[, 2]))[1], 1]
+                        p_temp <-
                                (exp(logit_temp)^(each))/(1+exp(logit_temp)^(each))
                     } 
                     else {
-                        each<-1
+                        each <- 1
                     }
                        expos <- c(expos, each)
                        names(expos)[length(expos)] <- x
@@ -818,9 +736,11 @@ setMethod(
             }
             
             else {
-                if(length(trans) != length(grep(paste(slot(slot(object,
-                                                                   "score_data"), "signsindex")[, 3], collapse="|"), 
-                                                   colnames(temp_pval_object)))){
+                if(length(trans) != 
+                       length(grep(paste(slot(slot(object,"score_data"), 
+                                              "signsindex")[, 3], collapse="|"),
+                                   colnames(temp_pval_object)))){
+                    
                        stop("Length of p and transformations must equal!")
                 }
                 else {
@@ -862,12 +782,12 @@ setMethod(
 setMethod(
     f="scorePval", 
     signature="PvalueAnnotation", 
-    definition=function(object, weights){ 
+    definition=function(object, weights){ #ARI again, is object the best name?
         
         totalfactor <- ncol(slot(slot(object, "score_data"), "pval_data"))
         if(missing(weights)){
             weights <- rep((1/(totalfactor)), totalfactor)
-            names(weights) = colnames(slot(slot(object, "score_data"), 
+            names(weights) <- colnames(slot(slot(object, "score_data"), #ARI changed = to <-
                                          "pval_data"))
         } 
         else {
@@ -876,23 +796,26 @@ setMethod(
                      and weights must equal!")
             }
             else { 
+                pval_score_colnames <- colnames(slot(slot(object,"score_data"), 
+                                                    "pval_data")
                 if(is.null(names(weights))){ 
-                    names(weights)=colnames(slot(slot(object,
-                                                      "score_data"), "pval_data"))
+                    names(weights) <- pval_score_colnames
                 }
-                if(!all(sort(names(weights)) == sort(do.call(rbind, 
-                                                            strsplit(colnames(slot(slot(object, "score_data"), 
-                                                                                   "pval_data")), "_pvalue")))))
+                if(!all(sort(names(weights)) == 
+                            sort(do.call(rbind, strsplit(pval_score_colnames,
+                                                         "_pvalue")))))
                 {
                     stop(paste("Weight names must match the following:", 
-                               paste(do.call(rbind, strsplit(colnames(slot(slot(object, 
-                                                                                "score_data"), "pval_data")), "_pvalue")), collapse=", ")))
+                               paste(do.call(rbind, strsplit(pval_score_colnames,
+                                                             "_pvalue")), 
+                                     collapse=", ")))
                 }
             }
         }
         
-        weights <- weights[match(do.call(rbind, strsplit(colnames(slot(
-            slot(object, "score_data"), "pval_data")), "_pvalue")), names(weights))]
+        weights <- weights[match(
+            do.call(rbind, strsplit(pval_score_colnames, "_pvalue")),
+            names(weights))]
         
         message("The following weights are being applied")
         print(weights)
@@ -905,16 +828,29 @@ setMethod(
         if(any(grepl("exp", names(weights)))){
             weight_names_temp <- weight_names_temp[-grep("exp", names(weights))]
         }
+        slot(slot(object, "score_data"), "scoring_vector") <- weights
+        
+        #ARI what is happening here..May I propose the following see line 841
         unidirectional <- as.numeric(slot(slot(object, "score_data"), 
                                         "signsindex")[match(slot(slot(object, "score_data"),
-                                                                 "signsindex")[, 3], weight_names_temp), 2])
+                                                                 "signsindex")[, 3], weight_names_temp), 2]) 
         unidirectional[which(unidirectional == 2)] <- 0
-        bidirectional <- as.numeric(slot(slot(object, "score_data"), "signsindex")
-                                  [match(slot(slot(object, "score_data"), "signsindex")[, 3], 
-                                         weight_names_temp), 2])
+        bidirectional <- as.numeric(slot(slot(object, "score_data"),
+                                         "signsindex")[match(slot(slot(object, "score_data"), 
+                                                                  "signsindex")[, 3], weight_names_temp), 2])
         bidirectional[which(bidirectional != 2)] <- 0
         bidirectional[which(bidirectional == 2)] <- 1
-        slot(slot(object, "score_data"), "scoring_vector") <- weights
+        
+        ### PROPOSAL ## 
+        #unidirectional <- as.numeric(slot(slot(object, "score_data"), 
+        #                                  "signsindex")[match(slot(slot(object, "score_data"),
+        #                                                           "signsindex")[, 3], weight_names_temp), 2]) 
+        #bidirectional <- unidirectional
+        #unidirectional[which(unidirectional == 2)] <- 0                                                   
+        #bidirectional[which(bidirectional != 2)] <- 0
+        #bidirectional[which(bidirectional == 2)] <- 1
+        #### END ####
+        # since there's no difference in where you're getting bidirection and unidirectional, why do you need both objects?
         
         scoringdata <- qnorm(1-as.matrix(abs(scoringdata))/2)*sign(scoringdata)
         scoresout <- apply(scoringdata, 1, function(each){
@@ -922,7 +858,7 @@ setMethod(
             {
                 if(any(grepl("exp", names(each)))){
                     
-                    forreturn <- (sum(
+                    forreturn <- (sum( #ARI Holy fuck, nest more? any way to make some temp objects?
                         abs(sum(c(as.numeric(each[[grep("exp", names(each))]]), 
                                   as.numeric(each[-grep("exp", names(each))]))*
                                     c(1, unidirectional)*weights[c(grep("exp",
@@ -958,7 +894,7 @@ setMethod(
         new_pval <- sapply(scoresout , function(i){ 
             length(which(rand_mat > as.numeric(i)))/(100*length(scoresout))
         })
-        new_pval <- replace(new_pval, new_pval==0, 
+        new_pval <- replace(new_pval, new_pval == 0, 
                             min(subset(new_pval, new_pval!=0), na.rm=T))
         new_pval <- (-2)*log(new_pval[, 1])
         
@@ -1015,22 +951,20 @@ setMethod(
                               max(network_clusters$csize))[1]
         network <- induced_subgraph(network, 
                                     which(network_clusters$membership == maxclust)) 
-        rm(network_clusters)     
+        rm(network_clusters) #ARI is this necessary?
         genes_in_network <- intersect(genes_in_network,V(network)$name)
         
         scores_in_network <- scores_in_network[genes_in_network]
-        network.adj <-  as_adjacency_matrix(network)
+        network.adj <- as_adjacency_matrix(network)
         
         ## order of scores has to match order of adjacency rows 	   
         scores_in_network <- scores_in_network[rownames(network.adj)]
         genes_in_network <- names(scores_in_network)
         stat_scores <- as.numeric(scores_in_network)
         pval_scores <- exp(scores_in_network/(-2))
-        #adjaceny n x n matrix with either 0 or 1
-        temp1 <- apply(network.adj, 1, function(v) v*stat_scores)
-        #same adjaceny but instead of 1's it will now have the score that reflects the weight
-        W <- (temp1 + t(temp1)) # matrix of genes in network
-        #summing with the transpose will take two connected genes and add there scores
+        
+        temp1 <- apply(network.adj, 1, function(v) v*stat_scores) #ARI temp of what?
+        W <- (temp1 + t(temp1)) #Looks like you're defining W, so might as well give better name? W_forspinglass?
         rm(temp1)
         gc()
         W_vec <- (-2*log(1-pchisq(as.vector(W),4)))
@@ -1054,18 +988,18 @@ setMethod(
         sig_genes <- subset(genes_in_network, pval_scores < node_alpha)
         sig_genes_counter <- 1:length(sig_genes)
         names(sig_genes_counter) <- sig_genes
-        spin.glass.out <- lapply(sig_genes, function(j){
+        spin_glass_out <- lapply(sig_genes, function(j){
             message(paste("Computing modules: Vertex",sig_genes_counter[j],"of",
                           length(sig_genes), "significant genes is", j))
             genes_in_network[
                 cluster_spinglass(network, weights = E(network)$weight, 
                                   vertex=j, gamma=gam)$community]
             })
-        names(spin.glass.out) <- sig_genes 
+        names(spin_glass_out) <- sig_genes 
         
         ## Select modules with size requirements
-        spin.size <- do.call(c, lapply(spin.glass.out, length))
-        spin.glass.out <- subset(spin.glass.out, spin.size >= minsize & spin.size 
+        spin.size <- do.call(c, lapply(spin_glass_out, length))
+        spin_glass_out <- subset(spin_glass_out, spin.size >= minsize & spin.size 
                                 <= maxsize)
         
         Modularity.edges = function(v, network)
@@ -1073,18 +1007,18 @@ setMethod(
             h <- induced_subgraph(network, v);
             c(sum( E(h)$weight ))
         }
-        edge_sum <- do.call(c,lapply(spin.glass.out, function(j) { 
+        edge_sum <- do.call(c,lapply(spin_glass_out, function(j) { 
             Modularity.edges(j, network)
         }));
         
-        nspin.glass.out <- length(spin.glass.out);
-        random_edges <- lapply(1:nspin.glass.out, function(i) {
-            j <- spin.glass.out[[i]]
+        nspin_glass_out <- length(spin_glass_out);
+        random_edges <- lapply(1:nspin_glass_out, function(i) {
+            j <- spin_glass_out[[i]]
             h <- induced_subgraph(network, j);
             B <- as_adjacency_matrix(h, sparse=FALSE);
             v <- sapply(1:niter, function(k){
                 message(paste("Testing significance: module", i, "of", 
-                              nspin.glass.out, "Randomization", k, "of", niter))
+                              nspin_glass_out, "Randomization", k, "of", niter))
                 atperm = sample(stat_scores, nrow(B) , replace=TRUE)
                 temp1 = apply(B, 1, function(v) v*atperm)
                 W <- (temp1 + t(temp1));
@@ -1095,21 +1029,21 @@ setMethod(
             })
             v
         })
-        names(random_edges) <- names(spin.glass.out);
+        names(random_edges) <- names(spin_glass_out);
         
-        random_p <- lapply(1:nspin.glass.out, function(k){
+        random_p <- lapply(1:nspin_glass_out, function(k){
             length(which(random_edges[[k]] >
                              edge_sum[k]))/niter})
-        names(random_p) <- names(spin.glass.out)
+        names(random_p) <- names(spin_glass_out)
         
-        if(length(spin.glass.out[which(do.call(c,random_p) < random_alpha)]) == 0){
+        if(length(spin_glass_out[which(do.call(c,random_p) < random_alpha)]) == 0){
             stop("No modules found.  Please adjust the random_alpha and node_alpha 
                  parameters")
         }
         
         ## Assemble output data
         output <- list();
-        output[[1]] <- subset(spin.glass.out, do.call(c,random_p) < random_alpha);
+        output[[1]] <- subset(spin_glass_out, do.call(c,random_p) < random_alpha);
         output[[2]] <- pval_scores;
         output[[3]] <- stat_scores;
         output[[4]] <- induced_subgraph(network, as.character(
