@@ -6,7 +6,7 @@ setClass(
         pval_data="data.frame", 
         effect_data="data.frame", 
         genes="character", 
-        signsindex="data.frame", 
+        signs_index="data.frame", 
         scores="data.frame", 
         trans="numeric", 
         scoring_vector="numeric", 
