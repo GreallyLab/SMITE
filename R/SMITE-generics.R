@@ -1,6 +1,6 @@
 setGeneric(
     name="stoufferTest", 
-    def=function(p, w)
+    def=function(pvalues, weights)
     {
         standardGeneric("stoufferTest")
     }
@@ -8,7 +8,7 @@ setGeneric(
 
 setGeneric(
     name="annotationOutput", 
-    def=function(object)
+    def=function(pvalue_annotation)
     {
         standardGeneric("annotationOutput")
     }
@@ -34,7 +34,7 @@ setGeneric(
 
 setGeneric(
     name="convertGeneIds", 
-    def=function(a, a_type, b_type, delim=NULL, verbose=FALSE)
+    def=function(gene_IDs, ID_type, ID_convert_to, delim=NULL, verbose=FALSE)
     {
         standardGeneric("convertGeneIds")
     }
@@ -52,9 +52,6 @@ setGeneric(
 
 setGeneric(
     name="annotateModification", 
-    def=function(annotation, modData, weight_by=NULL, 
-                 weight_by_method="Stouffer", modInclude=NULL, modCorr=TRUE, 
-                 modType="methylation", verbose=FALSE)
     def=function(annotation, mod_data, weight_by=NULL, 
                  weight_by_method="Stouffer", mod_included=NULL, mod_corr=TRUE, 
                  mod_type="methylation", verbose=FALSE)
@@ -75,7 +72,7 @@ setGeneric(
 
 setGeneric(
     name="makePvalueObject", 
-    def=function(object, effect_directions=NULL)
+    def=function(pvalue_annotation), effect_directions=NULL)
     {
         standardGeneric("makePvalueObject")
     }
@@ -92,7 +89,7 @@ setGeneric(
 
 setGeneric(
     name="normalizePval", 
-    def=function(object, trans, ref="expression_pvalue", method="rescale")
+    def=function(pvalue_annotation), trans, ref="expression_pvalue", method="rescale")
     {
         standardGeneric("normalizePval")
     }
@@ -101,7 +98,7 @@ setGeneric(
 
 setGeneric(
     name="scorePval", 
-    def=function(object, weights)
+    def=function(pvalue_annotation, weights)
     {
         standardGeneric("scorePval")
     }
@@ -109,8 +106,8 @@ setGeneric(
 
 setGeneric(
     name="runSpinglass", 
-    def=function(object, network, random_alpha = 0.05, gam = 0.5, 
-                 node_alpha = 0.05, maxsize = 500, minsize = 8, niter = 1000,
+    def=function(pvalue_annotation), network, random_alpha = 0.05, gam = 0.5, 
+                 node_alpha = 0.05, maxsize = 500, minsize = 8, num_iterations = 1000,
                  simplify=TRUE)
     {
         standardGeneric("runSpinglass")
@@ -121,7 +118,7 @@ setGeneric(
 
 setGeneric(
     name="runBioNet", 
-    def=function(object, network, alpha = 0.05)
+    def=function(pvalue_annotation), network, alpha = 0.05)
     {
         standardGeneric("runBioNet")
     }
@@ -129,7 +126,7 @@ setGeneric(
 
 setGeneric(
     name="plotModule", 
-    def=function(object, p_thresh=0.05, which.network=1, goseq=FALSE, 
+    def=function(pvalue_annotation), p_thresh=0.05, which.network=1, goseq=FALSE, 
                  layout="fr",legend=TRUE, namestyle="symbol", 
                  suppressDetails=FALSE, 
                  meth_hi_col="blue", meth_low_col="yellow1", 
@@ -144,7 +141,7 @@ setGeneric(
 
 setGeneric(
     name="runGOseq", 
-    def=function(object, p_thresh=0.05, coverage, type="reactome")
+    def=function(pvalue_annotation), p_thresh=0.05, coverage, type="reactome")
     {
         standardGeneric("runGOseq")
     }
@@ -153,7 +150,7 @@ setGeneric(
 
 setGeneric(
     name="searchGOseq", 
-    def=function(object, searchstring, wholeword=FALSE)
+    def=function(pvalue_annotation), searchstring, wholeword=FALSE)
     {
         standardGeneric("searchGOseq")
     }
@@ -163,7 +160,7 @@ setGeneric(
 
 setGeneric(
     name="extractGOseq", 
-    def=function(object, which.network=NULL)
+    def=function(pvalue_annotation), which.network=NULL)
     {
         standardGeneric("extractGOseq")
     }
@@ -172,7 +169,7 @@ setGeneric(
 
 setGeneric(
     name="plotCompareScores", 
-    def=function(object, x_name, y_name, ...)
+    def=function(pvalue_annotation), x_name, y_name, ...)
     {
         standardGeneric("plotCompareScores")
     }

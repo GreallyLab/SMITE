@@ -6,18 +6,18 @@
 setMethod(
     f="stoufferTest", 
     signature="vector", 
-    definition=function(p, w) #ARI p and w are shitty variable names, not sure what w is
+    definition=function(pvalues, weights) 
     {
-        if(is.null(w)){
-            w <- rep(1, length(p))/length(p)
+        if(is.null(weights)){
+            weights <- rep(1, length(pvalues))/length(pvalues)
         } 
         
-        Zi <- qnorm(1-p/2) 
-        Z  <- sum(w*Zi)/sqrt(sum(w^2))
-        p_val <- (1-pnorm(Z))*2
-        p_val <- replace(p_val,p_val < .0000000000000001, .0000000000000001)
-        p_val <- replace(p_val, p_val > .9999999999999999, .9999999999999999)
-        p_val
+        Zi <- qnorm(1-pvalues/2) 
+        Z  <- sum(weights*Zi)/sqrt(sum(weights^2))
+        new_pvalues <- (1-pnorm(Z))*2
+        new_pvalues <- replace(new_pvalues,new_pvalues < .0000000000000001, .0000000000000001)
+        new_pvalues <- replace(new_pvalues, new_pvalues > .9999999999999999, .9999999999999999)
+        new_pvalues
     }
 )
 
@@ -148,19 +148,19 @@ setMethod(
 
 setMethod(
     f="convertGeneIds", 
-    signature(Gene_IDs="character", ID_type="character", ID_convert_to="character"), 
-    definition=function(Gene_IDs, ID_type, ID_convert_to, delim=NULL, verbose=FALSE)
+    signature(gene_IDs="character", ID_type="character", ID_convert_to="character"), 
+    definition=function(gene_IDs, ID_type, ID_convert_to, delim=NULL, verbose=FALSE)
     {
-        if(any(duplicated(Gene_IDs))){stop(
+        if(any(duplicated(gene_IDs))){stop(
             "Cannot convert duplicated ids. Please remove duplicates.")
         }
         
         if(!is.null(delim)){
-            Gene_IDs <- do.call(rbind, strsplit(Gene_IDs, delim))[, 2]
+            gene_IDs <- do.call(rbind, strsplit(gene_IDs, delim))[, 2]
         } 
         
-        genes_old <- unique(as.character(Gene_IDs))
-        Gene_IDs <- cbind(Gene_IDs, 1:length(Gene_IDs))
+        genes_old <- unique(as.character(gene_IDs))
+        gene_IDs <- cbind(gene_IDs, 1:length(gene_IDs))
         
         if(ID_type == "refseq"){
             genes_old <- subset(genes_old, genes_old %in% 
@@ -235,7 +235,7 @@ setMethod(
                 
             }
         
-        out <- merge(Gene_IDs, out, by=1, all.x=TRUE)
+        out <- merge(gene_IDs, out, by=1, all.x=TRUE)
         out <- out[order(as.numeric(out[, 2])), ]
         out <- subset(out,!duplicated(out[,1]))
         
@@ -424,7 +424,7 @@ setMethod(
                         
                         if(weight_by[i] == "distance"){
                             ##mean is weighted by distance
-                            out_mean <- weighted.mean(each_effect, #ARI changed = to <-
+                            out_mean <- weighted.mean(each_effect, 
                                                     w=(1/log(distances)))
                             ##Stouffer test is weighted by distance
                             out_pval <- stoufferTest(each_pval, w=(1/log(distances)))
@@ -432,12 +432,12 @@ setMethod(
                         else if(weight_by[i] %in%
                                       c("pval", "p.value", "pvalue", "p_val")){
                             ##mean is weight by pvalue
-                            out_mean <- weighted.mean(each_effect, w=-log(each_pval)) #ARI changed = to <-
+                            out_mean <- weighted.mean(each_effect, w=-log(each_pval)) 
                             out_pval <- stoufferTest(each_pval, w=NULL)
                         } 
                         else {
                             ##mean is not weighted
-                            out_mean <- mean(each_effect, na.rm=TRUE) #ARI changed = to <-
+                            out_mean <- mean(each_effect, na.rm=TRUE) 
                             out_pval <- stoufferTest(each_pval, w=NULL)    
                         }
                               
@@ -449,7 +449,7 @@ setMethod(
                             index <- index[which(
                                 abs(each_effect[index]) == max(abs(each_effect[index])))][1]
                         }
-                        out_mean <- each_effect[index] #ARI changed = to <-
+                        out_mean <- each_effect[index] 
                         out_pval <- 1-(1-each_pval[index])^length(each_pval)
                         
                     } 
@@ -460,7 +460,7 @@ setMethod(
                             index <- index[which(abs(each_effect[index]) == max(
                                 abs(each_effect[index])))][1]
                         }
-                        out_mean <- each_effect[index] #ARI changed = to <-
+                        out_mean <- each_effect[index] 
                         out_pval <- (1-pbinom(q=length(which(each_pval<0.05)), 
                                             size=each_length, prob=0.05))
                     } else if(weight_by_method %in%
@@ -524,16 +524,16 @@ setMethod(
         names(newmods) <- NULL
         newmods <- split(newmods, newmods$name)
         
-        final <- #ARI change final to better variable, don't replace all. 
+        output_m_summary <- 
             suppressWarnings(as.data.frame(c(list(names=names(mod_grange_overlaps)),
-                                             lapply(mylist, function(x){
+                                             lapply(combined_pvalues_list, function(x){
                                                     x[match(names(
                                                         mod_grange_overlaps),
                                                         rownames(x)), 1:2]
                                                     }))))
-        rownames(final) <- final[, 1]
-        final <- final[, -1]
-        colnames(final) <- paste(mod_type, 
+        rownames(output_m_summary) <- output_m_summary[, 1]
+        output_m_summary <- output_m_summary[, -1]
+        colnames(output_m_summary) <- paste(mod_type, 
                                  apply(expand.grid(c("effect", "pvalue"),
                                                    mod_included),1, function(i){
                                                         paste(i[2], i[1], 
@@ -542,10 +542,10 @@ setMethod(
         
         newmetadata <- slot(slot(annotation, "modifications"), "metadata")
         if(is.null(newmetadata$m_summary)){
-            newmetadata$m_summary <- final
+            newmetadata$m_summary <- output_m_summary
         } 
         else{
-            newmetadata$m_summary <- merge(newmetadata$m_summary, final, by=0, 
+            newmetadata$m_summary <- merge(newmetadata$m_summary, output_m_summary, by=0, 
                                          all=TRUE)
             rownames(newmetadata$m_summary) <- newmetadata$m_summary[, 1]
             newmetadata$m_summary<-newmetadata$m_summary[, -1]
@@ -604,22 +604,22 @@ setMethod(
 setMethod(
     f="makePvalueObject", #ARI could you elaborate on what a Pvalue object is? it looks like it's really to Make Pvalue scores for each modification interaction? Object is pretty vague. 
     signature="PvalueAnnotation", 
-    definition=function(object, effect_directions=NULL) {
+    definition=function(pvalue_annotation, effect_directions=NULL) {
         
         
         if(is.null(effect_directions)){
             effect_directions <- rep("bidirectional", 
                                      length(slot(
-                                                slot(object, "modifications"),
+                                                slot(pvalue_annotation, "modifications"),
                                                 "metadata")$elementnames))
         }
         
         if(is.null(names(effect_directions))){
-            names(effect_directions)<-slot(slot(object, "modifications"), 
+            names(effect_directions)<-slot(slot(pvalue_annotation, "modifications"), 
                                            "metadata")$elementnames
         }
         
-        if(any(!names(effect_directions) %in% slot(slot(object, "modifications"), 
+        if(any(!names(effect_directions) %in% slot(slot(pvalue_annotation, "modifications"), 
                                                  "metadata")$elementnames)){
             stop("Effect name is invalid")
         }
@@ -630,7 +630,7 @@ setMethod(
         }
         
         
-        exp_ind <- ifelse(nrow(pData(object@expression)) > 0, 1, 0)
+        exp_ind <- ifelse(nrow(pData(pvalue_annotation@expression)) > 0, 1, 0)
         
         totalfactor <- length(effect_directions)
         
@@ -641,7 +641,7 @@ setMethod(
         rownames(signs_index) <- NULL
         colnames(signs_index) <- c("expression_relationship", "B_coeff","name")
         
-        temp1 <- annotationOutput(object)
+        temp1 <- annotationOutput(pvalue_annotation)
         genenames <- temp1[, 1]
         data <- temp1[, -1]
         
@@ -660,14 +660,14 @@ setMethod(
                                              }))]
         }
         signs_index[, 3] <- names(effect_directions)
-        slot(object, "score_data") <- new(Class="PvalueObject", 
+        slot(pvalue_annotation, "score_data") <- new(Class="PvalueObject", 
                                         pval_data=data[, grep("pval",
                                                               colnames(data))], 
                                         effect_data=data[, grep("effect", 
                                                                 colnames(data))], 
                                         genes=genenames, 
-                                        signsindex=signs_index)
-        object
+                                        signs_index=signs_index)
+        pvalue_annotation
     }
 )
 
@@ -677,9 +677,9 @@ setMethod(
 setMethod(
     f="normalizePval", 
     signature="PvalueAnnotation", 
-    definition=function(object, trans, ref="expression_pvalue", #ARI isn't object a PValueAnnotation S4?
+    definition=function(pvalue_annotation, trans, ref="expression_pvalue", #ARI isn't object a PValueAnnotation S4?
                         method="rescale"){
-        temp_pval_data <- slot(slot(object,"score_data"),"pval_data")
+        temp_pval_data <- slot(slot(pvalue_annotation,"score_data"),"pval_data")
         names_temp_pval_data <- colnames(temp_pval_data)
         
         if(nrow(temp_pval_data == 0)){
@@ -702,33 +702,33 @@ setMethod(
         }
         
         par(mfrow=c(1, 2))
-        plotDensityPval(object, ref=ref)
+        plotDensityPval(pvalue_annotation, ref=ref)
            
         if(method %in% c("Box-Cox", "box-cox", "boxcox", "Boxcox")){
             if(missing(trans)){
                 message(paste("Auto-detecting best transformation"))
-                expos <- c() #ARI what's expos?
+                optimal_boxcox_exponent <- c() 
                 for(x in subset(names_temp_pval_data,
                                    !names_temp_pval_data %in% ref)){
                        
                     p_temp <- temp_pval_object[[x]]
                     if(!all(is.na(p_temp))){
                         logit_temp <- log(p_temp/(1-p_temp))
-                        each <- t(sapply(c(seq(.05, .95, .05), #ARI each what? VNC (Variable Name Change)
+                        nonparametric_comparison <- t(sapply(c(seq(.05, .95, .05), 
                                            rev(1/seq(.05, .95, .05))),
                                            function(i){
                                                c(i,wilcox.test(logit_ref,
                                                                as.numeric(logit_temp)*i)$p_value)
                                                }))
-                        each <- each[which(each[, 2] == max(each[, 2]))[1], 1]
+                        nonparametric_comparison <-  subset(nonparametric_comparison, nonparametric_comparison[, 2] == max( nonparametric_comparison[, 2])[1])[, 1]
                         p_temp <-
-                               (exp(logit_temp)^(each))/(1+exp(logit_temp)^(each))
+                               (exp(logit_temp)^( nonparametric_comparison))/(1+exp(logit_temp)^( nonparametric_comparison))
                     } 
                     else {
-                        each <- 1
+                        nonparametric_comparison <- 1
                     }
-                       expos <- c(expos, each)
-                       names(expos)[length(expos)] <- x
+                       optimal_boxcox_exponent <- c(optimal_boxcox_exponent,  nonparametric_comparison)
+                       names(optimal_boxcox_exponent)[length(optimal_boxcox_exponent)] <- x
                        temp_pval_object[[x]] <- p_temp
                        
                 }
@@ -736,29 +736,29 @@ setMethod(
             
             else {
                 if(length(trans) != 
-                       length(grep(paste(slot(slot(object,"score_data"), 
-                                              "signsindex")[, 3], collapse="|"),
+                       length(grep(paste(slot(slot(pvalue_annotation,"score_data"), 
+                                              "signs_index")[, 3], collapse="|"),
                                    colnames(temp_pval_object)))){
                     
                        stop("Length of p and transformations must equal!")
                 }
                 else {
-                    expos <- trans 
-                    names(expos) <- subset(names_temp_pval_data,!names_temp_pval_data  %in%ref)
+                    optimal_boxcox_exponent <- trans 
+                    names(optimal_boxcox_exponent) <- subset(names_temp_pval_data,!names_temp_pval_data  %in%ref)
                 }
-                for(x in names(expos)){
+                for(x in names(optimal_boxcox_exponent)){
                     p_temp <- temp_pval_object[[x]]
                     if(!all(is.na(p_temp))){
-                           p_temp <- p_temp^expos[x]
+                           p_temp <- p_temp^optimal_boxcox_exponent[x]
                     }
                     temp_pval_object[[x]] <- p_temp
                 }
             }
         }
         else if(method%in%c("Rescale", "rescale")){
-            for(i in slot(slot(object,"score_data"),"signsindex")[, 3]){
+            for(i in slot(slot(pvalue_annotation,"score_data"),"signs_index")[, 3]){
                 if(!all(is.na(slot(
-                    slot(object, "score_data"), "pval_data")[[grep(i,
+                    slot(pvalue_annotation, "score_data"), "pval_data")[[grep(i,
                                                                    names_temp_pval_data)]])
                    )){
                     p_temp <- temp_pval_object[[grep(i, names_temp_pval_data)]]
@@ -772,21 +772,21 @@ setMethod(
             }
         }
            
-        slot(slot(object,"score_data"),"pval_data") <- temp_pval_data				
-        plotDensityPval(object, ref=ref)   
-        object
+        slot(slot(pvalue_annotation,"score_data"),"pval_data") <- temp_pval_data				
+        plotDensityPval(pvalue_annotation, ref=ref)   
+        pvalue_annotation
     }
 )
 
 setMethod(
     f="scorePval", 
     signature="PvalueAnnotation", 
-    definition=function(object, weights){ #ARI again, is object the best name?
+    definition=function(pvalue_annotation, weights){ 
         
-        totalfactor <- ncol(slot(slot(object, "score_data"), "pval_data"))
+        totalfactor <- ncol(slot(slot(pvalue_annotation, "score_data"), "pval_data"))
         if(missing(weights)){
             weights <- rep((1/(totalfactor)), totalfactor)
-            names(weights) <- colnames(slot(slot(object, "score_data"), #ARI changed = to <-
+            names(weights) <- colnames(slot(slot(pvalue_annotation, "score_data"), 
                                          "pval_data"))
         } 
         else {
@@ -795,7 +795,7 @@ setMethod(
                      and weights must equal!")
             }
             else { 
-                pval_score_colnames <- colnames(slot(slot(object,"score_data"), 
+                pval_score_colnames <- colnames(slot(slot(pvalue_annotation,"score_data"), 
                                                     "pval_data")
                 if(is.null(names(weights))){ 
                     names(weights) <- pval_score_colnames
@@ -819,31 +819,31 @@ setMethod(
         message("The following weights are being applied")
         print(weights)
         
-        scoringdata <- slot(slot(object, "score_data"), "pval_data")*sign(slot(
-            slot(object, "score_data"), "effect_data"))
+        scoringdata <- slot(slot(pvalue_annotation, "score_data"), "pval_data")*sign(slot(
+            slot(pvalue_annotation, "score_data"), "effect_data"))
         
         weight_names_temp <- names(weights)
         
         if(any(grepl("exp", names(weights)))){
             weight_names_temp <- weight_names_temp[-grep("exp", names(weights))]
         }
-        slot(slot(object, "score_data"), "scoring_vector") <- weights
+        slot(slot(pvalue_annotation, "score_data"), "scoring_vector") <- weights
         
         #ARI what is happening here..May I propose the following see line 841
-        unidirectional <- as.numeric(slot(slot(object, "score_data"), 
-                                        "signsindex")[match(slot(slot(object, "score_data"),
-                                                                 "signsindex")[, 3], weight_names_temp), 2]) 
+        unidirectional <- as.numeric(slot(slot(pvalue_annotation, "score_data"), 
+                                        "signs_index")[match(slot(slot(pvalue_annotation, "score_data"),
+                                                                 "signs_index")[, 3], weight_names_temp), 2]) 
         unidirectional[which(unidirectional == 2)] <- 0
-        bidirectional <- as.numeric(slot(slot(object, "score_data"),
-                                         "signsindex")[match(slot(slot(object, "score_data"), 
-                                                                  "signsindex")[, 3], weight_names_temp), 2])
+        bidirectional <- as.numeric(slot(slot(pvalue_annotation, "score_data"),
+                                         "signs_index")[match(slot(slot(pvalue_annotation, "score_data"), 
+                                                                  "signs_index")[, 3], weight_names_temp), 2])
         bidirectional[which(bidirectional != 2)] <- 0
         bidirectional[which(bidirectional == 2)] <- 1
         
         ### PROPOSAL ## 
-        #unidirectional <- as.numeric(slot(slot(object, "score_data"), 
-        #                                  "signsindex")[match(slot(slot(object, "score_data"),
-        #                                                           "signsindex")[, 3], weight_names_temp), 2]) 
+        #unidirectional <- as.numeric(slot(slot(pvalue_annotation, "score_data"), 
+        #                                  "signs_index")[match(slot(slot(pvalue_annotation, "score_data"),
+        #                                                           "signs_index")[, 3], weight_names_temp), 2]) 
         #bidirectional <- unidirectional
         #unidirectional[which(unidirectional == 2)] <- 0                                                   
         #bidirectional[which(bidirectional != 2)] <- 0
@@ -899,28 +899,28 @@ setMethod(
         
         
         
-        slot(slot(object, "score_data"), "scores") <- 
+        slot(slot(pvalue_annotation, "score_data"), "scores") <- 
             data.frame(scores=as.numeric(new_pval), 
-                       row.names=as.character(slot(slot(object,"score_data"), 
+                       row.names=as.character(slot(slot(pvalue_annotation,"score_data"), 
                                                    "genes")))
-        object
+        pvalue_annotation
     }
 ) 
 
 setMethod(
     f="runSpinglass", 
     signature="PvalueAnnotation", 
-    definition=function(object, network, random_alpha = 0.05, gam = 0.5, 
+    definition=function(pvalue_annotation, network, random_alpha = 0.05, gam = 0.5, 
                         node_alpha = 0.05, maxsize = 500, minsize = 8,
-                        niter = 1000, simplify=TRUE)
+                        num_iterations = 1000, simplify=TRUE)
     {        
         
         if(inherits(network, what="graphNEL")){
             network <- graph_from_graphnel(network)
         }
         
-        if(length(slot(slot(object,"score_data"),"module_output")) !=0 ){
-            slot(slot(object,"score_data"),"module_output") <- list()
+        if(length(slot(slot(pvalue_annotation,"score_data"),"module_output")) !=0 ){
+            slot(slot(pvalue_annotation,"score_data"),"module_output") <- list()
             message("Overwriting existing modules.")
         }
         
@@ -928,10 +928,10 @@ setMethod(
             network <- igraph::simplify(network,remove.multiple=TRUE, 
                                         remove.loops=TRUE)
         }
-        genes_in_network <- subset(slot(slot(object, "score_data"), "genes"), 
-                                   slot(slot(object, "score_data"), "genes") %in% 
+        genes_in_network <- subset(slot(slot(pvalue_annotation, "score_data"), "genes"), 
+                                   slot(slot(pvalue_annotation, "score_data"), "genes") %in% 
                                        V(network)$name)
-        scores_in_network <- extractScores(object)[genes_in_network]
+        scores_in_network <- extractScores(pvalue_annotation)[genes_in_network]
         
         ##should be FALSE, but just in case check for NAs 
         if(any(is.na(scores_in_network))){
@@ -962,22 +962,22 @@ setMethod(
         stat_scores <- as.numeric(scores_in_network)
         pval_scores <- exp(scores_in_network/(-2))
         
-        temp1 <- apply(network.adj, 1, function(v) v*stat_scores) #ARI temp of what?
-        W <- (temp1 + t(temp1)) #Looks like you're defining W, so might as well give better name? W_forspinglass?
-        rm(temp1)
+        network_with_scores <- apply(network.adj, 1, function(v) v*stat_scores) 
+        W_for_spinglass <- ( network_with_scores + t( network_with_scores)) #Looks like you're defining W, so might as well give better name? W_forspinglass?
+        rm( network_with_scores)
         gc()
-        W_vec <- (-2*log(1-pchisq(as.vector(W),4)))
+        W_vec <- (-2*log(1-pchisq(as.vector(W_for_spinglass),4)))
         
         
             W_vec<-replace(W_vec, is.infinite(W_vec), max(subset(W_vec,!is.infinite(W_vec))) )
             
-        W <- matrix(W_vec, nrow=nrow(W))
+        W_for_spinglass <- matrix(W_vec, nrow=nrow(W))
         rm(W_vec)
-        rownames(W) <- genes_in_network
-        colnames(W) <- genes_in_network
+        rownames(W_for_spinglass) <- genes_in_network
+        colnames(W_for_spinglass) <- genes_in_network
         gc()
         final_network <- 
-            graph_from_adjacency_matrix(W, mode = "undirected", weighted=TRUE)
+            graph_from_adjacency_matrix(W_for_spinglass, mode = "undirected", weighted=TRUE)
         V(final_network)$weight <- stat_scores
         network <- final_network
         rm(final_network)
@@ -1012,27 +1012,26 @@ setMethod(
         
         nspin_glass_out <- length(spin_glass_out);
         random_edges <- lapply(1:nspin_glass_out, function(i) {
-            j <- spin_glass_out[[i]]
-            h <- induced_subgraph(network, j);
-            B <- as_adjacency_matrix(h, sparse=FALSE);
-            v <- sapply(1:niter, function(k){
+            each_spin_result <- spin_glass_out[[i]]
+            subnetwork <- induced_subgraph(network, each_spin_result);
+            adjacency_of_subnetwork <- as_adjacency_matrix(subnetwork, sparse=FALSE);
+            sapply(1:num_iterations, function(k){
                 message(paste("Testing significance: module", i, "of", 
-                              nspin_glass_out, "Randomization", k, "of", niter))
-                atperm = sample(stat_scores, nrow(B) , replace=TRUE)
-                temp1 = apply(B, 1, function(v) v*atperm)
-                W <- (temp1 + t(temp1));
-                W <- apply(W, 2, function(i){ 
+                              nspin_glass_out, "Randomization", k, "of", num_iterations))
+                random_sample_of_scores = sample(stat_scores, nrow(adjacency_of_subnetwork) , replace=TRUE)
+                random_network_with_scores = apply(adjacency_of_subnetwork , 1, function(v) v*random_sample_of_scores)
+                W_random <- (random_network_with_scores + t(random_network_with_scores));
+                W_random <- apply(W_random, 2, function(i){ 
                     replace(i, i>0, (-2*log(1-pchisq(subset(i,i>0),4))))
                     })
-                sum(W)/2
+                sum(W_random)/2
             })
-            v
         })
         names(random_edges) <- names(spin_glass_out);
         
         random_p <- lapply(1:nspin_glass_out, function(k){
             length(which(random_edges[[k]] >
-                             edge_sum[k]))/niter})
+                             edge_sum[k]))/num_iterations})
         names(random_p) <- names(spin_glass_out)
         
         if(length(spin_glass_out[which(do.call(c,random_p) < random_alpha)]) == 0){
@@ -1078,8 +1077,8 @@ setMethod(
         output[[1]] <- output[[1]][index]
         output[[5]] <- output[[5]][index]
 
-        slot(slot(object, "score_data"), "module_output") <- output
-        object    
+        slot(slot(pvalue_annotation, "score_data"), "module_output") <- output
+        pvalue_annotation    
     }	
 )
 
@@ -1087,17 +1086,17 @@ setMethod(
 setMethod(
     f="runBioNet", 
     signature="PvalueAnnotation", 
-    definition=function(object, network, alpha = 0.05)
+    definition=function(pvalue_annotation, network, alpha = 0.05)
     {
         if(any(alpha<0, alpha>1)){
             stop("Error: alpha must be between zero and one.")
         }
-        if(length(slot(slot(object,"score_data"),"module_output")) !=0 ){
-            slot(slot(object,"score_data"),"module_output") <- list()
+        if(length(slot(slot(pvalue_annotation,"score_data"),"module_output")) !=0 ){
+            slot(slot(pvalue_annotation,"score_data"),"module_output") <- list()
             message("Overwriting existing modules.")
         }
         
-        scores <- highScores(object, alpha=alpha)
+        scores <- highScores(pvalue_annotation, alpha=alpha)
         pval.v <- exp(scores/(-2))
         g <- subNetwork(names(pval.v), network)
         g <- rmSelfLoops(g)
@@ -1128,26 +1127,26 @@ setMethod(
         names(output[[1]])[1] <- 
             names(sub_score[which(sub_score==max(sub_score))[1]]
                   )
-        slot(slot(object,"score_data"),"module_output") <- output
-        object
+        slot(slot(pvalue_annotation,"score_data"),"module_output") <- output
+        pvalue_annotation
     }    
 )
 
 setMethod(
     f="runGOseq", 
     signature="PvalueAnnotation", 
-    definition=function(object, p_thresh=0.05, coverage, type="reactome")
+    definition=function(pvalue_annotation, p_thresh=0.05, coverage, type="reactome")
     {
         while(!names(dev.cur()) %in% c("pdf","null device")){
             dev.off()
         }
-        names.eid <- names(slot(slot(object, "score_data"),
+        names.eid <- names(slot(slot(pvalue_annotation, "score_data"),
                               "module_output")$modules)
-        eid <- slot(slot(object, "score_data"), "module_output")$modules
-        pval <- slot(slot(object, "score_data"), "module_output")$p_value
-        stat <- slot(slot(object, "score_data"), "module_output")$statistic
-        genes <- names(slot(slot(object, "score_data"), "module_output")$modules)
-        goseqdata <- slot(slot(object, "score_data"), "module_output")$modules
+        eid <- slot(slot(pvalue_annotation, "score_data"), "module_output")$modules
+        pval <- slot(slot(pvalue_annotation, "score_data"), "module_output")$p_value
+        stat <- slot(slot(pvalue_annotation, "score_data"), "module_output")$statistic
+        genes <- names(slot(slot(pvalue_annotation, "score_data"), "module_output")$modules)
+        goseqdata <- slot(slot(pvalue_annotation, "score_data"), "module_output")$modules
         
         sym2eg <- AnnotationDbi::as.list(org.Hs.eg.db::org.Hs.egSYMBOL2EG)
         eg2sym <- AnnotationDbi::as.list(org.Hs.eg.db::org.Hs.egSYMBOL)
@@ -1216,8 +1215,8 @@ setMethod(
             a <- do.call(rbind, a)
         }
         
-        slot(slot(object, "score_data"), "module_output")$goseqOut <- 
-            lapply(slot(slot(object, "score_data"), 
+        slot(slot(pvalue_annotation, "score_data"), "module_output")$goseqOut <- 
+            lapply(slot(slot(pvalue_annotation, "score_data"), 
                         "module_output")$modules, function(i){
                             b <- cbind(a[, 1], rep(0, nrow(a)))
                             b[which(b[, 1]%in%i), 2] <- 1
@@ -1233,7 +1232,7 @@ setMethod(
                             subset(path, path$over_represented_pvalue < p_thresh)
                         }
                    )
-        object
+        pvalue_annotation
     }
 ) 
 
@@ -1243,11 +1242,11 @@ setMethod(
 setMethod(
     f="searchGOseq", 
     signature="PvalueAnnotation", 
-    definition=function(object, searchstring, wholeword=FALSE){
+    definition=function(pvalue_annotation, searchstring, wholeword=FALSE){
         options(stringsAsFactors=FALSE)
         searchstring<-tolower(searchstring)
         nums <- which(do.call("c", lapply(
-            slot(slot(object, "score_data"), "module_output")$goseqOut,
+            slot(slot(pvalue_annotation, "score_data"), "module_output")$goseqOut,
             function(each){
                 any(grepl(ifelse(wholeword == FALSE, searchstring, 
                                  paste("\\b", searchstring, "\\b", sep="")), 
@@ -1259,12 +1258,12 @@ setMethod(
             out <- lapply(nums, function(i){
                 pos <- grep(ifelse(wholeword == FALSE, searchstring, 
                                    paste("\\b", searchstring, "\\b", sep="")),
-                            tolower(slot(slot(object, "score_data"), 
+                            tolower(slot(slot(pvalue_annotation, "score_data"), 
                                          "module_output")$goseqOut[[i]][, 6]))
-                tot <- nrow(slot(slot(object, "score_data"), 
+                tot <- nrow(slot(slot(pvalue_annotation, "score_data"), 
                                  "module_output")$goseqOut[[i]])
                 outterm <- as.data.frame(as.character(slot(
-                    slot(object, "score_data"), 
+                    slot(pvalue_annotation, "score_data"), 
                     "module_output")$goseqOut[[i]][pos, 6]))
                 cbind(outterm, as.data.frame(pos), 
                       as.data.frame(rep(tot,length(pos))))
@@ -1280,7 +1279,7 @@ setMethod(
             out[,2] <- sapply(out[,2], function(i){
                 i <- as.numeric(i);
                 i <- paste(i, "/", round(slot(
-                    slot(object, "score_data"), 
+                    slot(pvalue_annotation, "score_data"), 
                     "module_output")$moduleStats[[i]][2],4));
                 i
             })
@@ -1299,8 +1298,8 @@ setMethod(
 setMethod(
     f="extractGOseq", 
     signature="PvalueAnnotation", 
-    definition=function(object, which.network=NULL){  
-        temp <- slot(slot(object, "score_data"), "module_output")$goseqOut
+    definition=function(pvalue_annotation, which.network=NULL){  
+        temp <- slot(slot(pvalue_annotation, "score_data"), "module_output")$goseqOut
         if(!is.null(which.network)){temp <- temp[which.network]}
         temp
     }
