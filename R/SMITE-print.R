@@ -9,7 +9,7 @@ setMethod (
         else {      
             cat("* Expression data :"); 
             print(pData(slot(x,"expression"))); 
-            print(paste("Expression has",nrow(pData(slot(x,"expression"))),
+            print(paste("Expression has",nrow(pData(slot(x, "expression"))),
                         "entries"))
         }
         readline()
@@ -17,23 +17,23 @@ setMethod (
             cat("* Modification data :"); print("0 entries")
         }
         else{
-            for(i in unique(unlist(slot(x,"modifications"))$type)){
+            for(i in unique(unlist(slot(x, "modifications"))$type)){
                 cat(paste("*", i, "data :"));
-                print(subset(unlist(slot(x,"modifications")), 
+                print(subset(unlist(slot(x, "modifications")), 
                              unlist(slot(x, "modifications"))$type==i));
-                print(paste(i,"has",length(
-                    subset(unlist(slot(x,"modifications")),
-                           unlist(slot(x,"modifications"))$type==i)),"entries"))
+                print(paste(i,"has", length(
+                    subset(unlist(slot(x, "modifications")),
+                           unlist(slot(x, "modifications"))$type==i)), "entries"))
             }
         }
         readline()
-        if(nrow(slot(slot(x,"score_data"),"pval_data")) == 0){
+        if(nrow(slot(slot(x,"score_data"), "pval_data")) == 0){
             cat("* Score data :"); print("0 entries")
         }
         else {                                
             cat("* Score data :"); print(slot(slot(x,"score_data"),"scores"))
             print(paste("Score data has", 
-                        nrow(slot(slot(x,"score_data"), "scores")),
+                        nrow(slot(slot(x, "score_data"), "scores")),
                         "entries"))
         }
         readline()

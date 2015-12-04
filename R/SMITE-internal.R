@@ -20,10 +20,10 @@ setMethod(
 setMethod(
     f="returnPvalueCol", 
     signature="PvalueObject", 
-    definition=function(pval_object, c_name){        
+    definition=function(pval_object, col_name){        
         
         return(slot(pval_object, 
-                    "pval_data")[, grep(c_name, 
+                    "pval_data")[, grep(col_name, 
                                         colnames(slot(pval_object, 
                                                       "pval_data")))])
     }

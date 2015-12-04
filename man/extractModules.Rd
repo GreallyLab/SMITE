@@ -8,10 +8,10 @@ View specific modules within a PvalueAnnotation
 Having identfied modules within a Pvalue annotation, this function allows the user to display 1 or more of the module genes.
 }
 \usage{
-extractModules(annotation, whichModule = NULL)
+extractModules(pvalue_annotation, which_module = NULL)
 }
 \arguments{
-  \item{annotation}{
+  \item{pvalue_annotation}{
 An S4 object of class PvalueAnnotation for which Spinglass or BioNet has already been run.
 }
   \item{whichModule}{

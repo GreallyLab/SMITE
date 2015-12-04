@@ -2,61 +2,49 @@
 setMethod(
     f="plotCompareScores", 
     signature="PvalueAnnotation", 
-    definition=function(object, x_name, y_name, ...){
-        if(all(!grepl(x_name,colnames(slot(slot(object, "score_data")
-                                          , "pval_data")))))
+    definition=function(pvalue_annotation, x_name, y_name, ...)
+    {
+        pval_data <- slot(slot(pvalue_annotation, "score_data"), "pval_data") #ARI hopefully this won't slow down the code too much?
+        pval_col_names <- colnames(pval_data)
+        effect_data <-  slot(slot(pvalue_annotation, "score_data"), "effect_data")
+        effect_col_names <- colnames(effect_data)
+        
+        if(all(!grepl(x_name, pval_col_names)))
         {
             stop(paste("Provided x_name was not one of the following:",
-                    paste(colnames(slot(slot(object, "score_data")
-                                        , "pval_data")), collapse=",")))
+                    paste(pval_col_names, collapse=",")))
         }
               
-        if(all(!grepl(y_name,colnames(slot(slot(object, "score_data")
-                                          , "pval_data")))))
+        if(all(!grepl(y_name, pval_col_names)))
         {
             stop(paste("Provided y_name was not one of the following:",
-                    paste(colnames(slot(slot(object, "score_data")
-                                        , "pval_data")),collapse=",")))
+                    paste(pval_col_names, collapse=",")))
         }
             
-        if(length(grep(x_name,colnames(slot(slot(object, "score_data")
-                                                , "pval_data")))) > 1)
+        if(length(grep(x_name, pval_col_names)) > 1)
         {
             stop(paste("Provided x_name was not unique"))
         }
             
-        if(length(grep(y_name,colnames(slot(slot(object, "score_data")
-                                                , "pval_data")))) > 1)
+        if(length(grep(y_name, colnames(pval_col_names)) > 1)
         {
             stop(paste("Provided y_name was not unique"))
         }   
         
-        x <- (-log(abs(as.numeric(
-            slot(
-                slot(object, "score_data"),"pval_data")[[grep(x_name, colnames(
-                    slot(
-                        slot(object, "score_data"), "pval_data")))]])))*sign(
-                            slot(
-                                slot(object, "score_data"), "effect_data")[[grep(
-                                    x_name, colnames(slot(slot(object, "score_data"), 
-                                                          "effect_data")))]]
-                            )
-            )
-        y <- (-log(abs(as.numeric(slot(slot(object, "score_data"),
-                    "pval_data")[[grep(y_name, colnames(slot(slot(object, 
-                    "score_data"), "pval_data")))]]))
-                    )*sign(slot(slot(object, "score_data"), 
-                    "effect_data")[[grep(y_name, colnames(slot(slot(object, 
-                                            "score_data"), "effect_data")))]])
-              )
-        ggplot(data=data.frame(x=x, y=y), 
-            aes(x=x, y=y))+stat_binhex(bins=50)+geom_hline(yintercept=0, 
-            colour="red", linetype = "longdash")+geom_vline(xintercept=0,
-            colour="red", linetype = "longdash") +labs(title = paste(y_name, 
-            "vs", x_name, "p-values comparing effect direction"), 
-            x=paste(x_name, "Score * Effect Direction"), y=paste( y_name, 
-            "Score * Effect Direction")
-        )
+        x <- (-log(abs(as.numeric(pval_data[[grep(x_name, pval_col_names)]])))*
+                  sign(effect_data[[grep(x_name, effect_col_names)]]))
+        
+        y <- (-log(abs(as.numeric(pval_data[[grep(y_name, pval_col_names)]])))*
+                  sign(effect_data[[grep(y_name, effect_col_names)]]))
+        
+        ggplot(data=data.frame(x=x, y=y), aes(x=x, y=y))+
+            stat_binhex(bins=50)+
+            geom_hline(yintercept=0, colour="red", linetype = "longdash")+
+            geom_vline(xintercept=0, colour="red", linetype = "longdash")+
+            labs(title = paste(y_name, "vs", x_name,
+                               "p-values comparing effect direction"), 
+            x=paste(x_name, "Score * Effect Direction"), y=paste(y_name, 
+            "Score * Effect Direction"))
         
     }
 )
@@ -65,52 +53,52 @@ setMethod(
 setMethod(
     f="plotModule", 
     signature="PvalueAnnotation", 
-    definition=function(object, p_thresh=0.05, which.network=1, goseq=FALSE, 
+    definition=function(pvalue_annotation, p_thresh=0.05, which_network=1, goseq=FALSE, 
                         layout="fr", legend=TRUE, namestyle="symbol",
-                        suppressDetails=FALSE, meth_hi_col="blue", 
+                        suppress_details=FALSE, meth_hi_col="blue", 
                         meth_low_col="yellow1", meth_mid_col="gray90", 
                         exp_hi_col="red1", exp_low_col="chartreuse1", 
                         exp_mid_col="gray90", label_scale=TRUE,
-                        comparePlot=FALSE,pdfOut=NULL)
+                        compare_plot=FALSE, pdf_out=NULL)
     {
         
-        if(!is.null(pdfOut)){
-            unlink(pdfOut)
-            if(comparePlot==TRUE){
-                pdf(pdfOut, width=24, height=8.5)
+        module_output <- slot(slot(pvalue_annotation, "score_data"), "module_output")
+        
+        if(!is.null(pdf_out)){
+            unlink(pdf_out)
+            if(compare_plot==TRUE){
+                pdf(pdf_out, width=24, height=8.5)
             }
             else {
-                pdf(pdfOut, width=16, height=8.5)
+                pdf(pdf_out, width=16, height=8.5)
             }
         }
         
-        for(n_plot in which.network){
+        for(n_plot in which_network){
             if(goseq == TRUE){
-                if(length(slot(slot(object, "score_data"), 
+                if(length(slot(slot(pvalue_annotation, "score_data"), 
                            "module_output")$goseqOut) == 0){ 
                 stop("Goseq analysis has not been performed.")
                 }
             }
-            name.eid <- 
-                names(slot(slot(object, "score_data"), 
-                       "module_output")$modules)[n_plot]
-            eid <- slot(slot(object, "score_data"), 
-                 "module_output")$modules[[n_plot]]
-            g <- slot(slot(object, "score_data"), "module_output")$network
-            stat <- extractScores(object)
+            name.eid <- names(module_output$modules)[n_plot]
+            eid <- module_output$modules[[n_plot]]
+            network <- module_output$network
+            stat <- extractScores(pvalue_annotation)
             pval <- exp(stat/(-2))
-        
-            if(class(g)=="graphNEL"){
-                g <- graph_from_graphnel(g)
-                A <- as_adjacency_matrix(g)
-                stat.v <- stat[which(names(stat) %in% rownames(A))]
+
+            if(class(network) == "graphNEL"){
+                network <- graph_from_graphnel(network)
+                adj_mat_network <- as_adjacency_matrix(network)
+                stat.v <- stat[which(names(stat) %in% rownames(adj_mat_network))]
                 stat.v <- stat.v[order(names(stat.v))]
-                A <- A[order(rownames(A)),order(colnames(A))]
-                temp1 <- apply(A, 1, function(v) return(v*stat.v))
+                adj_mat_network <- adj_mat_network[order(
+                    rownames(adj_mat_network)),order(colnames(adj_mat_network))]
+                temp1 <- apply(adj_mat_network, 1, function(v) return(v*stat.v))
                 W <- (temp1 + t(temp1))/2
-                G <- graph_from_adjacency_matrix(W, mode = "undirected", weighted=TRUE)
-                V(G)$weight <- stat.v
-                g <- G
+                Graph_adj_mat <- graph_from_adjacency_matrix(W, mode = "undirected", weighted=TRUE)
+                V(Graph_adj_mat)$weight <- stat.v
+                network <- Graph_adj_mat
             }    
         
             vect2color <- function(v, palettev, breaks) {
@@ -129,10 +117,10 @@ setMethod(
             ## Edge palette: grey to black 
             edgePalette.v <- 
                 colorRampPalette(c("white","gray85","gray65","salmon"))(50);
-            edgeBreaks.v <- cut2(E(g)$weight, g=50, onlycuts=TRUE)         
+            edgeBreaks.v <- cut2(E(network)$weight, g=50, onlycuts=TRUE)         
             
             ## Compute iGraph object
-            h <- induced_subgraph(g, eid);
+            h <- induced_subgraph(network, eid);
             stat.v <- stat[V(h)$name];
             pval.v <- pval[V(h)$name];
             pval.v[which(pval.v == 0)] <- 0.000000001
@@ -151,9 +139,9 @@ setMethod(
             if(layout == "circle"){layout1 <- layout_in_circle(h)}
             if(layout == "fr"){layout1 <- layout_with_fr(h)}
             ## if two side by side plots are not needed
-            if(comparePlot == FALSE){
+            if(compare_plot == FALSE){
                 ## no pdf
-                if(is.null(pdfOut)){
+                if(is.null(pdf_out)){
                     ##no goseq
                     if(goseq == FALSE){
                         ##yes legend
@@ -181,7 +169,7 @@ setMethod(
             else{
                 legend <- FALSE
                 goseq <- FALSE
-                suppressDetails <- TRUE
+                suppress_details <- TRUE
                 if(!names(dev.cur()) %in% c("RStudioGD","pdf")){
                     dev.new(height=10, width=20)
                 }
@@ -246,43 +234,43 @@ setMethod(
                 expcol <- c(exp_low_col, exp_mid_col, exp_hi_col, "white")
                 names(expcol) <- c("Low", "Med", "High", "NoData")
                 
-                if(any(suppressDetails == FALSE, counter == 1)){
+                if(any(suppress_details == FALSE, counter == 1)){
                     for(i in 1:nrow(layout1_scaled)){
                         
                         halfCircle(x=layout1_scaled[i, 1], y=layout1_scaled[i, 2], 
                             r=ifelse(length(V(h)) < 50, 0.075, 0.025), start=pi/2, 
                             end=2*pi/2, quarter=TRUE, lwd=1, 
-                            col=ifelse(!is.na(slot(slot(object, "score_data"),
-                            "pval_data")$expression_pvalue[which(slot(object,
+                            col=ifelse(!is.na(slot(slot(pvalue_annotation, "score_data"),
+                            "pval_data")$expression_pvalue[which(slot(pvalue_annotation,
                             "score_data")@genes%in%V(h)$name[i])]), 
-                            expcol[ifelse(abs(slot(slot(object, "score_data"), 
-                            "pval_data")$expression_pvalue[which(slot(object, 
+                            expcol[ifelse(abs(slot(slot(pvalue_annotation, "score_data"), 
+                            "pval_data")$expression_pvalue[which(slot(pvalue_annotation, 
                             "score_data")@genes%in%V(h)$name[i])]) < p_thresh, 
-                            ifelse(sign(slot(slot(object, "score_data"), 
+                            ifelse(sign(slot(slot(pvalue_annotation, "score_data"), 
                             "effect_data")$expression_effect[
-                            which(slot(object,"score_data")@genes %in% V(h)$name[i])])
+                            which(slot(pvalue_annotation,"score_data")@genes %in% V(h)$name[i])])
                             == 1, 3, 1), 2)], expcol[4])
                         )
                         
                         start <- pi
-                        delta <- (3*pi/2)/nrow(slot(slot(object, "score_data"), 
+                        delta <- (3*pi/2)/nrow(slot(slot(pvalue_annotation, "score_data"), 
                                                  "signsindex"))
                         
-                        for(j in slot(slot(object, "score_data"), "signsindex")[, 3]){
+                        for(j in slot(slot(pvalue_annotation, "score_data"), "signsindex")[, 3]){
                             
                             halfCircle(x=layout1_scaled[i, 1], y=layout1_scaled[i, 2], 
                                        r=ifelse(length(V(h))< 50, 0.075, 0.025), 
                                        start=start, end=start+delta, quarter=TRUE, 
                                        
-                                      col=ifelse(!is.na(returnPvalueCol(slot(object, 
-                                      "score_data"), j)[which(slot(object, 
+                                      col=ifelse(!is.na(returnPvalueCol(slot(pvalue_annotation, 
+                                      "score_data"), j)[which(slot(pvalue_annotation, 
                                         "score_data")@genes%in%V(h)$name[i])]), 
                                 {
-                                methcol[ ifelse(abs(returnPvalueCol(slot(object, "score_data"), j)[
-                                which(slot(object, "score_data")@genes%in%V(h)$name[i])])<p_thresh, 
-                                ifelse(sign(slot(slot(object, "score_data"), 
-                                "effect_data")[, grep(j, colnames(slot(slot(object, 
-                                "score_data"), "effect_data")))][which(slot(object, 
+                                methcol[ ifelse(abs(returnPvalueCol(slot(pvalue_annotation, "score_data"), j)[
+                                which(slot(pvalue_annotation, "score_data")@genes%in%V(h)$name[i])])<p_thresh, 
+                                ifelse(sign(slot(slot(pvalue_annotation, "score_data"), 
+                                "effect_data")[, grep(j, colnames(slot(slot(pvalue_annotation, 
+                                "score_data"), "effect_data")))][which(slot(pvalue_annotation, 
                                 "score_data")@genes%in%V(h)$name[i])]) == 1, 3, 1), 2)]
                                 }, methcol[4])
                             )
@@ -292,13 +280,13 @@ setMethod(
                 }
     
                 if(any(legend == TRUE, counter == 1)){
-                    if(any(suppressDetails == FALSE, counter == 1)){
-                        num_factors <- nrow(slot(slot(object, "score_data"), "signsindex"))
+                    if(any(suppress_details == FALSE, counter == 1)){
+                        num_factors <- nrow(slot(slot(pvalue_annotation, "score_data"), "signsindex"))
                         halfCircle(x=-1.25, y=1.25, r=.4, start=pi/2, end=pi, quarter=TRUE)
                         start <- pi/2
                         delta <- pi/8
             
-                        for(g in 1:4){
+                        for(g in 1:4){ #ARI this isn't the same g (what i now named network from before), right?
                             halfCircle(x=-1.25, y=1.25, r=.37, r2=.89, start=start+delta*(g-1), 
                                        end=start+delta*g, col=expcol[g], quarter=TRUE)
                             arctext(x=-1.25, y=1.25, r=.35, start=start+delta*(g-1), 
@@ -311,7 +299,7 @@ setMethod(
                         start <- pi
                         delta <- (3*pi/2)/num_factors
                 
-                        for(j in slot(slot(object, "score_data"), "signsindex")[, 3]){
+                        for(j in slot(slot(pvalue_annotation, "score_data"), "signsindex")[, 3]){
                             halfCircle(x=-1.25, y=1.25, r=.4, start=start, end=start+delta,
                                        quarter=TRUE)
                             for(g in 1:4){
@@ -392,29 +380,29 @@ setMethod(
                 if(namestyle == "symbol"){
                     text(0, 1.7, paste(
                         "Network built around", name.eid, "\nChi-square P-value=", 
-                        round(slot(slot(object, "score_data"), 
+                        round(slot(slot(pvalue_annotation, "score_data"), 
                                    "module_output")$moduleStats[[n_plot]][2],4)))
                 }
     
                 if(goseq == TRUE){
-                    if(nrow(slot(slot(object, "score_data"),
+                    if(nrow(slot(slot(pvalue_annotation, "score_data"),
                                  "module_output")$goseqOut[[n_plot]]) > 0){
             
                         text("Num\nGenes", x=1.35, y=1.6, font=2)
                         text("Enriched\nPathway/Term", x=2, y=1.6, font=2)
-                        for(i in 1:nrow(slot(slot(object, "score_data"), 
+                        for(i in 1:nrow(slot(slot(pvalue_annotation, "score_data"), 
                                              "module_output")$goseqOut[[n_plot]])){
-                            text(slot(slot(object, "score_data"), 
+                            text(slot(slot(pvalue_annotation, "score_data"), 
                                       "module_output")$goseqOut[[n_plot]][i, 4], x=1.3,
                                  y=seq(1.4, -1, length.out= nrow(slot(
-                                     slot(object, "score_data"),
+                                     slot(pvalue_annotation, "score_data"),
                                      "module_output")$goseqOut[[n_plot]]))[i], 
                                  adj = c(0, 0))
                         
-                            text(slot(slot(object, "score_data"),
+                            text(slot(slot(pvalue_annotation, "score_data"),
                                       "module_output")$goseqOut[[n_plot]][i, 6], x=1.5, 
                                  y=seq(1.4, -1, length.out= nrow(slot(
-                                     slot(object, "score_data"),
+                                     slot(pvalue_annotation, "score_data"),
                                      "module_output")$goseqOut[[n_plot]]))[i], 
                                  adj= c(0, 0))
                         }
@@ -428,17 +416,17 @@ setMethod(
                 
                 if(counter == 1){break}
                 counter <- 2
-                if(comparePlot == TRUE){counter <- 1}
+                if(compare_plot == TRUE){counter <- 1}
             }
             
-            if(is.null(pdfOut)){
-                if(n_plot != which.network[length(which.network)]){
+            if(is.null(pdf_out)){
+                if(n_plot != which_network[length(which_network)]){
                     message("Press key to go to next plot")
                     readline()
                 }
             }
         }
-        if(!is.null(pdfOut)){dev.off()}
+        if(!is.null(pdf_out)){dev.off()}
     }
 )
 	
@@ -447,25 +435,24 @@ setMethod(
 setMethod(
     f="plotDensityPval", 
     signature="PvalueAnnotation", 
-    definition=function(x, ref="expression_pvalue", ...){
+    definition=function(pvalue_annotation, ref="expression_pvalue", ...) #ARI ref is for?
+    {
         palette(c("red", "green", "blue", "gold", "orange", 
                         "purple", "magenta"))
-           
-        if(!any(grepl(ref,colnames(slot(slot(x, "score_data"), 
-                                        "pval_data"))))){
+        pval_data <- slot(slot(pvalue_annotation, "score_data"), "pval_data")
+        pval_col_names <- colnames(pval_data)
+        
+        if(!any(grepl(ref, pval_col_names))){
             stop("paste(Reference is not one of the available:", 
-                 colnames(slot(slot(x, "score_data"), "pval_data")))
+                 pval_col_names)
         }
-        if(length(grep(ref,colnames(slot(slot(x, "score_data"), 
-                                        "pval_data"))))>1){
+        if(length(grep(ref, pval_col_names)) > 1){
             stop("Reference was not specific enough.")
         }
               
-        ref <- colnames(slot(slot(x, "score_data"), "pval_data"))[
-            grep(ref,colnames(slot(slot(x, "score_data"), "pval_data")))]
-        nonref <- colnames(slot(slot(x, "score_data"), "pval_data"))[
-            which(!grepl(ref,colnames(slot(slot(x, "score_data"), "pval_data"))))]
-        dens_range <- lapply(slot(slot(x,"score_data"), "pval_data"), 
+        ref <- pval_col_names[grep(ref, pval_col_names)]
+        nonref <- pval_col_names[which(!grepl(ref, pval_col_names))]
+        dens_range <- lapply(pval_data, 
                              function(i){
                                 dens <- density(as.numeric(i), na.rm=TRUE)
                                 x <- dens$x
@@ -491,34 +478,22 @@ setMethod(
         box()
         title("Density of P-values/Scores", xlab="P-values",
               ylab="Density")
-              
-        sapply(slot(slot(x, "score_data"), "signsindex")[, 3], 
-                    function(i){
-                        message(paste("Plotting: ",i))
-                        if(!all(is.na(slot(slot(x, "score_data"), "pval_data")[[
-                            grep(i, colnames(slot(slot(x, "score_data"), "pval_data")
-                                             ))]]
-                        ))){ 
-                            
-                            lines(density(abs(as.numeric(slot(
-                                slot(x, "score_data"), "pval_data")
-                                [[grep(i, colnames(slot(
-                                    slot(x, "score_data"),"pval_data")))]])),
-                                na.rm=TRUE), col= which(slot(
-                                    slot(x, "score_data"),
-                                    "signsindex")[, 3] == i))
-                        }
-                    }
-               )
+        
+        score_sign_idx <- slot(slot(pvalue_annotation, "score_data"), "signsindex")
+        sapply(score_sign_idx[, 3], function(i){
+            message(paste("Plotting: ", i))
+            if(!all(is.na(pval_data[[grep(i, pval_col_names)]]))){
+                lines(density(abs(as.numeric(pval_data[[grep(i, pval_col_names)]])),
+                              na.rm=TRUE), col= which(score_sign_idx[, 3] == i))
+            }
+        })
         
         lines(density(abs(
-            returnPvalueCol(slot(x, "score_data"), ref)
+            returnPvalueCol(slot(pvalue_annotation, "score_data"), ref)
             ), na.rm=TRUE), col="black")
               
-        legend(x_range[2]+.01,y_range[2]+.01, gsub("_","\n",c(paste(
-                strsplit(ref,"_pvalue")[[1]], "(REF)"),slot(slot(x, 
-                "score_data"), "signsindex")[, 3])), fill=c("black", 
-                1:length(slot(slot(x, "score_data"), "signsindex")[, 3])),
-                xpd=TRUE,bty="n")         
+        legend(x_range[2]+.01, y_range[2]+.01, gsub("_", "\n", c(paste(
+            strsplit(ref, "_pvalue")[[1]], "(REF)"), score_sign_idx[, 3])),
+            fill=c("black", 1:length(score_sign_idx[, 3])), xpd=TRUE,bty="n")         
     }
 )

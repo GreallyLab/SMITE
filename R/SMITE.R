@@ -245,7 +245,7 @@ setMethod(
 setMethod(
     f="annotateExpression", 
     signature="PvalueAnnotation", 
-    definition=function(annotation, expdata, effect_col=NULL, pval_col=NULL){
+    definition=function(annotation, expdata, effect_col=NULL, pval_col=NULL){ #ARI should we make expdata expr_data? I can't remember is expdata is used  in other R packages though.
         if(is.null(effect_col)){
             effect_col=grep("effect|odds|coeff|B", tolower(colnames(expdata)))
             if(length(effect_col) != 1){
@@ -602,7 +602,7 @@ setMethod(
 )
 
 setMethod(
-    f="makePvalueObject", #ARI could you elaborate on what a Pvalue object is? it looks like it's really to Make Pvalue scores for each modification interaction? Object is pretty vague. 
+    f="makePvalueObject", 
     signature="PvalueAnnotation", 
     definition=function(pvalue_annotation, effect_directions=NULL) {
         
@@ -677,7 +677,7 @@ setMethod(
 setMethod(
     f="normalizePval", 
     signature="PvalueAnnotation", 
-    definition=function(pvalue_annotation, trans, ref="expression_pvalue", #ARI isn't object a PValueAnnotation S4?
+    definition=function(pvalue_annotation, trans, ref="expression_pvalue", 
                         method="rescale"){
         temp_pval_data <- slot(slot(pvalue_annotation,"score_data"),"pval_data")
         names_temp_pval_data <- colnames(temp_pval_data)
@@ -963,15 +963,15 @@ setMethod(
         pval_scores <- exp(scores_in_network/(-2))
         
         network_with_scores <- apply(network.adj, 1, function(v) v*stat_scores) 
-        W_for_spinglass <- ( network_with_scores + t( network_with_scores)) #Looks like you're defining W, so might as well give better name? W_forspinglass?
-        rm( network_with_scores)
+        W_for_spinglass <- (network_with_scores + t(network_with_scores))
+        rm(network_with_scores)
         gc()
         W_vec <- (-2*log(1-pchisq(as.vector(W_for_spinglass),4)))
         
         
             W_vec<-replace(W_vec, is.infinite(W_vec), max(subset(W_vec,!is.infinite(W_vec))) )
             
-        W_for_spinglass <- matrix(W_vec, nrow=nrow(W))
+        W_for_spinglass <- matrix(W_vec, nrow=nrow(W_for_spinglass))
         rm(W_vec)
         rownames(W_for_spinglass) <- genes_in_network
         colnames(W_for_spinglass) <- genes_in_network
@@ -1242,22 +1242,22 @@ setMethod(
 setMethod(
     f="searchGOseq", 
     signature="PvalueAnnotation", 
-    definition=function(pvalue_annotation, searchstring, wholeword=FALSE){
+    definition=function(pvalue_annotation, search_string, wholeword=FALSE){
         options(stringsAsFactors=FALSE)
-        searchstring<-tolower(searchstring)
+        search_string<-tolower(search_string)
         nums <- which(do.call("c", lapply(
             slot(slot(pvalue_annotation, "score_data"), "module_output")$goseqOut,
             function(each){
-                any(grepl(ifelse(wholeword == FALSE, searchstring, 
-                                 paste("\\b", searchstring, "\\b", sep="")), 
+                any(grepl(ifelse(wholeword == FALSE, search_string, 
+                                 paste("\\b", search_string, "\\b", sep="")), 
                           tolower(each[, ncol(each)])))
                 }
             ))
         )
         if(length(nums) > 0){ 
             out <- lapply(nums, function(i){
-                pos <- grep(ifelse(wholeword == FALSE, searchstring, 
-                                   paste("\\b", searchstring, "\\b", sep="")),
+                pos <- grep(ifelse(wholeword == FALSE, search_string, 
+                                   paste("\\b", search_string, "\\b", sep="")),
                             tolower(slot(slot(pvalue_annotation, "score_data"), 
                                          "module_output")$goseqOut[[i]][, 6]))
                 tot <- nrow(slot(slot(pvalue_annotation, "score_data"), 
@@ -1298,9 +1298,9 @@ setMethod(
 setMethod(
     f="extractGOseq", 
     signature="PvalueAnnotation", 
-    definition=function(pvalue_annotation, which.network=NULL){  
+    definition=function(pvalue_annotation, which_network=NULL){  
         temp <- slot(slot(pvalue_annotation, "score_data"), "module_output")$goseqOut
-        if(!is.null(which.network)){temp <- temp[which.network]}
+        if(!is.null(which_network)){temp <- temp[which_network]}
         temp
     }
 )
@@ -1313,16 +1313,16 @@ setMethod(
 setMethod(
     f="extractModification", 
     signature="PvalueAnnotation", 
-    definition=function(annotation, mod_type=NULL){
+    definition=function(pvalue_annotation, mod_type=NULL){
         if(!is.null(mod_type)){
-            if(!mod_type%in%names(slot(annotation,
+            if(!mod_type%in%names(slot(pvalue_annotation,
                                       "modifications")@metadata$elements)){
-                stop("Provided mod_type is not in the annotation")
+                stop("Provided mod_type is not in the PvalueAnnotation object.")
             } 
         }
         
-        temp_meta <- slot(slot(annotation,"modifications"),"metadata")
-        temp <- unlist(slot(annotation,"modifications"))
+        temp_meta <- slot(slot(pvalue_annotation,"modifications"),"metadata")
+        temp <- unlist(slot(pvalue_annotation,"modifications"))
         names(temp) <- NULL
         
         if(is.null(mod_type)){mod_type <- unique(temp$type)}
@@ -1335,11 +1335,11 @@ setMethod(
 setMethod(
     f="extractExpression", 
     signature="PvalueAnnotation", 
-    definition=function(annotation){
+    definition=function(pvalue_annotation){
         if(is.null(expression)){
             stop("No expression data loaded.")
         } 
-        temp_exp <- slot(annotation,"expression")
+        temp_exp <- slot(pvalue_annotation,"expression")
         pData(temp_exp)
     }
 )
@@ -1350,8 +1350,8 @@ setMethod(
 setMethod(
     f="extractModSummary", 
     signature="PvalueAnnotation", 
-    definition=function(annotation){ 
-        temp_meta<-slot(slot(annotation,"modifications"),"metadata")
+    definition=function(pvalue_annotation){ 
+        temp_meta<-slot(slot(pvalue_annotation,"modifications"),"metadata")
         temp_meta$m_summary
     }
 )
@@ -1359,11 +1359,11 @@ setMethod(
 setMethod(
     f="extractScores", 
     signature="PvalueAnnotation", 
-    definition=function(annotation){
-        if(nrow(slot(slot(annotation,"score_data"),"scores")) == 0){
+    definition=function(pvalue_annotation){
+        if(nrow(slot(slot(pvalue_annotation,"score_data"),"scores")) == 0){
             stop("Run scorePval function first.")
         }
-        temp <- slot(slot(annotation,"score_data"),"scores")
+        temp <- slot(slot(pvalue_annotation,"score_data"),"scores")
         names_temp <- rownames(temp)
         temp <- as.vector(temp[,1])
         names(temp) <- names_temp
@@ -1374,15 +1374,15 @@ setMethod(
 setMethod(
     f="highScores", 
     signature="PvalueAnnotation", 
-    definition=function(annotation,alpha=0.05){
-        if(nrow(slot(slot(annotation,"score_data"),"scores")) == 0){
+    definition=function(pvalue_annotation, alpha=0.05){
+        if(nrow(slot(slot(pvalue_annotation,"score_data"),"scores")) == 0){
             stop("Run scorePval function first.")
         }
         if(any(alpha < 0, alpha > 1)){
             stop("alpha must be between 0 and 1")
         }
         
-        temp <- slot(slot(annotation,"score_data"),"scores")
+        temp <- slot(slot(pvalue_annotation,"score_data"),"scores")
         names_temp <- rownames(temp) 
         temp <- as.vector(temp[,1])
         names(temp) <- names_temp
@@ -1400,7 +1400,7 @@ setMethod(
 )
 
 shadowtext <- function(x, y=NULL, labels, col='white', bg='black',
-                       theta= seq(pi/4, 2*pi, length.out=8), r=0.1, ... ) {
+                       theta= seq(pi/4, 2*pi, length_out=8), r=0.1, ... ) {
     xy <- xy.coords(x,y)
     xo <- r*strwidth('A')
     yo <- r*strheight('A')
@@ -1415,7 +1415,7 @@ setMethod(
     f="addShadowText", 
     signature="ANY",
     definition=function(x, y=NULL, labels, col='white', bg='black',
-                        theta= seq(pi/4, 2*pi, length.out=8), r=0.1, ...) {
+                        theta=seq(pi/4, 2*pi, length_out=8), r=0.1, ...) {
         
         xy <- xy.coords(x,y)
         xo <- r*strwidth('A')
@@ -1431,14 +1431,14 @@ setMethod(
 setMethod(
     f="extractModules", 
     signature="PvalueAnnotation", 
-    definition=function(annotation,whichModule=NULL){
-        if(length(slot(slot(annotation, "score_data"), 
+    definition=function(pvalue_annotation, which_module=NULL){
+        if(length(slot(slot(pvalue_annotation, "score_data"), 
                        "module_output")$modules) == 0) {
             stop("Spinglass or Bionet analysis has not been performed.")
         }
-        temp <- slot(slot(annotation,"score_data"),"module_output")$modules
-        if(!is.null(whichModule)){
-            temp <- temp[whichModule]
+        temp <- slot(slot(pvalue_annotation,"score_data"),"module_output")$modules
+        if(!is.null(which_module)){
+            temp <- temp[which_module]
         }
         temp
     }
