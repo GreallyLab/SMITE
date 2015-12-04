@@ -1372,8 +1372,6 @@ setMethod(
     }
 )
 
-
-
 setMethod(
     f="highScores", 
     signature="PvalueAnnotation", 
