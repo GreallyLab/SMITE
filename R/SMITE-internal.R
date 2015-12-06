@@ -4,16 +4,16 @@ setMethod(
     signature="PvalueAnnotation", 
     definition=function(pvalue_annotation)){
         
-        temp1 <- slot(slot(pvalue_annotation), "modifications"), "metadata")$m_summary
-        temp1 <- cbind(rownames(temp1), temp1)
-        colnames(temp1)[1] <- "genes"
+        metadata_sum <- slot(slot(pvalue_annotation), "modifications"), "metadata")$m_summary
+        metadata_sum <- cbind(rownames(metadata_sum), metadata_sum)
+        colnames(metadata_sum)[1] <- "genes"
         if(nrow(pData(pvalue_annotation)@expression)) > 0){
             
-            temp2 <- pData(pvalue_annotation)@expression)
-            temp2 <- cbind(rownames(temp2), temp2)
-            temp1 <- merge(temp1, temp2, by=1, all=TRUE)
+            exprs <- pData(pvalue_annotation)@expression)
+            exprs <- cbind(rownames(exprs), exprs)
+            metadata_sum <- merge(metadata_sum, exprs, by=1, all=TRUE)
         }
-        return(temp1)
+        return(metadata_sum)
     }
 )
 	
