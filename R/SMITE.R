@@ -245,36 +245,36 @@ setMethod(
 setMethod(
     f="annotateExpression", 
     signature="PvalueAnnotation", 
-    definition=function(annotation, expdata, effect_col=NULL, pval_col=NULL){ #ARI should we make expdata expr_data? I can't remember is expdata is used  in other R packages though.
+    definition=function(annotation, expr_data, effect_col=NULL, pval_col=NULL){ 
         if(is.null(effect_col)){
-            effect_col=grep("effect|odds|coeff|B", tolower(colnames(expdata)))
+            effect_col=grep("effect|odds|coeff|B", tolower(colnames(expr_data)))
             if(length(effect_col) != 1){
                 stop("Cannot determine effect column. Please specify with arg:effect_col")
             }
         }
         
-        if(any(!c(-1,1) %in% unique(sign(expdata[, effect_col])))){
+        if(any(!c(-1,1) %in% unique(sign(expr_data[, effect_col])))){
             message("WARNING: Effects should provide a direction, but these effects
             are all in the same direction.")
         }
         
         if(is.null(pval_col)){
             
-            pval_col <- grep("pval|p.val|p_val|sig", tolower(colnames(expdata))) #ARI Changed = to <-, I hope that's OK
+            pval_col <- grep("pval|p.val|p_val|sig", tolower(colnames(expr_data))) 
             if(length(effect_col) != 1){
                 stop("Cannot determine p.value column. Please specify with arg:effect_col")
             }
         }
-        if(any(expdata[, pval_col] < 0, expdata[, pval_col] > 1)){
+        if(any(expr_data[, pval_col] < 0, expr_data[, pval_col] > 1)){
             stop("P-values must be between 0 and 1")
         }
-        temp_pval_col <- expdata[, pval_col]
+        temp_pval_col <- expr_data[, pval_col]
         temp_pval_col <- replace(temp_pval_col, temp_pval_col < .0000001,.0000001)
         temp_pval_col <- replace(temp_pval_col, temp_pval_col > .9999999,.9999999)
-        expdata[, pval_col] <- temp_pval_col
+        expr_data[, pval_col] <- temp_pval_col
        
-        expression_output <- ExpressionSet(as.matrix(expdata), featureNames=rownames(expdata))
-        phenoData(expression_output) <- #ARI changed = to <-
+        expression_output <- ExpressionSet(as.matrix(expr_data), featureNames=rownames(expr_data))
+        phenoData(expression_output) <-
             new("AnnotatedDataFrame", 
                 data=as.data.frame(exprs(expression_output)[, 
                                                             c(effect_col, pval_col)]))
@@ -309,7 +309,7 @@ setMethod(
         ##no mod_included or weight names
         if(is.null(names(weight_by))){
             if(is.null(mod_included)){
-                mod_included <- unique_feature_names[!unique_feature_names %in% #ARI changed = to <-
+                mod_included <- unique_feature_names[!unique_feature_names %in% 
                             c("original", "tss")]
             }
             names(weight_by) <- mod_included
@@ -632,11 +632,11 @@ setMethod(
         
         exp_ind <- ifelse(nrow(pData(pvalue_annotation@expression)) > 0, 1, 0)
         
-        totalfactor <- length(effect_directions)
+        total_num_factor <- length(effect_directions)
         
         signs_index <- merge(cbind(c("increase", "decrease", "bidirectional"),
                                 c(1, -1, 2)), 
-                          cbind(effect_directions, 1:totalfactor), by=1)
+                          cbind(effect_directions, 1:total_num_factor), by=1)
         signs_index <- signs_index[order(signs_index[, 3]), ]
         rownames(signs_index) <- NULL
         colnames(signs_index) <- c("expression_relationship", "B_coeff","name")
@@ -679,10 +679,12 @@ setMethod(
     signature="PvalueAnnotation", 
     definition=function(pvalue_annotation, trans, ref="expression_pvalue", 
                         method="rescale"){
+        
         temp_pval_data <- slot(slot(pvalue_annotation,"score_data"),"pval_data")
+        
         names_temp_pval_data <- colnames(temp_pval_data)
         
-        if(nrow(temp_pval_data == 0)){
+        if(nrow(temp_pval_data) == 0){
             stop("Run makePvalueObject function first.")
         }
         if(!any(grepl(ref,names_temp_pval_data))){
@@ -694,8 +696,10 @@ setMethod(
         }
            
         ref_index <- grep(ref,names_temp_pval_data)
-        p_ref <- temp_pval_object[[ref_index]]
+        p_ref <- temp_pval_data[[ref_index]]
         logit_ref <- log(p_ref/(1-p_ref))
+        temp_signs_index<-slot(slot(pvalue_annotation,"score_data"), 
+                               "signs_index")[, 3]
         
         if(!names(dev.cur()) %in% c("RStudioGD","pdf")){
             dev.new(height=7, width=14)
@@ -708,10 +712,9 @@ setMethod(
             if(missing(trans)){
                 message(paste("Auto-detecting best transformation"))
                 optimal_boxcox_exponent <- c() 
-                for(x in subset(names_temp_pval_data,
-                                   !names_temp_pval_data %in% ref)){
+                for(x in names_temp_pval_data[-ref_index]){
                        
-                    p_temp <- temp_pval_object[[x]]
+                    p_temp <- temp_pval_data[[x]]
                     if(!all(is.na(p_temp))){
                         logit_temp <- log(p_temp/(1-p_temp))
                         nonparametric_comparison <- t(sapply(c(seq(.05, .95, .05), 
@@ -729,16 +732,18 @@ setMethod(
                     }
                        optimal_boxcox_exponent <- c(optimal_boxcox_exponent,  nonparametric_comparison)
                        names(optimal_boxcox_exponent)[length(optimal_boxcox_exponent)] <- x
-                       temp_pval_object[[x]] <- p_temp
+                       temp_pval_data[[x]] <- p_temp
                        
                 }
             }
             
             else {
+                
+                
+                
                 if(length(trans) != 
-                       length(grep(paste(slot(slot(pvalue_annotation,"score_data"), 
-                                              "signs_index")[, 3], collapse="|"),
-                                   colnames(temp_pval_object)))){
+                       length(grep(paste(temp_signs_index, collapse="|"),
+                                   colnames(temp_pval_data)))){
                     
                        stop("Length of p and transformations must equal!")
                 }
@@ -747,25 +752,25 @@ setMethod(
                     names(optimal_boxcox_exponent) <- subset(names_temp_pval_data,!names_temp_pval_data  %in%ref)
                 }
                 for(x in names(optimal_boxcox_exponent)){
-                    p_temp <- temp_pval_object[[x]]
+                    p_temp <- temp_pval_data[[x]]
                     if(!all(is.na(p_temp))){
                            p_temp <- p_temp^optimal_boxcox_exponent[x]
                     }
-                    temp_pval_object[[x]] <- p_temp
+                    temp_pval_data[[x]] <- p_temp
                 }
             }
         }
         else if(method%in%c("Rescale", "rescale")){
-            for(i in slot(slot(pvalue_annotation,"score_data"),"signs_index")[, 3]){
+            for(i in temp_signs_index){
                 if(!all(is.na(slot(
                     slot(pvalue_annotation, "score_data"), "pval_data")[[grep(i,
                                                                    names_temp_pval_data)]])
                    )){
-                    p_temp <- temp_pval_object[[grep(i, names_temp_pval_data)]]
+                    p_temp <- temp_pval_data[[grep(i, names_temp_pval_data)]]
                     logit_temp <- log(p_temp/(1-p_temp))
                     logit_temp <- rescale(logit_temp, to=range(logit_ref, 
                                                                     na.rm=TRUE))
-                    temp_pval_object[[grep(i, 
+                    temp_pval_data[[grep(i, 
                                            names_temp_pval_data
                                            )]] <- exp(logit_temp)/(1+exp(logit_temp))
                 }
@@ -783,30 +788,29 @@ setMethod(
     signature="PvalueAnnotation", 
     definition=function(pvalue_annotation, weights){ 
         
-        totalfactor <- ncol(slot(slot(pvalue_annotation, "score_data"), "pval_data"))
+        total_num_factor <- ncol(slot(slot(pvalue_annotation, "score_data"), "pval_data"))
+        pval_score_colnames <- colnames(slot(slot(pvalue_annotation,"score_data"), 
+                                             "pval_data"))
         if(missing(weights)){
-            weights <- rep((1/(totalfactor)), totalfactor)
-            names(weights) <- colnames(slot(slot(pvalue_annotation, "score_data"), 
-                                         "pval_data"))
+            weights <- rep((1/(total_num_factor)), total_num_factor)
+            names(weights) <- pval_score_colnames
         } 
         else {
-            if(length(weights) != totalfactor){
+            if(length(weights) != total_num_factor){
                 stop("ERROR: Number of factors(with expression data)
                      and weights must equal!")
             }
             else { 
-                pval_score_colnames <- colnames(slot(slot(pvalue_annotation,"score_data"), 
-                                                    "pval_data")
+              
                 if(is.null(names(weights))){ 
                     names(weights) <- pval_score_colnames
                 }
-                if(!all(sort(names(weights)) == 
-                            sort(do.call(rbind, strsplit(pval_score_colnames,
-                                                         "_pvalue")))))
+                sorted_pval_score_colnames <- sort(do.call(rbind, strsplit(pval_score_colnames,
+                                             "_pvalue")))
+                if(!all(sort(names(weights)) == sorted_pval_score_colnames))
                 {
                     stop(paste("Weight names must match the following:", 
-                               paste(do.call(rbind, strsplit(pval_score_colnames,
-                                                             "_pvalue")), 
+                               paste(sorted_pval_score_colnames, 
                                      collapse=", ")))
                 }
             }
@@ -818,58 +822,47 @@ setMethod(
         
         message("The following weights are being applied")
         print(weights)
-        
-        scoringdata <- slot(slot(pvalue_annotation, "score_data"), "pval_data")*sign(slot(
-            slot(pvalue_annotation, "score_data"), "effect_data"))
+        temp_score_data <- slot(pvalue_annotation, "score_data")
+        temp_pval_data <- slot(temp_score_data, "pval_data")
+        temp_effect_data <- slot(temp_score_data, "effect_data")
+        temp_signs_index <- slot(temp_score_data, "signs_index")
+        scoringdata <- temp_pval_data*sign(temp_effect_data)
         
         weight_names_temp <- names(weights)
         
         if(any(grepl("exp", names(weights)))){
             weight_names_temp <- weight_names_temp[-grep("exp", names(weights))]
         }
-        slot(slot(pvalue_annotation, "score_data"), "scoring_vector") <- weights
+        slot(temp_score_data, "scoring_vector") <- weights
         
-        #ARI what is happening here..May I propose the following see line 841
-        unidirectional <- as.numeric(slot(slot(pvalue_annotation, "score_data"), 
-                                        "signs_index")[match(slot(slot(pvalue_annotation, "score_data"),
-                                                                 "signs_index")[, 3], weight_names_temp), 2]) 
+        unidirectional <- as.numeric(temp_signs_index[match(temp_signs_index[, 3], weight_names_temp), 2]) 
+        bidirectional <- unidirectional
         unidirectional[which(unidirectional == 2)] <- 0
-        bidirectional <- as.numeric(slot(slot(pvalue_annotation, "score_data"),
-                                         "signs_index")[match(slot(slot(pvalue_annotation, "score_data"), 
-                                                                  "signs_index")[, 3], weight_names_temp), 2])
         bidirectional[which(bidirectional != 2)] <- 0
         bidirectional[which(bidirectional == 2)] <- 1
         
-        ### PROPOSAL ## 
-        #unidirectional <- as.numeric(slot(slot(pvalue_annotation, "score_data"), 
-        #                                  "signs_index")[match(slot(slot(pvalue_annotation, "score_data"),
-        #                                                           "signs_index")[, 3], weight_names_temp), 2]) 
-        #bidirectional <- unidirectional
-        #unidirectional[which(unidirectional == 2)] <- 0                                                   
-        #bidirectional[which(bidirectional != 2)] <- 0
-        #bidirectional[which(bidirectional == 2)] <- 1
-        #### END ####
-        # since there's no difference in where you're getting bidirection and unidirectional, why do you need both objects?
         
         scoringdata <- qnorm(1-as.matrix(abs(scoringdata))/2)*sign(scoringdata)
         scoresout <- apply(scoringdata, 1, function(each){
+            # for each gene
             if(any(!is.na(each)))
             {
+              # not all missing
                 if(any(grepl("exp", names(each)))){
-                    
+                    # there is expression data
+                    exp_index <- grep("exp", names(each))
                     forreturn <- (sum( #ARI Holy fuck, nest more? any way to make some temp objects?
-                        abs(sum(c(as.numeric(each[[grep("exp", names(each))]]), 
-                                  as.numeric(each[-grep("exp", names(each))]))*
-                                    c(1, unidirectional)*weights[c(grep("exp",
-                                                                        names(each)), which(!grepl("exp", 
-                                                                                                   names(each))))], na.rm=TRUE)), 
-                        (abs(as.numeric(each[-grep("exp",
-                                                   names(each))])*bidirectional)*
-                             weights[-grep("exp", names(each))]), 
+                        abs(sum(c(as.numeric(each[[exp_index]]), 
+                                  as.numeric(each[-exp_index]))*
+                                    c(1, unidirectional)*weights[c(exp_index, which(!grepl("exp",names(each))))], na.rm=TRUE)), 
+                        (abs(as.numeric(each[-exp_index])*bidirectional)*
+                             weights[-exp_index]), 
                         na.rm=TRUE)/sum(weights^2)^.5)
                     
                 } 
                 else {
+                   
+                    # there is no expression data
                     
                     forreturn <- (
                         sum(abs(sum(as.numeric(each)*unidirectional*weights,
@@ -895,15 +888,16 @@ setMethod(
         })
         new_pval <- replace(new_pval, new_pval == 0, 
                             min(subset(new_pval, new_pval!=0), na.rm=T))
-        new_pval <- (-2)*log(new_pval[, 1])
+        new_pval <- (-2)*log(new_pval)
         
         
         
-        slot(slot(pvalue_annotation, "score_data"), "scores") <- 
+        slot(temp_score_data, "scores") <- 
             data.frame(scores=as.numeric(new_pval), 
-                       row.names=as.character(slot(slot(pvalue_annotation,"score_data"), 
+                       row.names=as.character(slot(temp_score_data, 
                                                    "genes")))
-        pvalue_annotation
+        slot(pvalue_annotation, "score_data") <- temp_score_data
+    pvalue_annotation
     }
 ) 
 

@@ -43,7 +43,7 @@ setGeneric(
 
 setGeneric(
     name="annotateExpression", 
-    def=function(annotation, expdata, effect_col=NULL, pval_col=NULL)
+    def=function(annotation, expr_data, effect_col=NULL, pval_col=NULL)
     {
         standardGeneric("annotateExpression")
     }
@@ -160,7 +160,7 @@ setGeneric(
 
 setGeneric(
     name="extractGOseq", 
-    def=function(pvalue_annotation), which_network=NULL)
+    def=function(pvalue_annotation, which_network=NULL)
     {
         standardGeneric("extractGOseq")
     }

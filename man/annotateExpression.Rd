@@ -11,13 +11,13 @@ that the function will use to determine the effect and p-value columns, it loads
 the data it into the PvalueAnnotation. 
 }
 \usage{
-annotateExpression(annotation, expdata, effect_col = NULL, pval_col = NULL)
+annotateExpression(annotation, expr_data, effect_col = NULL, pval_col = NULL)
 }
 \arguments{
   \item{annotation}{
 An S4 object of class PvalueAnnotation
 }
-  \item{expdata}{
+  \item{expr_data}{
 An object of class data.frame or matrix with row names corresponding to 
 genes and atleast two columns with an effect and p-value for expression.
 

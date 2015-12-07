@@ -54,9 +54,9 @@ setMethod(
         } 
         else{}
               
-        if(nrow(slot(object, "signsindex")) !=0 ){
+        if(nrow(slot(object, "signs_index")) !=0 ){
             cat("Signs Index: \n")      
-            print(slot(object, "signsindex"))
+            print(slot(object, "signs_index"))
         }
         else{}
         if(nrow(slot(object, "scores")) !=0 ){ 

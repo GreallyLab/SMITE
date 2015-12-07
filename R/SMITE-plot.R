@@ -26,7 +26,7 @@ setMethod(
             stop(paste("Provided x_name was not unique"))
         }
             
-        if(length(grep(y_name, colnames(pval_col_names)) > 1)
+        if(length(grep(y_name, colnames(pval_col_names))) > 1)
         {
             stop(paste("Provided y_name was not unique"))
         }   
@@ -254,9 +254,9 @@ setMethod(
                         
                         start <- pi
                         delta <- (3*pi/2)/nrow(slot(slot(pvalue_annotation, "score_data"), 
-                                                 "signsindex"))
+                                                 "signs_index"))
                         
-                        for(j in slot(slot(pvalue_annotation, "score_data"), "signsindex")[, 3]){
+                        for(j in slot(slot(pvalue_annotation, "score_data"), "signs_index")[, 3]){
                             
                             halfCircle(x=layout1_scaled[i, 1], y=layout1_scaled[i, 2], 
                                        r=ifelse(length(V(h))< 50, 0.075, 0.025), 
@@ -281,7 +281,7 @@ setMethod(
     
                 if(any(legend == TRUE, counter == 1)){
                     if(any(suppress_details == FALSE, counter == 1)){
-                        num_factors <- nrow(slot(slot(pvalue_annotation, "score_data"), "signsindex"))
+                        num_factors <- nrow(slot(slot(pvalue_annotation, "score_data"), "signs_index"))
                         halfCircle(x=-1.25, y=1.25, r=.4, start=pi/2, end=pi, quarter=TRUE)
                         start <- pi/2
                         delta <- pi/8
@@ -299,7 +299,7 @@ setMethod(
                         start <- pi
                         delta <- (3*pi/2)/num_factors
                 
-                        for(j in slot(slot(pvalue_annotation, "score_data"), "signsindex")[, 3]){
+                        for(j in slot(slot(pvalue_annotation, "score_data"), "signs_index")[, 3]){
                             halfCircle(x=-1.25, y=1.25, r=.4, start=start, end=start+delta,
                                        quarter=TRUE)
                             for(g in 1:4){
@@ -479,7 +479,7 @@ setMethod(
         title("Density of P-values/Scores", xlab="P-values",
               ylab="Density")
         
-        score_sign_idx <- slot(slot(pvalue_annotation, "score_data"), "signsindex")
+        score_sign_idx <- slot(slot(pvalue_annotation, "score_data"), "signs_index")
         sapply(score_sign_idx[, 3], function(i){
             message(paste("Plotting: ", i))
             if(!all(is.na(pval_data[[grep(i, pval_col_names)]]))){

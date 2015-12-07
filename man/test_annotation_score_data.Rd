@@ -15,7 +15,7 @@ of analysis and test latter functionality.
   A PvalueAnnotation with the following slots
   \describe{
     \item{score_data}{a PvalueObject with slots corresponding to pval_data,
-    effect_data, genes, signsindex, scores, trans, scoring_vector, and 
+    effect_data, genes, signs_index, scores, trans, scoring_vector, and 
     module_otuput}
   }
 }
