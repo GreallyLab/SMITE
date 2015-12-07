@@ -92,8 +92,7 @@ SMITE vignette
 data(hg19_genes_bed)
 
 ## Create a PvalueAnnotation with defaults for promoter size##
-test_annotation<-makePvalueAnnotation( data=hg19_genes, 
-, gene_name_col=5)
+test_annotation <- makePvalueAnnotation(data=hg19_genes, gene_name_col=5)
 
 }
 \keyword{ SMITE }

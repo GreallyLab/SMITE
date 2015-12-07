@@ -9,10 +9,10 @@ a PvalueObject within the slot "score_data" of a PvalueAnnotation.  This
 is a necessary step before being able to run downstrem functions.
 }
 \usage{
-makePvalueObject(object, effect_directions = NULL)
+makePvalueObject(pvalue_annotation, effect_directions = NULL)
 }
 \arguments{
-  \item{object}{
+  \item{pvalue_annotation}{
 An S4 object of class PvalueAnnotation
 }
   \item{effect_directions}{
@@ -63,11 +63,11 @@ methylation<-methylation[-which(is.na(methylation[,5])),]
 #this step takes ~10 minutes
 #test_annotation<-annotateModification(test_annotation, methylation, 
 #weight_by=c(promoter="distance",body="distance",h3k4me1="distance"),
-#verbose=TRUE, modCorr=FALSE)
+#verbose=TRUE, mod_corr=FALSE)
 
 #create a pvalue object that will count the effect of the h3k4me1 as
 #bidirectional
-#test_annotation<-makePvalueObject(test_annotation, 
+#test_annotation<-makePvalueObject(pvalue_annotation=test_annotation, 
 #effect_directions=c(methylation_promoter="decrease",methylation_body=
 #"decrease",
 #methylation_h3k4me1="bidirectional"))

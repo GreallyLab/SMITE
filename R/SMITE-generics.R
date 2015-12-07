@@ -14,9 +14,8 @@ setGeneric(
     }
 )
 
-setGeneric( #CHECK
+setGeneric(
     name="returnPvalueCol", 
-    def=function(pval_object, col_name)
     {
         standardGeneric("returnPvalueCol")
     }
@@ -52,7 +51,7 @@ setGeneric(
 
 setGeneric(
     name="annotateModification", 
-    def=function(annotation, mod_data, weight_by=NULL, 
+    def=function(pvalue_annotation, mod_data, weight_by=NULL, 
                  weight_by_method="Stouffer", mod_included=NULL, mod_corr=TRUE, 
                  mod_type="methylation", verbose=FALSE)
     {
@@ -220,7 +219,7 @@ setGeneric(
 
 setGeneric(
     name="extractModules", 
-    def=function(annotation, which_module=NULL)
+    def=function(pvalue_annotation, which_module=NULL)
     {
         standardGeneric("extractModules")
     }
@@ -228,7 +227,7 @@ setGeneric(
 
 setGeneric(
     name="highScores", 
-    def=function(annotation, alpha=0.05)
+    def=function(pvalue_annotation, alpha=0.05)
     {
         standardGeneric("highScores")
     }

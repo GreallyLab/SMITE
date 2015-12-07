@@ -8,10 +8,10 @@ Extract scores for all genes
 A function to obtain all gene scores
 }
 \usage{
-extractScores(annotation)
+extractScores(pvalue_annotation)
 }
 \arguments{
-  \item{annotation}{
+  \item{pvalue_annotation}{
 An S4 object of class PvalueAnnotation for which scores have already
 been calculated
 }
@@ -31,7 +31,7 @@ highScores
 \examples{
 data(test_annotation_score_data)
 
-out<-extractScores(test_annotation)
+out <- extractScores(pvalue_annotation=test_annotation)
 
 head(out)
 

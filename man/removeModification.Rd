@@ -10,13 +10,13 @@ PValue annotation, you may wish to remove a modification or reannotate one,
 which requires removing it first.
 }
 \usage{
-removeModification(annotation, modType = "methylation")
+removeModification(pvalue_annotation, mod_type = "methylation")
 }
 \arguments{
-  \item{annotation}{
+  \item{pvalue_annotation}{
 An S4 object of class PvalueAnnotation
 }
-  \item{modType}{
+  \item{mod_type}{
 A character string that identifies a type of modification within a 
 PvalueAnnotation.  
 }
@@ -53,30 +53,31 @@ methylation[,5]<-replace(methylation[,5],methylation[,5]==0, min(subset(methylat
 #meth2<-methylation
 
 ## Create a PvalueAnnotation with defaults for promoter size##
-#test_annotation<-makePvalueAnnotation( data=hg19_genes, gene_name_col=5)
+#test_annotation<-makePvalueAnnotation(data=hg19_genes, gene_name_col=5)
 
 ## Load DNA methylation into PvalueAnnotation ##
-#test_annotation<-annotateModification(test_annotation, 
-#meth1, weight_by=c(promoter="distance",body="distance"),verbose=TRUE,
-#modCorr=TRUE,modType="methylation")
+#test_annotation<-annotateModification(annotation=test_annotation, 
+#mod_data=meth1, weight_by=c(promoter="distance",body="distance"),verbose=TRUE,
+#mod_corr=TRUE,mod_type="methylation")
 
 ## Extract GRanges with modification data ##
 #extractModification(test_annotation)
 
 ## Load second dataset bed file ##
-#test_annotation<-annotateModification(test_annotation, 
-#meth2, weight_by=c(promoter="distance",body="distance"),
-#verbose=TRUE, modCorr=TRUE,modType="hydroxy")
+#test_annotation<-annotateModification(pvalue_annotation=test_annotation, 
+#mod_data=meth2, weight_by=c(promoter="distance",body="distance"),
+#verbose=TRUE, mod_corr=TRUE,mod_type="hydroxy")
 
 ## Extract GRanges with both modification dataset loaded ##
 #head(extractModification(test_annotation,"hydroxy"))
 
 ## Unload DNA hydroxymethylation form PvalueAnnotation ##
 
-#test_annotation<-removeModification(test_annotation, modType="hydroxy")
+#test_annotation<-removeModification(pvalue_annotation=test_annotation, 
+                                    #mod_type="hydroxy")
 
 ## Extract GRanges to see only one modification dataset loaded ##
-#head(extractModification(test_annotation))
+#head(extractModification(pvalue_annotation=test_annotation))
 
 }
 

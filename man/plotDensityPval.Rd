@@ -9,10 +9,10 @@ This function in called by the normalizePval function, but can also be called
 by the user to visualize the relative densities of combined p-values (scores). 
 }
 \usage{
-plotDensityPval(x, ref = "expression_pvalue", ...)
+plotDensityPval(pvalue_annotation, ref = "expression_pvalue", ...)
 }
 \arguments{
-  \item{x}{
+  \item{pvalue_annotation}{
 An S4 object of class PvalueAnnotation.
 }
   \item{ref}{
@@ -33,7 +33,7 @@ N. Ari Wijetunga
 ## Load test annotation with only score data ##
 data(test_annotation_score_data)
 
-plotDensityPval(test_annotation)
+plotDensityPval(pvalue_annotation=test_annotation)
 
 }
 \keyword{ density }

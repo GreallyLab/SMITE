@@ -11,15 +11,15 @@ an internal correlation structure and 2) aggregate the modification over all
 intervals associated with a gene in the "makePvalueAnnotation" function.
 }
 \usage{
-annotateModification(annotation, modData, weight_by = NULL, 
-weight_by_method = "Stouffer", modInclude = NULL, modCorr = TRUE, 
-modType = "methylation", verbose = FALSE)
+annotateModification(pvalue_annotation, mod_data, weight_by = NULL, 
+weight_by_method = "Stouffer", mod_included = NULL, mod_corr = TRUE, 
+mod_type = "methylation", verbose = FALSE)
 }
 \arguments{
-  \item{annotation}{
+  \item{pvalue_annotation}{
 An S4 object of class PvalueAnnotation.
 }
-  \item{modData}{
+  \item{mod_data}{
 A dataframe or matrix derived from a bed file with thhe the first three columns
 as (chromosome, start, end), column 4 is the effect, and column 5 is the
 p-value.
@@ -70,17 +70,17 @@ p-values.  Must be one of:
                 given the total number of p values and the probability of a 
                 false positive.
 }
-  \item{modInclude}{
+  \item{mod_included}{
 A vector of named elements specifying for which intervals in the annotation the
 function should find combined scores (e.g. promoters).  If not specified the
 assumption is that all type of intervals associated with a gene should be 
 included.
 }
-  \item{modCorr}{
+  \item{mod_corr}{
 A logical (TRUE/FALSE) specifying whether a correlation matrix should be
 estimated.  The DEFAULT is TRUE.
 }
-  \item{modType}{
+  \item{mod_type}{
 A character naming the modification that is being loaded.  The DEFAULT is
 "methylation" and any modType string can be used, but will be referred to 
 in downstream analysis.  A unique name must be used for each modification that 
@@ -132,7 +132,7 @@ options(stringsAsFactors=FALSE)
 #data(hg19_genes_bed)
 
 ## Create a PvalueAnnotation with defaults for promoter size##
-#test_annotation<-makePvalueAnnotation( data=hg19_genes, gene_name_col=5)
+#test_annotation<-makePvalueAnnotation(data=hg19_genes, gene_name_col=5)
 
 ## Load DNA methylation bed file ##
 #data(methylationdata)
@@ -141,9 +141,9 @@ options(stringsAsFactors=FALSE)
 
 ## Load DNA methylation into PvalueAnnotation modCorr=F for example##
 ## NOTE: Commented out below.  See vignette for better example ##
-#test_annotation<-annotateModification(test_annotation, 
-#methylation, weight_by=c(promoter="distance",body="distance"),
-#verbose=F, modCorr=FALSE,modType="methylation")
+#test_annotation <- annotateModification(pvalue_annotation=test_annotation, 
+#mod_data=methylation, weight_by=c(promoter="distance", body="distance"),
+#verbose=F, mod_corr=FALSE, mod_type="methylation")
 
 }
 \keyword{ SMITE }

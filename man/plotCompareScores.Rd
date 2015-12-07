@@ -10,10 +10,10 @@ two expression or modification-context pairing within a PvalueObject
 inside of a PvalueAnnotation
 }
 \usage{
-plotCompareScores(object, x_name, y_name, ...)
+plotCompareScores(pvalue_annotation, x_name, y_name, ...)
 }
 \arguments{
-  \item{object}{
+  \item{pvalue_annotation}{
 An S4 object of class PvalueAnnotation for which a PvalueObject has already
 been created
   }
@@ -50,5 +50,6 @@ plotDensityPval
 \examples{
 data(test_annotation_score_data)
 
-plotCompareScores(test_annotation, x_name="expression", y_name="methylation_promoter")
+plotCompareScores(pvalue_annotation=test_annotation, x_name="expression",
+#y_name="methylation_promoter")
 }

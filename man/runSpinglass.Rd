@@ -9,11 +9,11 @@ This function is a  function to prepare the data for calling the Spinglass
 network algorithm.
 }
 \usage{
-runSpinglass(object, network, random_alpha = 0.05, gam = 0.5, 
-node_alpha = 0.05, maxsize = 500, minsize = 8, niter = 1000, simplify = TRUE)
+runSpinglass(pvalue_annotation, network, random_alpha = 0.05, gam = 0.5, 
+node_alpha = 0.05, maxsize = 500, minsize = 8, num_iterations = 1000, simplify = TRUE)
 }
 \arguments{
-  \item{object}{
+  \item{pvalue_annotation}{
 An S4 object of class PvalueAnnotation
 }
   \item{network}{
@@ -35,7 +35,7 @@ The maximum module size
   \item{minsize}{
 The minimum module size
 }
-  \item{niter}{
+  \item{num_iterations}{
 The number of randomizations that will be computed to determine whether the
 module is significant by chance
 }
@@ -90,9 +90,9 @@ data(test_annotation_score_data)
 #load(system.file("data","Reactome.Symbol.Igraph.rda", package="SMITE"))
  
 ## NOTE: commented out for example.  See vignette for better explanation ##
-#test_annotation<-runSpinglass(test_annotation, REACTOME,maxsize=50, 
-#niter=10)
+#test_annotation <- runSpinglass(pvalue_annotation=test_annotation, 
+#network=REACTOME, maxsize=50, num_iterations=10)
 
-plotModule(test_annotation, which.network=6,layout="fr")
+plotModule(test_annotation, which_network=6, layout="fr")
 
 }

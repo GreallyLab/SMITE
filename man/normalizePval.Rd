@@ -10,14 +10,15 @@ scales.
 This function is a used to rescale compenent scores when distributions
 have been altered.  There are two methods available.}
 \usage{
-normalizePval(object, trans, ref = "expression_pvalue", method = "rescale")
+normalizePval(pvalue_annotation, trans, ref = "expression_pvalue", method = "rescale")
 }
 \arguments{
-  \item{object}{
+  \item{pvalue_annotation}{
 An S4 object of class p-value annotation
 }
   \item{trans}{
-A vector specifying a specific Box-cox power transformation to use
+A vector specifying a specific Box-cox power transformation to use. If not 
+specified, the optimal transformation powers will be estimated. 
 }
   \item{ref}{
 A string that will be grepped from the names of the loaded expression data or
@@ -67,6 +68,6 @@ plotDensityPval
 \examples{
 data(test_annotation_score_data)
 
-#test_annotation<-normalizePval(test_annotation)
+#test_annotation<-normalizePval(pvalue_annotation=test_annotation)
 
 }

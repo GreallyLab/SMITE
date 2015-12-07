@@ -1,22 +1,17 @@
-
 setMethod(
     f="annotationOutput", 
     signature="PvalueAnnotation", 
     definition=function(pvalue_annotation){
-        
-<<<<<<< HEAD
-        metadata_sum <- slot(slot(pvalue_annotation), "modifications"), "metadata")$m_summary
+        metadata_sum <- slot(slot(pvalue_annotation, "modifications"), "metadata")$m_summary
         metadata_sum <- cbind(rownames(metadata_sum), metadata_sum)
         colnames(metadata_sum)[1] <- "genes"
-        if(nrow(pData(pvalue_annotation)@expression)) > 0){
+        if(nrow(pData(pvalue_annotation@expression))) > 0){
             
-            exprs <- pData(pvalue_annotation)@expression)
+            exprs <- pData(pvalue_annotation@expression)
             exprs <- cbind(rownames(exprs), exprs)
             metadata_sum <- merge(metadata_sum, exprs, by=1, all=TRUE)
         }
-<<<<<<< HEAD
         metadata_sum
->>>>>>> ce95657b8041fa66d5bc5d2ebd3e9d315c4e9f27
     }
 )
 	

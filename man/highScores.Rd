@@ -10,10 +10,10 @@ This function can be used to extract a subset of the highest scoring genes for
 other downstream analysis. 
 }
 \usage{
-highScores(annotation, alpha = 0.05)
+highScores(pvalue_annotation, alpha = 0.05)
 }
 \arguments{
-  \item{annotation}{
+  \item{pvalue_annotation}{
 An S4 object of class PvalueAnnotation for which scoring has already been
 performed
 }
@@ -48,7 +48,7 @@ data(test_annotation_score_data)
 
 ## Note: commented out for example.  See vignette for better example ##
 
-#out<-highScores(test_annotation, alpha=0.01)
+#out <- highScores(pvalue_annotation=test_annotation, alpha=0.01)
 
 }
 \keyword{ nonparametric }

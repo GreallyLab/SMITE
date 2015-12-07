@@ -49,15 +49,15 @@ data(hg19_genes_bed)
 #methylation[,5]<-replace(methylation[,5],methylation[,5]==0, min(subset(methylation[,5], methylation[,5]!=0), na.rm=T))
 
 ## Create a PvalueAnnotation with defaults for promoter size##
-test_annotation<-makePvalueAnnotation( data=hg19_genes, gene_name_col=5)
+test_annotation<-makePvalueAnnotation(data=hg19_genes, gene_name_col=5)
 
 ## Load DNA methylation into PvalueAnnotation ##
-#test_annotation<-annotateModification(test_annotation, 
+#test_annotation<-annotateModification(pvalue_annotation=test_annotation, 
 #methylation, weight_by=c(promoter="distance",body="distance"),verbose=TRUE,
 #modCorr=FALSE,modType="methylation")
 
 ## Extract GRanges with modification data ##
-#extractModification(test_annotation)
+#extractModification(pvalue_annotation=test_annotation)
 
 }
 \keyword{ SMITE }

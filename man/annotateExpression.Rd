@@ -11,10 +11,10 @@ that the function will use to determine the effect and p-value columns, it loads
 the data it into the PvalueAnnotation. 
 }
 \usage{
-annotateExpression(annotation, expr_data, effect_col = NULL, pval_col = NULL)
+annotateExpression(pvalue_annotation, expr_data, effect_col = NULL, pval_col = NULL)
 }
 \arguments{
-  \item{annotation}{
+  \item{pvalue_annotation}{
 An S4 object of class PvalueAnnotation
 }
   \item{expr_data}{
@@ -45,7 +45,6 @@ A PvalueAnnotation, an S4 object with the slot "expression" filled in.
 N. Ari Wijetunga
 }
 \seealso{
-
 annotateModification
 makePvalueAnnotation
 createPvalueObject
@@ -55,13 +54,14 @@ createPvalueObject
 data(curated_expressiondata)
 data(test_annotation_score_data)
 ## Load Expression data into PvalueAnnotation ##
-test_annotation<-annotateExpression(test_annotation, expression_curated)
+test_annotation <- annotateExpression(pvalue_annotation=test_annotation, 
+#expression_curated)
 
 ## Extract entire ExpressionSet with expression data ##
 #slot(test_annotation,"expression")
 
 ## Extract expression data summary ##
-#head(extractExpression(test_annotation))
+#head(extractExpression(pvalue_annotation=test_annotation))
 
 }
 \keyword{ expression }

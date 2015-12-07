@@ -245,7 +245,7 @@ setMethod(
 setMethod(
     f="annotateExpression", 
     signature="PvalueAnnotation", 
-    definition=function(annotation, expr_data, effect_col=NULL, pval_col=NULL){ 
+    definition=function(pvalue_annotation, expr_data, effect_col=NULL, pval_col=NULL){ 
         if(is.null(effect_col)){
             effect_col=grep("effect|odds|coeff|B", tolower(colnames(expr_data)))
             if(length(effect_col) != 1){
@@ -280,8 +280,8 @@ setMethod(
                                                             c(effect_col, pval_col)]))
         varLabels(expression_output) <- c("expression_effect", 
                                                       "expression_pvalue")
-        slot(annotation, "expression") <- expression_output
-        annotation
+        slot(pvalue_annotation, "expression") <- expression_output
+        pvalue_annotation
         })
 
 
@@ -289,16 +289,16 @@ setMethod(
 setMethod(
     f="annotateModification", 
     signature="PvalueAnnotation",
-    definition=function(annotation, mod_data, weight_by=NULL, 
+    definition=function(pvalue_annotation, mod_data, weight_by=NULL, 
                         weight_by_method="Stouffer", mod_included=NULL, 
                         mod_corr=TRUE, mod_type="methylation", verbose=FALSE){
-        if(mod_type %in% names(slot(annotation,"modifications")@metadata$elements))
+        if(mod_type %in% names(slot(pvalue_annotation,"modifications")@metadata$elements))
         {
             stop("Provided data set is already loaded as mod_type")
         } 
         
 		unique_feature_names <- unique(
-            unlist(slot(annotation, "annotation"))$feature)
+            unlist(slot(pvalue_annotation, "annotation"))$feature)
 				
         ##no weights provided
         if(missing(weight_by)){ 
@@ -338,7 +338,7 @@ setMethod(
             start=mod_data[, 2], end=mod_data[, 3]), effect=mod_data[, 4], 
             pval=mod_data[, 5], type=mod_type)
         
-		temp_annotation <- unlist(slot(annotation, "annotation"))
+		temp_annotation <- unlist(slot(pvalue_annotation, "annotation"))
         
 		overlap_mods <- findOverlaps(temp_annotation, mod_grange)
         mod_grange_overlaps <- mod_grange[subjectHits(overlap_mods)]
@@ -380,7 +380,7 @@ setMethod(
             temp <- subset(unlist(mod_grange_overlaps), unlist(mod_grange_overlaps)$feature == i)
             
             
-            ref_data <- unlist(slot(annotation, "annotation"))
+            ref_data <- unlist(slot(pvalue_annotation, "annotation"))
             ref_data <-
                 subset(ref_data,
                        ref_data$feature == "tss")
@@ -520,7 +520,7 @@ setMethod(
             message("Scores have been adjusted")
         }
         
-        newmods <- c(unlist(slot(annotation, "modifications")), unlist(mod_grange_overlaps))
+        newmods <- c(unlist(slot(pvalue_annotation, "modifications")), unlist(mod_grange_overlaps))
         names(newmods) <- NULL
         newmods <- split(newmods, newmods$name)
         
@@ -540,7 +540,7 @@ setMethod(
                                                               sep="_")
                                                     }), sep="_")
         
-        newmetadata <- slot(slot(annotation, "modifications"), "metadata")
+        newmetadata <- slot(slot(pvalue_annotation, "modifications"), "metadata")
         if(is.null(newmetadata$m_summary)){
             newmetadata$m_summary <- output_m_summary
         } 
@@ -556,23 +556,23 @@ setMethod(
                                                                     mod_included, sep="_"))
        
 	    slot(newmods, "metadata") <- newmetadata
-	    slot(annotation, "modifications") <- newmods
-        annotation
+	    slot(pvalue_annotation, "modifications") <- newmods
+		pvalue_annotation
     }
 )
 
 setMethod(
     f="removeModification", 
     signature="PvalueAnnotation", 
-    definition=function(annotation, mod_type="methylation"){
+    definition=function(pvalue_annotation, mod_type="methylation"){
         
-        if(!mod_type%in%names(slot(annotation,
+        if(!mod_type%in%names(slot(pvalue_annotation,
                                   "modifications")@metadata$elements)){
             stop("Provided mod_type is not in the annotation")
         }
         
-        temp_meta <- slot(slot(annotation,"modifications"),"metadata")
-        temp <- unlist(slot(annotation,"modifications"))
+        temp_meta <- slot(slot(pvalue_annotation,"modifications"),"metadata")
+        temp <- unlist(slot(pvalue_annotation,"modifications"))
         names(temp) <- NULL
         temp <- subset(temp,!(temp$type == mod_type))
         slot(temp,"metadata") <- temp_meta
@@ -595,9 +595,9 @@ setMethod(
                     function(i)i[1]))[, 1] %in% mod_type)]
         
         temp_meta <- slot(temp,"metadata")
-        slot(annotation,"modifications") <- split(temp, temp$name)
-        slot(slot(annotation,"modifications"),"metadata") <- temp_meta
-        annotation
+        slot(pvalue_annotation,"modifications") <- split(temp, temp$name)
+        slot(slot(pvalue_annotation,"modifications"),"metadata") <- temp_meta
+        pvalue_annotation
     }
 )
 
@@ -744,12 +744,12 @@ setMethod(
                 if(length(trans) != 
                        length(grep(paste(temp_signs_index, collapse="|"),
                                    colnames(temp_pval_data)))){
-                    
                        stop("Length of p and transformations must equal!")
                 }
                 else {
                     optimal_boxcox_exponent <- trans 
-                    names(optimal_boxcox_exponent) <- subset(names_temp_pval_data,!names_temp_pval_data  %in%ref)
+                    names(optimal_boxcox_exponent) <- subset(names_temp_pval_data,
+                                                             !names_temp_pval_data %in% ref)
                 }
                 for(x in names(optimal_boxcox_exponent)){
                     p_temp <- temp_pval_data[[x]]
@@ -1393,6 +1393,7 @@ setMethod(
     }
 )
 
+#ARI shadowtext and addShadowText, do we need both functions? Does addShadowText need a generic?
 shadowtext <- function(x, y=NULL, labels, col='white', bg='black',
                        theta= seq(pi/4, 2*pi, length_out=8), r=0.1, ... ) {
     xy <- xy.coords(x,y)

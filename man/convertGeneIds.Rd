@@ -9,19 +9,19 @@ A convenient function used to convert between gene ids from different
 gene annotations.
 }
 \usage{
-convertGeneIds(a, a_type, b_type, delim = NULL, verbose = FALSE)
+convertGeneIds(gene_IDs, ID_type, ID_convert_to, delim = NULL, verbose = FALSE)
 }
 \arguments{
-  \item{a}{
+  \item{gene_IDs}{
 A vector of gene names.
 }
-  \item{a_type}{
+  \item{ID_type}{
 A character specifying the type of given annotation.  Currently one of "refseq",
-"ensembleprot","uniprot" or "ensemble". In the case of b_type="entrez", "symbol"
+"ensembleprot","uniprot" or "ensemble". In the case of ID_convert_to="entrez", "symbol"
 }
-  \item{b_type}{
+  \item{ID_convert_to}{
 A character specifying the type of desired annotation.  Currently one of 
-"symbol" or in they case of a_type="symbol", "entrez"
+"symbol" or in they case of ID_type="symbol", "entrez"
 }
   \item{delim}{
 An optional character that will be removed from the beginning of each gene 
@@ -38,7 +38,7 @@ it's use to mainly converting to gene symbol.
 
 }
 \value{
-A character vector formatted to b_type
+A character vector formatted to ID_convert_to
 }
 \author{
 N. Ari Wijetunga < Neil.Wijetunga@med.einstein.yu.edu >
@@ -55,8 +55,8 @@ AnnotationDBI, Biomart
 
 data(genes_for_conversiontest)
 
-genes[,1]<-convertGeneIds(a=genes[,1], a_type="refseq",
-                                     b_type="symbol")
+genes[,1] <- convertGeneIds(gene_IDs=genes[,1], ID_type="refseq",
+                            ID_convert_to="symbol")
                                                  
 }
 \keyword{SMITE }

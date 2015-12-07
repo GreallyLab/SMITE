@@ -9,10 +9,10 @@ This function uses an a priori weighting scheme to combine scores for a given
 gene. 
 }
 \usage{
-scorePval(object, weights)
+scorePval(pvalue_annotation, weights)
 }
 \arguments{
-  \item{object}{
+  \item{pvalue_annotation}{
 An S4 object of class PvalueAnnotation, for which makePvalueObject has
 already been run.
 }
@@ -50,7 +50,7 @@ options(stringsAsFactors=FALSE)
 data(test_annotation_score_data)
 
 ## NOTE: commented out for example.  See vignette for better explanation ##
-#test_annotation<-scorePval(test_annotation,
+#test_annotation<-scorePval(pvalue_annotation=test_annotation,
 #weights=c(methylation_promoter=.3,methylation_body=.1,expression=.3,
 #methylation_h3k4me1=.3))
 

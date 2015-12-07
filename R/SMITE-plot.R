@@ -236,7 +236,7 @@ setMethod(
                 pval_data <- slot(slot(pvalue_annotation, "score_data"), "pval_data")
                 genes_score <- slot(pvalue_annotation, "score_data")@genes
                 effect_data <- slot(slot(pvalue_annotation, "score_data"), "effect_data")
-                signs_index <- slot(slot(pvalue_annotation, "score_data"), "signsindex")
+                signs_idx <- slot(slot(pvalue_annotation, "score_data"), "signs_index")
                 if(any(suppress_details == FALSE, counter == 1)){
                     for(i in 1:nrow(layout1_scaled)){
                         
@@ -254,11 +254,9 @@ setMethod(
                         )
                         
                         start <- pi
-<<<<<<< HEAD
-                        delta <- (3*pi/2)/nrow(signs_index)
+                        delta <- (3*pi/2)/nrow(signs_idx)
                         
-                        for(j in signs_index[, 3]){
->>>>>>> ce95657b8041fa66d5bc5d2ebd3e9d315c4e9f27
+                        for(j in signs_idx[, 3]){
                             
                             halfCircle(x=layout1_scaled[i, 1], y=layout1_scaled[i, 2], 
                                        r=ifelse(length(V(h))< 50, 0.075, 0.025), 
@@ -280,14 +278,12 @@ setMethod(
     
                 if(any(legend == TRUE, counter == 1)){
                     if(any(suppress_details == FALSE, counter == 1)){
-<<<<<<< HEAD
-                        num_factors <- nrow(signs_index)
->>>>>>> ce95657b8041fa66d5bc5d2ebd3e9d315c4e9f27
+                        num_factors <- nrow(signs_idx)
                         halfCircle(x=-1.25, y=1.25, r=.4, start=pi/2, end=pi, quarter=TRUE)
                         start <- pi/2
                         delta <- pi/8
             
-                        for(g in 1:4){ #ARI this isn't the same g (what I now named network from before), right?
+                        for(g in 1:4){ 
                             halfCircle(x=-1.25, y=1.25, r=.37, r2=.89, start=start+delta*(g-1), 
                                        end=start+delta*g, col=expcol[g], quarter=TRUE)
                             arctext(x=-1.25, y=1.25, r=.35, start=start+delta*(g-1), 
@@ -300,12 +296,10 @@ setMethod(
                         start <- pi
                         delta <- (3*pi/2)/num_factors
                 
-<<<<<<< HEAD
-                        for(j in signs_index[, 3]){
+                        for(j in signs_idx[, 3]){
                             halfCircle(x=-1.25, y=1.25, r=.4, start=start, 
                                        end=start+delta, quarter=TRUE)
                             
->>>>>>> ce95657b8041fa66d5bc5d2ebd3e9d315c4e9f27
                             for(g in 1:4){
                                 start <- start
                                 end <- start+delta

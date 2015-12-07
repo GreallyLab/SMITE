@@ -10,10 +10,10 @@ the highest scoring genes generated in a PvalueAnnotation.  This function will
 load the module into the PvalueAnnotation for visualization and downstream 
 analysis.}
 \usage{
-runBioNet(object, network, alpha = 0.05)
+runBioNet(pvalue_annotation, network, alpha = 0.05)
 }
 \arguments{
-  \item{object}{
+  \item{pvalue_annotation}{
 An S4 object of class PvalueAnnotation that has already had scores generated.
 }
   \item{network}{
@@ -65,13 +65,14 @@ data(test_annotation_score_data)
 #load(system.file("data","Reactome.Symbol.Igraph.rda", package="SMITE"))
 
 ## run BioNet ##
-#test_annotation<-runBioNet(test_annotation,network = REACTOME)
+#test_annotation<-runBioNet(pvalue_annotation=test_annotation,
+#network = REACTOME)
 
 ## view module ##
-#extractModules(test_annotation, 1)
+#extractModules(pvalue_annotation=test_annotation, 1)
 
 ## plot module ##
-#plotModule(test_annotation, which.network=1)
+#plotModule(pvalue_annotation=test_annotation, which.network=1)
 
 }
 \keyword{ SMITE }

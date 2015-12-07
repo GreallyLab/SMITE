@@ -14,7 +14,7 @@ extractModules(pvalue_annotation, which_module = NULL)
   \item{pvalue_annotation}{
 An S4 object of class PvalueAnnotation for which Spinglass or BioNet has already been run.
 }
-  \item{whichModule}{
+  \item{which_module}{
 A numeric vector specifying one or more module to display
 }
 }
@@ -34,6 +34,6 @@ runBioNet
 \examples{
 data(test_annotation_score_data)
 
-extractModules(test_annotation, 1)
+extractModules(pvalue_annotation=test_annotation, which_module=1)
 
 }

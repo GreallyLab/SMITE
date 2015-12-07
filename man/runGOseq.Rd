@@ -8,11 +8,11 @@ Run a GoSeq pathway analysis
 This function allows pathway annotation of identified modules.
 }
 \usage{
-runGOseq(object, p_thresh = 0.05, coverage, type = "reactome")
+runGOseq(pvalue_annotation, p_thresh = 0.05, coverage, type = "reactome")
 }
 
 \arguments{
-  \item{object}{
+  \item{pvalue_annotation}{
 An S4 object of class PvalueAnnotation, for which module-finding has already 
 been performed
 }
@@ -71,7 +71,7 @@ plotModule
 data(test_annotation_score_data)
 
 ## NOTE commented out in example.  Please see Vignette for better example ##
-#test_annotation<-runGOseq(test_annotation,
+#test_annotation<-runGOseq(pvalue_annotation=test_annotation,
 #coverage=read.table(
 #system.file("extdata", "hg19_symbol_hpaii.sites.inbodyand2kbupstream.bed.gz", 
 #package="SMITE"),stringsAsFactors=FALSE),type="kegg")

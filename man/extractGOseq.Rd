@@ -12,11 +12,11 @@ runBioNet, this function allows you to interrogate the enriched terms for a
 specific module or combination of modules.
 }
 \usage{
-extractGOseq(object, which.network = NULL)
-searchGOseq(object, searchstring, wholeword = FALSE)
+extractGOseq(pvalue_annotation, which.network = NULL)
+searchGOseq(pvalue_annotation, search_string, wholeword = FALSE)
 }
 \arguments{
-  \item{object}{
+  \item{pvalue_annotation}{
 An S4 object of class PvalueAnnotation, for which module-finding and GOseq 
 analysis have already been performed
 }
@@ -24,7 +24,7 @@ analysis have already been performed
 A numeric vector of a length of at least one, corresponding to a particular 
 functional module specifically for the extract function.
 }
- \item{searchstring}{
+ \item{search_string}{
 A character specfying a search string specifically for the search function.
 }
   \item{wholeword}{
@@ -76,14 +76,14 @@ plotModule
 data(test_annotation_score_data)
 
 ## show goseq analysis for module 1 ##
-extractGOseq(test_annotation,1)
+extractGOseq(test_annotation, 1)
 
 ## show goseq analysis for module 1 and 2 ##
-#extractGOseq(test_annotation,1:2)
+#extractGOseq(test_annotation, 1:2)
 
 ## search for term ##
 
-#searchGOseq(test_annotation,"Cell cycle")
+#searchGOseq(test_annotation, "Cell cycle")
 }
 
 \keyword{ goseq }

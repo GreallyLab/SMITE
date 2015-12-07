@@ -8,18 +8,18 @@ Stouffer's Test
 This function performs a weighted Stouffer's mehtod of combining p-values.
 }
 \usage{
-stoufferTest(p, w)
+stoufferTest(pvalues, weights)
 }
 \arguments{
-  \item{p}{
+  \item{pvalues}{
 A vector of p-values.
 }
-  \item{w}{
+  \item{weights}
 Optional weights used when combining probabilites.  If no weights are given then the p-values are equally weighted.
 }
 }
 \details{
-For each p value the inverse standard normal CDF is applied and  Z scores 
+For each p-value the inverse standard normal CDF is applied and  Z scores 
 are derived. Z-scores are then summed and a new Z score is transformed back to 
 a p-value.
 }
@@ -47,7 +47,7 @@ weights<-sort(weights)
 pvals<-runif(10,0,1)
 
 ## run stoufferTest ##
-stoufferTest(p = pvals, w=1/weights)
+stoufferTest(pvalues = pvals, weights=1/weights)
 
 }
 \keyword{ pvalues }
