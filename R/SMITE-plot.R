@@ -76,8 +76,7 @@ setMethod(
         
         for(n_plot in which_network){
             if(goseq == TRUE){
-                if(length(slot(slot(pvalue_annotation, "score_data"), 
-                           "module_output")$goseqOut) == 0){ 
+                if(length(module_output$goseqOut) == 0){ 
                 stop("Goseq analysis has not been performed.")
                 }
             }
@@ -94,7 +93,7 @@ setMethod(
                 stat.v <- stat.v[order(names(stat.v))]
                 adj_mat_network <- adj_mat_network[order(
                     rownames(adj_mat_network)),order(colnames(adj_mat_network))]
-                temp1 <- apply(adj_mat_network, 1, function(v) return(v*stat.v))
+                temp1 <- apply(adj_mat_network, 1, function(v) return(v*stat.v)) #ARI variable name
                 W <- (temp1 + t(temp1))/2
                 Graph_adj_mat <- graph_from_adjacency_matrix(W, mode = "undirected", weighted=TRUE)
                 V(Graph_adj_mat)$weight <- stat.v
@@ -234,46 +233,46 @@ setMethod(
                 expcol <- c(exp_low_col, exp_mid_col, exp_hi_col, "white")
                 names(expcol) <- c("Low", "Med", "High", "NoData")
                 
+                pval_data <- slot(slot(pvalue_annotation, "score_data"), "pval_data")
+                genes_score <- slot(pvalue_annotation, "score_data")@genes
+                effect_data <- slot(slot(pvalue_annotation, "score_data"), "effect_data")
+                signs_index <- slot(slot(pvalue_annotation, "score_data"), "signsindex")
                 if(any(suppress_details == FALSE, counter == 1)){
                     for(i in 1:nrow(layout1_scaled)){
                         
                         halfCircle(x=layout1_scaled[i, 1], y=layout1_scaled[i, 2], 
                             r=ifelse(length(V(h)) < 50, 0.075, 0.025), start=pi/2, 
                             end=2*pi/2, quarter=TRUE, lwd=1, 
-                            col=ifelse(!is.na(slot(slot(pvalue_annotation, "score_data"),
-                            "pval_data")$expression_pvalue[which(slot(pvalue_annotation,
-                            "score_data")@genes%in%V(h)$name[i])]), 
-                            expcol[ifelse(abs(slot(slot(pvalue_annotation, "score_data"), 
-                            "pval_data")$expression_pvalue[which(slot(pvalue_annotation, 
-                            "score_data")@genes%in%V(h)$name[i])]) < p_thresh, 
-                            ifelse(sign(slot(slot(pvalue_annotation, "score_data"), 
-                            "effect_data")$expression_effect[
-                            which(slot(pvalue_annotation,"score_data")@genes %in% V(h)$name[i])])
-                            == 1, 3, 1), 2)], expcol[4])
+                            col=ifelse(!is.na(pval_data$expression_pvalue[which(
+                                genes_score %in% V(h)$name[i])]), expcol[ifelse(
+                                    abs(pval_data$expression_pvalue[which(
+                                        genes_score %in% V(h)$name[i])]) < 
+                                        p_thresh, ifelse(sign(
+                                            effect_data$expression_effect[which(
+                                                genes_score %in% V(h)$name[i])])
+                                            == 1, 3, 1), 2)], expcol[4])
                         )
                         
                         start <- pi
-                        delta <- (3*pi/2)/nrow(slot(slot(pvalue_annotation, "score_data"), 
-                                                 "signs_index"))
+<<<<<<< HEAD
+                        delta <- (3*pi/2)/nrow(signs_index)
                         
-                        for(j in slot(slot(pvalue_annotation, "score_data"), "signs_index")[, 3]){
+                        for(j in signs_index[, 3]){
+>>>>>>> ce95657b8041fa66d5bc5d2ebd3e9d315c4e9f27
                             
                             halfCircle(x=layout1_scaled[i, 1], y=layout1_scaled[i, 2], 
                                        r=ifelse(length(V(h))< 50, 0.075, 0.025), 
                                        start=start, end=start+delta, quarter=TRUE, 
                                        
                                       col=ifelse(!is.na(returnPvalueCol(slot(pvalue_annotation, 
-                                      "score_data"), j)[which(slot(pvalue_annotation, 
-                                        "score_data")@genes%in%V(h)$name[i])]), 
-                                {
+                                      "score_data"), j)[which(genes_score %in% V(h)$name[i])]), 
+                                { #ARI where do you get the brackets from. I was cleaning up this code and have no idea what's supposed to work. 
                                 methcol[ ifelse(abs(returnPvalueCol(slot(pvalue_annotation, "score_data"), j)[
-                                which(slot(pvalue_annotation, "score_data")@genes%in%V(h)$name[i])])<p_thresh, 
-                                ifelse(sign(slot(slot(pvalue_annotation, "score_data"), 
-                                "effect_data")[, grep(j, colnames(slot(slot(pvalue_annotation, 
-                                "score_data"), "effect_data")))][which(slot(pvalue_annotation, 
-                                "score_data")@genes%in%V(h)$name[i])]) == 1, 3, 1), 2)]
+                                which(genes_score %in% V(h)$name[i])]) < p_thresh, 
+                                ifelse(effect_data[, grep(j, colnames(
+                                    effect_data))][which(genes_score %in% V(h)$name[i])]) == 1, 3, 1), 2)]
                                 }, methcol[4])
-                            )
+                            
                             start <- start+delta
                         }    
                     }	
@@ -281,12 +280,14 @@ setMethod(
     
                 if(any(legend == TRUE, counter == 1)){
                     if(any(suppress_details == FALSE, counter == 1)){
-                        num_factors <- nrow(slot(slot(pvalue_annotation, "score_data"), "signs_index"))
+<<<<<<< HEAD
+                        num_factors <- nrow(signs_index)
+>>>>>>> ce95657b8041fa66d5bc5d2ebd3e9d315c4e9f27
                         halfCircle(x=-1.25, y=1.25, r=.4, start=pi/2, end=pi, quarter=TRUE)
                         start <- pi/2
                         delta <- pi/8
             
-                        for(g in 1:4){ #ARI this isn't the same g (what i now named network from before), right?
+                        for(g in 1:4){ #ARI this isn't the same g (what I now named network from before), right?
                             halfCircle(x=-1.25, y=1.25, r=.37, r2=.89, start=start+delta*(g-1), 
                                        end=start+delta*g, col=expcol[g], quarter=TRUE)
                             arctext(x=-1.25, y=1.25, r=.35, start=start+delta*(g-1), 
@@ -299,20 +300,26 @@ setMethod(
                         start <- pi
                         delta <- (3*pi/2)/num_factors
                 
-                        for(j in slot(slot(pvalue_annotation, "score_data"), "signs_index")[, 3]){
-                            halfCircle(x=-1.25, y=1.25, r=.4, start=start, end=start+delta,
-                                       quarter=TRUE)
+<<<<<<< HEAD
+                        for(j in signs_index[, 3]){
+                            halfCircle(x=-1.25, y=1.25, r=.4, start=start, 
+                                       end=start+delta, quarter=TRUE)
+                            
+>>>>>>> ce95657b8041fa66d5bc5d2ebd3e9d315c4e9f27
                             for(g in 1:4){
                                 start <- start
                                 end <- start+delta
                                 delta2 <- (end-start)/4
                                 halfCircle(x=-1.25, y=1.25, r=.37, r2=.89, 
-                                           start=start+delta2*(g-1), end=start+delta2*g, 
+                                           start=start+delta2*(g-1), 
+                                           end=start+delta2*g, 
                                            col=methcol[g], quarter=TRUE)
                         
-                                arctext(x=-1.25, y=1.25, r=.35, start=start+delta2*(g-1), 
-                                        end=start+delta2*g, ifelse(num_factors<=4, 
-                                                       names(methcol)[g],
+                                arctext(x=-1.25, y=1.25, r=.35,
+                                        start=start+delta2*(g-1), 
+                                        end=start+delta2*g, 
+                                        ifelse(num_factors<=4, 
+                                               names(methcol)[g],
                                                        substring(names(methcol)[g],
                                                                  1, 1)),
                                         cex=.5)
@@ -380,30 +387,21 @@ setMethod(
                 if(namestyle == "symbol"){
                     text(0, 1.7, paste(
                         "Network built around", name.eid, "\nChi-square P-value=", 
-                        round(slot(slot(pvalue_annotation, "score_data"), 
-                                   "module_output")$moduleStats[[n_plot]][2],4)))
+                        round(module_output$moduleStats[[n_plot]][2],4)))
                 }
     
                 if(goseq == TRUE){
-                    if(nrow(slot(slot(pvalue_annotation, "score_data"),
-                                 "module_output")$goseqOut[[n_plot]]) > 0){
+                    if(nrow(module_output$goseqOut[[n_plot]]) > 0){
             
                         text("Num\nGenes", x=1.35, y=1.6, font=2)
                         text("Enriched\nPathway/Term", x=2, y=1.6, font=2)
-                        for(i in 1:nrow(slot(slot(pvalue_annotation, "score_data"), 
-                                             "module_output")$goseqOut[[n_plot]])){
-                            text(slot(slot(pvalue_annotation, "score_data"), 
-                                      "module_output")$goseqOut[[n_plot]][i, 4], x=1.3,
-                                 y=seq(1.4, -1, length.out= nrow(slot(
-                                     slot(pvalue_annotation, "score_data"),
-                                     "module_output")$goseqOut[[n_plot]]))[i], 
+                        for(i in 1:nrow(module_output$goseqOut[[n_plot]])){
+                            text(module_output$goseqOut[[n_plot]][i, 4], x=1.3,
+                                 y=seq(1.4, -1, length.out=nrow(module_output$goseqOut[[n_plot]]))[i], 
                                  adj = c(0, 0))
                         
-                            text(slot(slot(pvalue_annotation, "score_data"),
-                                      "module_output")$goseqOut[[n_plot]][i, 6], x=1.5, 
-                                 y=seq(1.4, -1, length.out= nrow(slot(
-                                     slot(pvalue_annotation, "score_data"),
-                                     "module_output")$goseqOut[[n_plot]]))[i], 
+                            text(module_output$goseqOut[[n_plot]][i, 6], x=1.5, 
+                                 y=seq(1.4, -1, length.out=nrow(module_output$goseqOut[[n_plot]]))[i], 
                                  adj= c(0, 0))
                         }
             
