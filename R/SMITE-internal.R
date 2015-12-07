@@ -14,6 +14,7 @@ setMethod(
             exprs <- cbind(rownames(exprs), exprs)
             metadata_sum <- merge(metadata_sum, exprs, by=1, all=TRUE)
         }
+<<<<<<< HEAD
         metadata_sum
 >>>>>>> ce95657b8041fa66d5bc5d2ebd3e9d315c4e9f27
     }
