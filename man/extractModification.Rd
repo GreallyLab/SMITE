@@ -12,15 +12,15 @@ be used to display the GRanges with the modification of interest, or the data
 frame containg a summary of the combined effects.
 }
 \usage{
-extractModification(annotation, modType = "methylation")
-extractModSummary(annotation)
+extractModification(pvalue_annotation, mod_type = "methylation")
+extractModSummary(pvalue_annotation)
 }
 
 \arguments{
-  \item{annotation}{
+  \item{pvalue_annotation}{
 An s4 object of calss PvalueAnnotation
 }
-  \item{modType}{
+  \item{mod_type}{
 A string or character vector that must match one or more of the loaded 
 modifications. If NULL (DEFAULT) then it will show all modifications.
 }
@@ -53,8 +53,8 @@ test_annotation<-makePvalueAnnotation(data=hg19_genes, gene_name_col=5)
 
 ## Load DNA methylation into PvalueAnnotation ##
 #test_annotation<-annotateModification(pvalue_annotation=test_annotation, 
-#methylation, weight_by=c(promoter="distance",body="distance"),verbose=TRUE,
-#modCorr=FALSE,modType="methylation")
+#methylation, weight_by=c(promoter="distance", body="distance"), verbose=TRUE,
+#mod_corr=FALSE, mod_type="methylation")
 
 ## Extract GRanges with modification data ##
 #extractModification(pvalue_annotation=test_annotation)

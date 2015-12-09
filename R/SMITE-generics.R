@@ -177,7 +177,7 @@ setGeneric(
 
 setGeneric(
     name="extractModification", 
-    def=function(pvalue_annotation, modType="methylation")
+    def=function(pvalue_annotation, mod_type="methylation")
     {
         standardGeneric("extractModification")
     }

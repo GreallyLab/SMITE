@@ -9,11 +9,11 @@ This function allows the user to see the effect and p-value data that was loaded
 into a PvalueAnnotation before performing downstream analysis.
 }
 \usage{
-extractExpression(annotation)
+extractExpression(pvalue_annotation)
 }
 
 \arguments{
-  \item{annotation}{
+  \item{pvalue_annotation}{
 An S4 object of class PvalueAnnotation for which expression data has already
 been loaded via annotateExpression
 }
@@ -39,7 +39,7 @@ test_annotation<-annotateExpression(test_annotation, expression_curated)
 #slot(test_annotation,"expression")
 
 ## Extract expression data summary ##
-head(extractExpression(test_annotation))
+head(extractExpression(pvalue_annotation=test_annotation))
 
 
 }
