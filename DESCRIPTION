@@ -1,7 +1,7 @@
 Package: SMITE
 Type: Package
 Title: Significance-based Modules Integrating the Transcriptome and Epigenome
-Version: 0.99.5
+Version: 0.99.6
 Date: 2015-01-15
 Author: Neil Ari Wijetunga
 Maintainer: N. Ari Wijetunga <Neil.Wijetunga@med.einstein.yu.edu>
@@ -12,9 +12,10 @@ Description: This package builds on the Epimods framework which facilitates
              associated with p-values and effect sizes and scores from any 
              researchers prior statistical results to find functional modules.
 License: GPL (>=2)
-Depends: 
-        R (>= 3.2.2),Biobase, igraph , GenomicRanges
-Imports: scales, plyr, Hmisc, AnnotationDbi, org.Hs.eg.db, ggplot2, reactome.db, KEGG.db, BioNet, goseq, methods, IRanges
+Depends:R (>= 3.2.2), igraph
+Imports: 
+    scales, plyr, Hmisc, AnnotationDbi, org.Hs.eg.db, ggplot2, reactome.db,
+    KEGG.db, BioNet, goseq, methods, IRanges, Biobase, GenomicRanges
 Suggests: knitr
 VignetteBuilder: knitr
 biocViews: 

@@ -1,6 +1,6 @@
 \name{makePvalueAnnotation}
 \alias{makePvalueAnnotation}
-\alias{makePvalueAnnotation,data.frame-method}
+\alias{makePvalueAnnotation,ANY-method}
 \title{
 Initialize a PvalueAnnotation
 }

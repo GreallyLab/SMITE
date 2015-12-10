@@ -25,7 +25,7 @@ setMethod(
 
 setMethod(
     f="makePvalueAnnotation",
-    signature="data.frame",
+    signature="ANY",
     definition=function(data, other_data=NULL, other_tss_distance=10000, 
                         promoter_upstream_distance=1000, promoter_downstream_distance=1000, 
                         strand_col=NULL, gene_name_col=NULL) 
@@ -359,9 +359,9 @@ setMethod(
             mod_grange_corr$distance <- distance(c(mod_grange, mod_grange), 
                                                mod_grange_corr)
             mod_grange_corr$pval2 <- c(mod_grange, mod_grange)$pval
-            quantile_distances_mod_corr <- cut2(mod_grange_corr$distance, g=500, onlycuts=TRUE) #doesn't cut make 
+            quantile_distances_mod_corr <- cut2(mod_grange_corr$distance, g=500, onlycuts=TRUE) 
             quantile_distances_mod_corr[length(quantile_distances_mod_corr)] <- 250000000
-            mod_grange_corr$cat <- (cut(mod_grange_corr$distance, breaks=quantile_distances_mod_corr))
+            mod_grange_corr$cat <- cut(mod_grange_corr$distance, breaks=quantile_distances_mod_corr)
             mod_grange_corr <- split(mod_grange_corr, mod_grange_corr$cat)
             mod_grange_corr2 <- lapply(mod_grange_corr, function(j){ 
                 mean((sapply(1:100, function(i){
@@ -1389,8 +1389,7 @@ setMethod(
             sample(temp, replace=TRUE)
             }))
         new_pval <- sapply(temp , function(i){ 
-            length(which(rand_mat > as.numeric(i)))/(100*length(temp)
-            )
+            length(which(rand_mat > as.numeric(i)))/(100*length(temp))
         })
         new_pval <- replace(new_pval, new_pval == 0, 
                             min(subset(new_pval, new_pval != 0), na.rm=TRUE))
