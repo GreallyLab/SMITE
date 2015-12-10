@@ -137,13 +137,14 @@ options(stringsAsFactors=FALSE)
 ## Load DNA methylation bed file ##
 #data(methylationdata)
 #methylation<-methylation[-which(is.na(methylation[,5])),]
-#methylation[,5]<-replace(methylation[,5],methylation[,5]==0, min(subset(methylation[,5], methylation[,5]!=0), na.rm=T))
+#methylation[,5]<-replace(methylation[,5],methylation[, 5] == 0, 
+#min(subset(methylation[,5], methylation[,5]!=0), na.rm=TRUE))
 
 ## Load DNA methylation into PvalueAnnotation modCorr=F for example##
 ## NOTE: Commented out below.  See vignette for better example ##
 #test_annotation <- annotateModification(pvalue_annotation=test_annotation, 
 #mod_data=methylation, weight_by=c(promoter="distance", body="distance"),
-#verbose=F, mod_corr=FALSE, mod_type="methylation")
+#verbose=FALSE, mod_corr=FALSE, mod_type="methylation")
 
 }
 \keyword{ SMITE }

@@ -12,7 +12,7 @@ runBioNet, this function allows you to interrogate the enriched terms for a
 specific module or combination of modules.
 }
 \usage{
-extractGOseq(pvalue_annotation, which.network = NULL)
+extractGOseq(pvalue_annotation, which_network = NULL)
 searchGOseq(pvalue_annotation, search_string, wholeword = FALSE)
 }
 \arguments{
@@ -20,7 +20,7 @@ searchGOseq(pvalue_annotation, search_string, wholeword = FALSE)
 An S4 object of class PvalueAnnotation, for which module-finding and GOseq 
 analysis have already been performed
 }
-  \item{which.network}{
+  \item{which_network}{
 A numeric vector of a length of at least one, corresponding to a particular 
 functional module specifically for the extract function.
 }

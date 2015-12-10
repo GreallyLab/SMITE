@@ -16,6 +16,7 @@ setGeneric(
 
 setGeneric(
     name="returnPvalueCol", 
+    def=function(pval_object, col_name)
     {
         standardGeneric("returnPvalueCol")
     }
@@ -42,7 +43,7 @@ setGeneric(
 
 setGeneric(
     name="annotateExpression", 
-    def=function(annotation, expr_data, effect_col=NULL, pval_col=NULL)
+    def=function(pvalue_annotation, expr_data, effect_col=NULL, pval_col=NULL)
     {
         standardGeneric("annotateExpression")
     }
@@ -62,7 +63,7 @@ setGeneric(
 
 setGeneric(
     name="removeModification", 
-    def=function(annotation, mod_type="methylation")
+    def=function(pvalue_annotation, mod_type="methylation")
     {
         standardGeneric("removeModification")
     }
@@ -210,7 +211,7 @@ setGeneric(
 setGeneric(
     name="addShadowText", 
     def=function(x, y=NULL, labels, col='white', bg='black',
-                 theta=seq(pi/4, 2*pi, length_out=8), r=0.1, ...)
+                 theta=seq(pi/4, 2*pi, length.out=8), r=0.1, ...)
     {
         standardGeneric("addShadowText")
     }

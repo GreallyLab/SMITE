@@ -50,6 +50,6 @@ plotDensityPval
 \examples{
 data(test_annotation_score_data)
 
-plotCompareScores(pvalue_annotation=test_annotation, x_name="expression",
-#y_name="methylation_promoter")
+plotCompareScores(pvalue_annotation=test_annotation, x_name="expression", 
+y_name="methylation_promoter")
 }

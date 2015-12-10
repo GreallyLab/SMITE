@@ -33,12 +33,13 @@ To curate the DNA methylation dataset, it is necessary to remove uninformative l
 ```{r, tidy=TRUE, tidy.opts=list(blank=FALSE, width.cutoff=60), eval=TRUE}
 ## Load methylation data ##
 data(methylationdata)
-
+head(methylation)
 ## Replace zeros with minimum non-zero p-value ##
-methylation[,5]<-replace(methylation[,5],methylation[,5]==0, min(subset(methylation[,5], methylation[,5]!=0), na.rm=T))
+methylation[,5] <- replace(methylation[,5], methylation[,5]==0, 
+                           min(subset(methylation[,5], methylation[,5]!=0), na.rm=TRUE))
 
 ## Remove NAs from p-value column ##
-methylation<-methylation[-which(is.na(methylation[,5])),] 
+methylation <- methylation[-which(is.na(methylation[, 5])), ] 
 ``` 
 
 Before integrating data from multiple datasets, it is \textbf{EXTREMELY} important that you choose a single gene ID platform that you will use for the entire analysis. Any form of gene ID will work as long as every dataset uses it or efforts are made to convert gene IDs. We prefer to use gene symbols to avoid downstream networks cluttered by multiple transcripts of the same gene, and we assign gene symbols to our expression dataset instead of RefSeq IDs using a convenient function. If starting from a different gene ID system, one can also convert ensemble, ensembleprot, and uniprot gene IDs to their respective gene symbols (See Manual).  The `convertGeneIds` function enumerates the combinations of to and from, so if a particular annotation is desired, we can add the functionality, if requested. 
@@ -46,7 +47,7 @@ Before integrating data from multiple datasets, it is \textbf{EXTREMELY} importa
 ```{r, warning=FALSE, tidy=TRUE, tidy.opts=list(blank=FALSE, width.cutoff=60), eval=TRUE}
 ## Load fake genes to show expression conversion ##
 data(genes_for_conversiontest)
-genes[,1]<-convertGeneIds(a=genes[,1], a_type="refseq",b_type="symbol")
+genes[,1] <- convertGeneIds(gene_IDs=genes[,1], ID_type="refseq", ID_convert_to="symbol")
 ```
 
 
@@ -56,12 +57,17 @@ After gene id conversion (example shown above), we remove expression data for ge
 
 ```{r, tidy=TRUE, tidy.opts=list(blank=FALSE, width.cutoff=60), eval=FALSE}
 ## This is just an example of how to pre-process data ##
-expression<-expression[-which(is.na(expression[,1])),]
-expression<-split(expression, expression[,1])
-expression<-lapply(expression, function(i){if(nrow(as.data.frame(i))>1){i<-i[which(i[,3]==min(i[,3],na.rm=T))[1],]}; return(i)}) 
-expression<-do.call(rbind, expression)
-expression<-expression[,-1]
-expression[,2]<-replace(expression[,2],expression[,2]==0, min(subset(expression[,2], expression[,2]!=0), na.rm=T))
+expression <- expression[-which(is.na(expression[, 1])), ]
+expression <- split(expression, expression[, 1])
+expression <- lapply(expression, function(i){
+    if(nrow(as.data.frame(i)) > 1){
+        i <- i[which(i[, 3] == min(i[, 3], na.rm=TRUE))[1],]
+        }
+    return(i)}) 
+expression <- do.call(rbind, expression)
+expression <- expression[,-1]
+expression[,2] <- replace(expression[,2],expression[,2] == 0, 
+                          min(subset(expression[, 2], expression[,2] != 0), na.rm=TRUE))
 ```
 
 ```{r, warning=FALSE, tidy=TRUE, tidy.opts=list(blank=FALSE, width.cutoff=60), eval=TRUE}
@@ -93,19 +99,22 @@ head(h3k4me1)
 In `makePvalueAnnotation`, we create a `GRangesList` object where each gene is associated with a promoter region (+/- 1000bp from TSS), gene body region (TSS+1000bp to TES), and putative "enhancers" using H3K4me1 ChIP-seq peaks (+/- 5000bp from TSS).  Note: These are the sizes of regions of the genome for which we are interested in calculating scores, but the user can easily alter the parameters. Additionally, the argument otherdata can be an unlimited list of bed files that will be associated with genes and then scored in functional modules. The argument other_d is the distance from the TSS that will be used to associate each otherdata dataset with a gene.  If different distances are required for otherdata, then you must provide a distance for each dataset.
 
 ```{r, tidy=TRUE, tidy.opts=list(blank=FALSE, width.cutoff=50), eval=TRUE}
-test_annotation<-makePvalueAnnotation(data=hg19_genes, other_data=list(h3k4me1=h3k4me1), gene_name_col=5,other_tss_distance=5000, promoter_upstream_distance=1000, promoter_downstream_distance=1000) 
+test_annotation <- makePvalueAnnotation(data=hg19_genes, other_data=list(h3k4me1=h3k4me1), 
+                                        gene_name_col=5, other_tss_distance=5000, 
+                                        promoter_upstream_distance=1000, promoter_downstream_distance=1000) 
 ```
 
 Having created a `PvalueAnnotation`, we can now load in the expression and methylation dataset.  First we load the expression data.  If `effect_col` and `pval_col` are not provided, the program will attempt to find them using the column names, but its probably safer to just provide the arguments.  
 ```{r,  tidy=TRUE, tidy.opts=list(blank=FALSE, width.cutoff=50), eval=TRUE}
-test_annotation<-annotateExpression(test_annotation, expression_curated, effect_col=1,pval_col=2)
+test_annotation <- annotateExpression(pvalue_annotation=test_annotation, expr_data=expression_curated, 
+                                      effect_col=1, pval_col=2)
 ```
 
 To load in modification data, we have provided a function that can be used multiple times, once for each modifcation data type (e.g. DNA methylation, DNA hydroxymethylation).  This is accomplished by using the `modType` character string, which can be any word. Please do not use "_" or names that are nested in one another (e.g. methylation and methyl) as this will cause erratic behavior when string splitting column names downstream.  For each loaded modification, when `modCorr=T` (DEFAULT);set as `FALSE` to reduce computation time) the function will determine a correlation structure, adjust the p-values and combine the p-values using the method specified (here, Stouffer's method (DEFAULT)).  In addition, we use a Monte Carlo Method (MCM) of random sampling of the combined scores to determine a FDR like p-value which will used as the p-value/score in downstream analysis.  When combining p-values using any method (see companion paper or `?annotateModification` for more details), p-values will be combined over the gene promoters (DEFAULT), gene bodies (DEFAULT), and over any provided other datasets.  Stouffer's method allows optional weights to be given, which we define here has `"distance"` (weighting the effect and p-value by distance from the TSS), `"pval"` (weighting the effect by the signifcance of the effect), or anything other text (unweighted).  Note: Depending on the amount of data, this step can take roughly 10 minutes per `modType`.
 ```{r, tidy=TRUE, tidy.opts=list(blank=FALSE, width.cutoff=45), eval=FALSE}
-test_annotation<-annotateModification(test_annotation, methylation, weight_by_method="Stouffer", 
-                                      weight_by=c(promoter="distance",body="distance",h3k4me1="distance"),
-                                      verbose=TRUE, modCorr=FALSE, modType="methylation")
+test_annotation <- annotateModification(test_annotation, methylation, weight_by_method="Stouffer", 
+                                      weight_by=c(promoter="distance", body="distance", h3k4me1="distance"),
+                                      verbose=TRUE, mod_corr=FALSE, mod_type="methylation")
 ```
 
 We can view the loaded data using the following functions:
@@ -115,7 +124,7 @@ We can view the loaded data using the following functions:
 head(extractExpression(test_annotation))
 
 ## See the uncombined p-values for a specific or all modType(s) ##
-extractModification(test_annotation, modType="methylation")
+extractModification(test_annotation, mod_type="methylation")
 
 ## See the combined p-value data.frame ##
 head(extractModSummary(test_annotation))
@@ -127,23 +136,26 @@ head(extractModSummary(test_annotation))
 Having loaded gene expression and DNA methylation data into the `PvalueAnnotation`, we now bring all of the data together into an object class called a `PvalueObject`.  The `PvalueObject` we will create has a slot within the `PvalueAnnotation` called `score_data` accessed through `slot(PvalueAnnotation, "scoredata")` or one of the accessor functions that we have set up like `SMITEextractScores`.  At this step we specify an \textit{a priori} argument that will be used in scoring downstream `effect_directions`.  We must specify an `effect_directions` element for each modification-context pairing that we wish to score.  It should reflect whether you want your modification-context (e.g. DNA methylation in gene promoters) to have a pre-specified relationship with expression so that if the opposite relationship is observed the score will be penalized. Users can specify either `"increase"`, `"decrease"` and `"bidirectional"` (for no prespecifed relationship).  This information will be stored and will not be used until the `SMITEscorePval` function is used.
 
 ```{r,  tidy=TRUE, tidy.opts=list(blank=FALSE, width.cutoff=35), eval=FALSE}
-test_annotation<-makePvalueObject(test_annotation, effect_directions=c(methylation_promoter="decrease", methylation_body="decrease", methylation_h3k4me1="bidirectional"))
+test_annotation <- makePvalueObject(test_annotation, effect_directions=c(methylation_promoter="decrease", 
+                                                                       methylation_body="decrease", 
+                                                                       methylation_h3k4me1="bidirectional"))
 ```   
 
 P-values/scores that are combined and then randomized will have a different range than gene expression, or one another, which can skew the identified modules toward a particular modification-context pairing.  Using the `plotDensityPval` function we view the distribution and then normalize using the `normalizePval` function if necessary.  Using the (DEFAULT) `rescale` procedure, p-values are logit transformed before rescaling resulting in a shifting of an approximately normal distribution and no effect on the order of p-values within a modification-context pairing.
 
 ```{r, echo=FALSE, eval=TRUE}
-## Because SMITErunSpinglass and SMITEscorePval are computationally intensive we simply load already ran data instead of evaluating the code.
+## Because runSpinglass and scorePval are computationally intensive we simply load already ran data instead of evaluating the code.
 data(test_annotation_score_data)
 ```
 
 ```{r,  tidy=TRUE, tidy.opts=list(blank=FALSE, width.cutoff=35), eval=TRUE}
 ## Plot density of p-values ##
-plotDensityPval(test_annotation, ref="expression")
+plotDensityPval(pvalue_annotation=test_annotation, ref="expression")
 ```
 ```{r,  tidy=TRUE, tidy.opts=list(blank=FALSE, width.cutoff=35), eval=TRUE, fig.width=9, fig.height=5}
 ## Normalize the p-values to the range of expression ##
-test_annotation<-normalizePval(test_annotation,ref="expression",method="rescale")
+test_annotation <- normalizePval(test_annotation, ref="expression", 
+                                 method="rescale")
 ```   
 We can compare p-values for different features using the `plotCompareScores` function, with the hope that it may reveal interesting patterns within the data.
 
@@ -155,7 +167,10 @@ Scoring the genes is the final step before finding modules, and after scoring, t
 
 ```{r long-compute-time, tidy=TRUE, tidy.opts=list(blank=FALSE, width.cutoff=45), eval=FALSE}
 #score with all four features contributing
-test_annotation<-SMITEscorePval(test_annotation,weights=c(methylation_promoter=.3,methylation_body=.1,expression=.3,methylation_h3k4me1=.3))
+test_annotation <- scorePval(test_annotation, weights=c(methylation_promoter=.3, 
+                                                        methylation_body=.1,
+                                                        expression=.3,
+                                                        methylation_h3k4me1=.3))
 ```
 
 \section{5 Visualize Modules}
@@ -166,21 +181,23 @@ First, we load the desired interactome, in our case from `REACTOME` and run the 
 ## load REACTOME ## 
  load(system.file("data","Reactome.Symbol.Igraph.rda", package="SMITE"))
 ## Run Spin-glass ##
-test_annotation<-SMITErunSpinglass(test_annotation, REACTOME,maxsize=50, niter=1000)
+test_annotation <- runSpinglass(test_annotation, network=REACTOME, maxsize=50, num_iterations=1000)
 
 ## Run goseq on individual modules to determine bias an annotate functions ## 
-test_annotation<-SMITErunGOseq(test_annotation,coverage=read.table(system.file("extdata", "hg19_symbol_hpaii.sites.inbodyand2kbupstream.bed.gz", package="SMITE")),type="kegg")
+test_annotation <- runGOseq(test_annotation, coverage=read.table(system.file(
+    "extdata", "hg19_symbol_hpaii.sites.inbodyand2kbupstream.bed.gz", package="SMITE")),
+    type="kegg")
 ```
 
 
 We can use keywords such as "cell cycle" to find within the goseq output which modules we are most interested. We can then use `SMITEplotModule` to visualize the module. 
 ```{r, tidy=TRUE, tidy.opts=list(blank=FALSE, width.cutoff=60), eval=TRUE, fig.width=10, fig.height=9}
 ## search goseq output for keywords ##
-SMITEsearchGOseq(test_annotation,"cell cycle")
+searchGOseq(test_annotation, search_string="cell cycle")
 ## Draw a network ##
-SMITEplotModule(test_annotation, which.network=6,layout="fr", label_scale=TRUE)
+plotModule(test_annotation, which_network=6, layout="fr", label_scale=TRUE)
 ```
 ```{r, tidy=TRUE, tidy.opts=list(blank=FALSE, width.cutoff=60), eval=TRUE, fig.width=12,fig.height=6}
 ## Draw a network with goseq analysis ##
-SMITEplotModule(test_annotation, which.network=1,layout="fr", goseq=TRUE,label_scale = FALSE)
+plotModule(test_annotation, which_network=1, layout="fr", goseq=TRUE, label_scale=FALSE)
 ```

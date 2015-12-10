@@ -38,8 +38,9 @@ BioNet
 options(stringsAsFactors=FALSE)
 
 data(methylationdata)
-methylation<-methylation[-which(is.na(methylation[,5])),]
-methylation[,5]<-replace(methylation[,5],methylation[,5]==0, min(subset(methylation[,5], methylation[,5]!=0), na.rm=T))
+methylation <- methylation[-which(is.na(methylation[, 5])), ]
+methylation[,5] <- replace(methylation[,5],methylation[,5] == 0, 
+    min(subset(methylation[,5], methylation[,5]!=0), na.rm=TRUE))
 
 data(curated_expressiondata)
 
@@ -47,7 +48,7 @@ data(hg19_genes_bed)
 data(histone_h3k4me1)
 
 #test_annotation<-makePvalueAnnotation( data=hg19_genes, 
-#other_data=list(h3k4me1=h3k4me1), gene_name_col=5,other_tss_distance=5000)
+#other_data=list(h3k4me1=h3k4me1), gene_name_col=5, other_tss_distance=5000)
 
 ##fill in expression data
 #test_annotation<-annotateExpression(test_annotation, expression_curated)
@@ -56,8 +57,8 @@ data(histone_h3k4me1)
 ##fill in methylation data
 
 #test_annotation<-annotateModification(test_annotation, methylation, 
-#weight_by=c(promoter="distance",body="distance",h3k4me1="distance"),
-#verbose=TRUE, modCorr=TRUE)
+#weight_by=c(promoter="distance", body="distance", h3k4me1="distance"),
+#verbose=TRUE, mod_corr=TRUE)
 
 ##create a pvalue object that will count the effect of the h3k4me1 as
 ##bidirectional
@@ -83,21 +84,20 @@ data(histone_h3k4me1)
  
 ##run Spinglass using REACTOME network
 
-#test_annotation<-runSpinglass(test_annotation, REACTOME,maxsize=50, 
-#niter=10)
+#test_annotation<-runSpinglass(test_annotation, REACTOME, maxsize=50, 
+#num_iterations=10)
 
 ##run goseq on individual modules to determine bias 
-
-#test_annotation<-runGOseq(test_annotation,
+#test_annotation <- runGOseq(test_annotation,
 #coverage=read.table(system.file("extdata", 
 #"hg19_symbol_hpaii.sites.inbodyand2kbupstream.bed.gz", package="SMITE")),
 #type="kegg")
 
 ##search go seq output for keywords
-#searchGOseq(test_annotation,"Cell")
+#searchGOseq(test_annotation, "Cell")
 
 ##Draw a network
-#plotModule(test_annotation, which.network=6,layout="fr")
+#plotModule(test_annotation, which_network=6, layout="fr")
 
 ##sample final file ##
 data(test_annotation_score_data)

@@ -24,14 +24,15 @@ setMethod(
 ##SMITE Functions
 
 setMethod(
-    f="makePvalueAnnotation",  
+    f="makePvalueAnnotation",
+    signature="data.frame",
     definition=function(data, other_data=NULL, other_tss_distance=10000, 
                         promoter_upstream_distance=1000, promoter_downstream_distance=1000, 
                         strand_col=NULL, gene_name_col=NULL) 
     {
         ##create a Granges data object
-        if(!inherits(data,"GRanges")){
-		    if(inherits(gene_name_col, NULL)){
+        if(!inherits(data, "GRanges")){
+		    if(is.null(gene_name_col)){
 		        stop("Gene name column must be specified if GRanges not given")
 		    }
 		    ##if the strand column was not specified auto-detect
@@ -71,8 +72,9 @@ setMethod(
                 other_tss_distance <- rep(other_tss_distance[1], 
                                           length(other_data))
             }
-        if(is.null(names(other_tss_distance))){
-            names(other_tss_distance) <- otherdata_names}
+            if(is.null(names(other_tss_distance))){
+            names(other_tss_distance) <- otherdata_names
+            }
         }
         
         tss <- shift(flank(data_grange, width=2), 1)
@@ -320,7 +322,7 @@ setMethod(
             mod_included <- names(weight_by)
             if(!all(mod_included %in% unique_feature_names)){  
                 stop("Provided weight names must match those in 
-                     unique(mcols(unlist(annotation@annotation))$feature)")
+                     unique(mcols(unlist(pvalue_annotation@annotation))$feature)")
             } 
         }
         
@@ -368,7 +370,9 @@ setMethod(
                 })))                
             })
             correlations <- as.data.frame(do.call(rbind, mod_grange_corr2))
-            final_corr <- data.frame(correlations, as.character(names(  mod_grange_corr2 )), stringsAsFactors=F)
+            final_corr <- data.frame(correlations, 
+                                     as.character(names(mod_grange_corr2)),
+                                     stringsAsFactors=FALSE)
             final_corr <- rbind(c(.9, paste("(-1, ", quantile_distances_mod_corr[1], "]", 
                                           sep="")), final_corr)
             rm(mod_grange_corr)
@@ -427,18 +431,18 @@ setMethod(
                             out_mean <- weighted.mean(each_effect, 
                                                     w=(1/log(distances)))
                             ##Stouffer test is weighted by distance
-                            out_pval <- stoufferTest(each_pval, w=(1/log(distances)))
+                            out_pval <- stoufferTest(each_pval, weights=(1/log(distances)))
                         } 
                         else if(weight_by[i] %in%
                                       c("pval", "p.value", "pvalue", "p_val")){
                             ##mean is weight by pvalue
                             out_mean <- weighted.mean(each_effect, w=-log(each_pval)) 
-                            out_pval <- stoufferTest(each_pval, w=NULL)
+                            out_pval <- stoufferTest(each_pval, weights=NULL)
                         } 
                         else {
                             ##mean is not weighted
                             out_mean <- mean(each_effect, na.rm=TRUE) 
-                            out_pval <- stoufferTest(each_pval, w=NULL)    
+                            out_pval <- stoufferTest(each_pval, weights=NULL)    
                         }
                               
                     } 
@@ -494,7 +498,7 @@ setMethod(
                 
             trans_p[, 1] <- replace(trans_p[, 1],is.infinite(trans_p[, 1]),
                                     max(subset(trans_p, !is.infinite(
-                                        trans_p[, 1])), na.rm=T))
+                                        trans_p[, 1])), na.rm=TRUE))
                 
                 
             num_list <- split(trans_p$trans, trans_p$categories)
@@ -509,7 +513,8 @@ setMethod(
                     (500*as.numeric(i[3]))
             })
             new_pval <- replace(new_pval, new_pval == 0, 
-                                min(subset(new_pval, new_pval != 0), na.rm=T))
+                                min(subset(new_pval, new_pval != 0), 
+                                    na.rm=TRUE))
             
             each_feature[, 2] <- new_pval 
             each_feature <- as.data.frame(each_feature)
@@ -568,7 +573,7 @@ setMethod(
         
         if(!mod_type%in%names(slot(pvalue_annotation,
                                   "modifications")@metadata$elements)){
-            stop("Provided mod_type is not in the annotation")
+            stop("Provided mod_type is not in the pvalue_annotation")
         }
         
         temp_meta <- slot(slot(pvalue_annotation,"modifications"),"metadata")
@@ -887,7 +892,7 @@ setMethod(
             length(which(rand_mat > as.numeric(i)))/(100*length(scoresout))
         })
         new_pval <- replace(new_pval, new_pval == 0, 
-                            min(subset(new_pval, new_pval!=0), na.rm=T))
+                            min(subset(new_pval, new_pval!=0), na.rm=TRUE))
         new_pval <- (-2)*log(new_pval)
         
         
@@ -1388,29 +1393,29 @@ setMethod(
             )
         })
         new_pval <- replace(new_pval, new_pval == 0, 
-                            min(subset(new_pval, new_pval != 0), na.rm=T))
+                            min(subset(new_pval, new_pval != 0), na.rm=TRUE))
         temp[which(new_pval < alpha)]
     }
 )
 
 #ARI shadowtext and addShadowText, do we need both functions? Does addShadowText need a generic?
-shadowtext <- function(x, y=NULL, labels, col='white', bg='black',
-                       theta= seq(pi/4, 2*pi, length_out=8), r=0.1, ... ) {
-    xy <- xy.coords(x,y)
-    xo <- r*strwidth('A')
-    yo <- r*strheight('A')
-    for (i in theta) {
-        text( xy$x + cos(i)*xo, xy$y + sin(i)*yo, 
-              labels, col=bg, ... )
-    }
-    text(xy$x, xy$y, labels, col=col, ... )
-}
+#shadowtext <- function(x, y=NULL, labels, col='white', bg='black',
+#                       theta= seq(pi/4, 2*pi, length.out=8), r=0.1, ... ) {
+#    xy <- xy.coords(x,y)
+#    xo <- r*strwidth('A')
+#    yo <- r*strheight('A')
+#    for (i in theta) {
+#        text( xy$x + cos(i)*xo, xy$y + sin(i)*yo, 
+#              labels, col=bg, ... )
+#    }
+#    text(xy$x, xy$y, labels, col=col, ... )
+#}
 
 setMethod(
     f="addShadowText", 
     signature="ANY",
     definition=function(x, y=NULL, labels, col='white', bg='black',
-                        theta=seq(pi/4, 2*pi, length_out=8), r=0.1, ...) {
+                        theta=seq(pi/4, 2*pi, length.out=8), r=0.1, ...) {
         
         xy <- xy.coords(x,y)
         xo <- r*strwidth('A')

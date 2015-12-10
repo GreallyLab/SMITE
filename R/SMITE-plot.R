@@ -258,19 +258,16 @@ setMethod(
                         
                         for(j in signs_idx[, 3]){
                             
-                            halfCircle(x=layout1_scaled[i, 1], y=layout1_scaled[i, 2], 
-                                       r=ifelse(length(V(h))< 50, 0.075, 0.025), 
-                                       start=start, end=start+delta, quarter=TRUE, 
-                                       
-                                      col=ifelse(!is.na(returnPvalueCol(slot(pvalue_annotation, 
-                                      "score_data"), j)[which(genes_score %in% V(h)$name[i])]), 
-                                { #ARI where do you get the brackets from. I was cleaning up this code and have no idea what's supposed to work. 
-                                methcol[ ifelse(abs(returnPvalueCol(slot(pvalue_annotation, "score_data"), j)[
-                                which(genes_score %in% V(h)$name[i])]) < p_thresh, 
-                                ifelse(effect_data[, grep(j, colnames(
-                                    effect_data))][which(genes_score %in% V(h)$name[i])]) == 1, 3, 1), 2)]
-                                }, methcol[4])
+                            score_graph_col<-returnPvalueCol(slot(pvalue_annotation, "score_data"), j)[which(genes_score %in% V(h)$name[i])]
                             
+                            halfCircle(x=layout1_scaled[i, 1], 
+                                y=layout1_scaled[i, 2], r=ifelse(length(V(h)) < 50, 0.075, 0.025), 
+                                start=start, end=start+delta, quarter=TRUE, 
+                                col=ifelse(!is.na(score_graph_col), 
+                                    methcol[ifelse(abs(score_graph_col) < p_thresh,
+                                        ifelse(effect_data[, grep(j, colnames(effect_data))][which(genes_score %in% V(h)$name[i])] == 1, 
+                                               3, 1), 2)],methcol[4])
+                                )
                             start <- start+delta
                         }    
                     }	

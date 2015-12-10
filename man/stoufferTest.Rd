@@ -14,7 +14,7 @@ stoufferTest(pvalues, weights)
   \item{pvalues}{
 A vector of p-values.
 }
-  \item{weights}
+  \item{weights}{
 Optional weights used when combining probabilites.  If no weights are given then the p-values are equally weighted.
 }
 }

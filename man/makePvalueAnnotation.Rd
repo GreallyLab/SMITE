@@ -1,6 +1,6 @@
 \name{makePvalueAnnotation}
-\alias{makePvalueAnnotation,data.frame-method}
 \alias{makePvalueAnnotation}
+\alias{makePvalueAnnotation,data.frame-method}
 \title{
 Initialize a PvalueAnnotation
 }
@@ -12,8 +12,8 @@ intervals.
 }
 \usage{
 makePvalueAnnotation(data, other_data = NULL, other_tss_distance = 10000, 
-promoter_upstream_ditance = 1000, promoter_downstream_distance = 1000, strand_col = NULL, 
-gene_name_col = NULL)
+    promoter_upstream_distance = 1000, promoter_downstream_distance = 1000, 
+    strand_col = NULL, gene_name_col = NULL)
 }
 \arguments{
   \item{data}{

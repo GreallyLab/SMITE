@@ -18,19 +18,19 @@ BED file with columns added for effect and p-value.
     \item{column3}{an integer vector specifying end}
     \item{column4}{a numeric vector with an effect direction (here it is average
     difference between two groups)}
-    \item{column1}{a numeric vector with a two sided t-test p-value}
+    \item{column5}{a numeric vector with a two sided t-test p-value}
   }
 }
 \details{
 This is a small subset of a DNA methylation dataset is a randomized version of 
 the Toxoplasma dataset used to benchmark.  We could not include the larger
 version do to package size requirements but larger versions are available.
-See Github below.
-SMITE.  It still has NAs and p-values=0.}
+See Github source below. It still has NAs and p-values=0.
+}
 \source{
-Manuscript in preparation.  Please see 
-https://github.com/GreallyLab 
-for more details.}
+Manuscript in preparation. Please see https://github.com/GreallyLab/SMITE 
+for more details.
+}
 \value{
 A dataframe in BED format (chromosome, start, end) with additional columns for
 and effect direction and p-value derived from T-tests of HELP-tagging DNA
@@ -39,8 +39,8 @@ methylation data.
 \examples{
 data(methylationdata)
 
-any(is.na(methylation[,4]))
+any(is.na(methylation[, 4]))
 
-any(methylation[,4]==0)
+any(methylation[, 4] == 0)
 }
 \keyword{datasets}

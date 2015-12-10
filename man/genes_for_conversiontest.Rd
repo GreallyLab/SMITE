@@ -24,8 +24,8 @@ A dataframe with genes in Refseq format for conversion testing.
 
 data("genes_for_conversiontest")
 
-genes[,1]<-convertGeneIds(a=genes[,1], a_type="refseq",
-                                       b_type="symbol")
+genes[,1]<-convertGeneIds(gene_IDs=genes[,1], ID_type="refseq",
+                          ID_convert_to="symbol")
 
 }
 \keyword{datasets}

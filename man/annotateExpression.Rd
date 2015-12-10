@@ -55,7 +55,7 @@ data(curated_expressiondata)
 data(test_annotation_score_data)
 ## Load Expression data into PvalueAnnotation ##
 test_annotation <- annotateExpression(pvalue_annotation=test_annotation, 
-#expression_curated)
+expression_curated)
 
 ## Extract entire ExpressionSet with expression data ##
 #slot(test_annotation,"expression")

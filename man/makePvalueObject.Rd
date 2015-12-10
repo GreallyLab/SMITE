@@ -45,14 +45,15 @@ makePvalueAnnotation
 options(stringsAsFactors=FALSE)
 
 data(methylationdata)
-methylation<-methylation[-which(is.na(methylation[,5])),]
-#methylation[,5]<-replace(methylation[,5],methylation[,5]==0, min(subset(methylation[,5], methylation[,5]!=0), na.rm=T))
+methylation <- methylation[-which(is.na(methylation[, 5])), ]
+#methylation[, 5] <- replace(methylation[, 5],methylation[, 5] == 0, 
+#min(subset(methylation[, 5], methylation[, 5] != 0), na.rm=TRUE))
 
 #data(curated_expressiondata)
 #data(hg19_genes_bed)
 #data(histone_h3k4me1)
 
-#test_annotation<-makePvalueAnnotation( data=hg19_genes, 
+#test_annotation<-makePvalueAnnotation(data=hg19_genes, 
 #other_data=list(h3k4me1=h3k4me1), gene_name_col=5,other_tss_distance=5000)
 
 #fill in expression data
@@ -68,10 +69,7 @@ methylation<-methylation[-which(is.na(methylation[,5])),]
 #create a pvalue object that will count the effect of the h3k4me1 as
 #bidirectional
 #test_annotation<-makePvalueObject(pvalue_annotation=test_annotation, 
-#effect_directions=c(methylation_promoter="decrease",methylation_body=
-#"decrease",
-#methylation_h3k4me1="bidirectional"))
-
-
+#effect_directions=c(methylation_promoter="decrease",
+#methylation_body="decrease", methylation_h3k4me1="bidirectional"))
 }
 \keyword{ SMITE }
