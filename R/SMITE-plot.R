@@ -88,15 +88,16 @@ setMethod(
 
             if(class(network) == "graphNEL"){
                 network <- graph_from_graphnel(network)
-                adj_mat_network <- as_adjacency_matrix(network)
+                adj_mat_network <- igraph::as_adjacency_matrix(network)
                 stat.v <- stat[which(names(stat) %in% rownames(adj_mat_network))]
                 stat.v <- stat.v[order(names(stat.v))]
                 adj_mat_network <- adj_mat_network[order(
                     rownames(adj_mat_network)),order(colnames(adj_mat_network))]
                 temp1 <- apply(adj_mat_network, 1, function(v) return(v*stat.v)) #ARI variable name
                 W <- (temp1 + t(temp1))/2
-                Graph_adj_mat <- graph_from_adjacency_matrix(W, mode = "undirected", weighted=TRUE)
-                V(Graph_adj_mat)$weight <- stat.v
+                Graph_adj_mat <- igraph::graph_from_adjacency_matrix(
+                    W, mode ="undirected", weighted=TRUE)
+                igraph::V(Graph_adj_mat)$weight <- stat.v
                 network <- Graph_adj_mat
             }    
         
@@ -111,29 +112,31 @@ setMethod(
             ## Vertex palette:
             vertexPalette.v <- 
                 colorRampPalette(c("white","gray85","gray65","salmon"))(50)
-            vertexBreaks.v <- rev(-2*log(cut2(pval, g=50, onlycuts=TRUE)))
+            vertexBreaks.v <- rev(-2*log(Hmisc::cut2(pval, g=50, 
+                                                     onlycuts=TRUE)))
             vertexBreaks.v[51] <- vertexBreaks.v[51]+0.001
             ## Edge palette: grey to black 
             edgePalette.v <- 
                 colorRampPalette(c("white","gray85","gray65","salmon"))(50);
-            edgeBreaks.v <- cut2(E(network)$weight, g=50, onlycuts=TRUE)         
+            edgeBreaks.v <- Hmisc::cut2(igraph::E(network)$weight, g=50, 
+                                        onlycuts=TRUE)         
             
             ## Compute iGraph object
-            h <- induced_subgraph(network, eid);
-            stat.v <- stat[V(h)$name];
-            pval.v <- pval[V(h)$name];
+            h <- igraph::induced_subgraph(network, eid);
+            stat.v <- stat[igraph::V(h)$name];
+            pval.v <- pval[igraph::V(h)$name];
             pval.v[which(pval.v == 0)] <- 0.000000001
             
             par(mar=c(4, 0, 2, 0))
             ## Color edges between grey and red according to significance
-            E(h)$color <- vect2color(E(h)$weight, edgePalette.v, edgeBreaks.v);
+            igraph::E(h)$color <- vect2color(igraph::E(h)$weight, edgePalette.v, edgeBreaks.v);
             ## Color nodes blue to yellow according to hyper/hypo-methylation
-            V(h)$color <- vect2color(stat.v, vertexPalette.v, vertexBreaks.v);
+            igraph::V(h)$color <- vect2color(stat.v, vertexPalette.v, vertexBreaks.v);
             #### this is where I could Modify to allow other annotation names
             ## vl = unlist(entrez2symbol[V(h)$name])
-            vl <- V(h)$name
-            V(h)$color[which(1-pchisq(V(h)$weight,2) < p_thresh)] <- "red"
-            E(h)$color[which(1-pchisq(E(h)$weight,4) < p_thresh)] <- "red"
+            vl <- igraph::V(h)$name
+            igraph::V(h)$color[which(1-pchisq(igraph::V(h)$weight,2) < p_thresh)] <- "red"
+            igraph::E(h)$color[which(1-pchisq(igraph::E(h)$weight,4) < p_thresh)] <- "red"
             
             if(layout == "circle"){layout1 <- layout_in_circle(h)}
             if(layout == "fr"){layout1 <- layout_with_fr(h)}
@@ -188,8 +191,9 @@ setMethod(
                      ##vertex.size = 15*13/length(V(h)), 
                      ##edge.width = 160/length(V(h))
                      vertex.size = 
-                         if(length(V(h)) < 50) { 15 } else {15*13/length(V(h))}, 
-                     edge.width = if(length(V(h))< 50) { 2 } else { 1 }, 
+                         if(length(igraph::V(h)) < 50) { 15 } 
+                         else {15*13/length(igraph::V(h))}, 
+                     edge.width = if(length(igraph::V(h))< 50) { 2 } else { 1 }, 
                      ylim=c(-1, 1.5), xlim=c(-1, 1)
                 )
                 
@@ -241,16 +245,17 @@ setMethod(
                     for(i in 1:nrow(layout1_scaled)){
                         
                         halfCircle(x=layout1_scaled[i, 1], y=layout1_scaled[i, 2], 
-                            r=ifelse(length(V(h)) < 50, 0.075, 0.025), start=pi/2, 
+                            r=ifelse(length(igraph::V(h)) < 50, 0.075, 0.025), start=pi/2, 
                             end=2*pi/2, quarter=TRUE, lwd=1, 
                             col=ifelse(!is.na(pval_data$expression_pvalue[which(
-                                genes_score %in% V(h)$name[i])]), expcol[ifelse(
-                                    abs(pval_data$expression_pvalue[which(
-                                        genes_score %in% V(h)$name[i])]) < 
-                                        p_thresh, ifelse(sign(
-                                            effect_data$expression_effect[which(
-                                                genes_score %in% V(h)$name[i])])
-                                            == 1, 3, 1), 2)], expcol[4])
+                                genes_score %in% igraph::V(h)$name[i])]), 
+                                expcol[ifelse(abs(pval_data$expression_pvalue[
+                                    which(genes_score %in% igraph::V(h)$name[i])
+                                    ]) < p_thresh, ifelse(sign(
+                                        effect_data$expression_effect[which(
+                                            genes_score %in% 
+                                                igraph::V(h)$name[i])]) ==
+                                            1, 3, 1), 2)], expcol[4])
                         )
                         
                         start <- pi
@@ -258,15 +263,22 @@ setMethod(
                         
                         for(j in signs_idx[, 3]){
                             
-                            score_graph_col<-returnPvalueCol(slot(pvalue_annotation, "score_data"), j)[which(genes_score %in% V(h)$name[i])]
+                            score_graph_col<-returnPvalueCol(slot(
+                                pvalue_annotation, "score_data"), 
+                                j)[which(genes_score %in% igraph::V(h)$name[i])]
                             
                             halfCircle(x=layout1_scaled[i, 1], 
-                                y=layout1_scaled[i, 2], r=ifelse(length(V(h)) < 50, 0.075, 0.025), 
+                                y=layout1_scaled[i, 2], 
+                                r=ifelse(length(igraph::V(h)) < 
+                                             50, 0.075, 0.025), 
                                 start=start, end=start+delta, quarter=TRUE, 
                                 col=ifelse(!is.na(score_graph_col), 
-                                    methcol[ifelse(abs(score_graph_col) < p_thresh,
-                                        ifelse(effect_data[, grep(j, colnames(effect_data))][which(genes_score %in% V(h)$name[i])] == 1, 
-                                               3, 1), 2)],methcol[4])
+                                    methcol[ifelse(abs(score_graph_col) < 
+                                                       p_thresh,
+                                        ifelse(effect_data[, grep(j, colnames(
+                                        effect_data))][which(genes_score %in% 
+                                        igraph::V(h)$name[i])] == 1,
+                                        3, 1), 2)],methcol[4])
                                 )
                             start <- start+delta
                         }    
@@ -325,8 +337,8 @@ setMethod(
                     halfCircle(x=-1.25, y=1.25, r=.3, end=2*pi, col="white")
         
                     vertexPalette.v[which(
-                        vertexBreaks.v >= min(V(h)$weight[which(
-                            V(h)$weight >= qchisq(1-p_thresh,2))]))-1] <- "red"
+                        vertexBreaks.v >= min(igraph::V(h)$weight[which(
+                            igraph::V(h)$weight >= qchisq(1-p_thresh,2))])) - 1] <- "red"
                     
                     points(seq(-1.45, -1.05, length.out=50), rep(1.35, 50), 
                            col=vertexPalette.v, pch=15, cex=2.5)
@@ -337,11 +349,11 @@ setMethod(
                     text(-1.07, 1.295, paste(">",round(qchisq(1-p_thresh,2), 2),sep=""))
         
                     if(length(which(
-                        E(h)$weight >= qchisq(1-p_thresh,4))) > 0){
+                        igraph::E(h)$weight >= qchisq(1-p_thresh, 4))) > 0){
                         
                         edgePalette.v[which(
                             edgeBreaks.v >= min(E(h)$weight[which(
-                                E(h)$weight >= qchisq(1-p_thresh,4))]))-1] <- "red"
+                                E(h)$weight >= qchisq(1-p_thresh, 4))]))-1] <- "red"
                     }
                     points(seq(-1.45, -1.05, length.out=50), rep(1.15, 50), 
                            col=edgePalette.v, pch=15, cex=2.5)

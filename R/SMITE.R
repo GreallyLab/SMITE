@@ -942,7 +942,7 @@ setMethod(
         }
         genes_in_network <- subset(slot(slot(pvalue_annotation, "score_data"), "genes"), 
                                    slot(slot(pvalue_annotation, "score_data"), "genes") %in% 
-                                       V(network)$name)
+                                       igraph::V(network)$name)
         scores_in_network <- extractScores(pvalue_annotation)[genes_in_network]
         
         ##should be FALSE, but just in case check for NAs 
@@ -953,7 +953,7 @@ setMethod(
             genes_in_network <- names(scores_in_network)     
         }
         
-        nodes_with_scores <- intersect(genes_in_network, V(network)$name)
+        nodes_with_scores <- intersect(genes_in_network, igraph::V(network)$name)
         network <- induced_subgraph(network, nodes_with_scores)
         network_clusters <- clusters(network)
         
@@ -963,7 +963,7 @@ setMethod(
         network <- induced_subgraph(network, 
                                     which(network_clusters$membership == maxclust)) 
         rm(network_clusters) #ARI is this necessary?
-        genes_in_network <- intersect(genes_in_network,V(network)$name)
+        genes_in_network <- intersect(genes_in_network, igraph::V(network)$name) #ARI, isn't genes_in_network already defined as nodes_with_scores (see above)
         
         scores_in_network <- scores_in_network[genes_in_network]
         network.adj <- as_adjacency_matrix(network)
@@ -990,7 +990,7 @@ setMethod(
         gc()
         final_network <- 
             graph_from_adjacency_matrix(W_for_spinglass, mode = "undirected", weighted=TRUE)
-        V(final_network)$weight <- stat_scores
+        igraph::V(final_network)$weight <- stat_scores
         network <- final_network
         rm(final_network)
         gc() 
