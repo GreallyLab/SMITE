@@ -34,6 +34,6 @@ http://www.reactome.org/pages/download-data/
 }
 \examples{
 data(Reactome.Symbol.Igraph)
-head(V(REACTOME))
+head(igraph::V(REACTOME))
 }
 \keyword{datasets}

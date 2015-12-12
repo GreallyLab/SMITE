@@ -196,9 +196,6 @@ We can use keywords such as "cell cycle" to find within the goseq output which m
 searchGOseq(test_annotation, search_string="cell cycle")
 ## Draw a network ##
 plotModule(test_annotation, which_network=6, layout="fr", label_scale=TRUE)
-highScores(test_annotation)
-head(test_annotation@score_data@module_output)
-browseVignettes("SMITE")
 ```
 ```{r, tidy=TRUE, tidy.opts=list(blank=FALSE, width.cutoff=60), eval=TRUE, fig.width=12,fig.height=6}
 ## Draw a network with goseq analysis ##

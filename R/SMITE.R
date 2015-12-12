@@ -336,30 +336,43 @@ setMethod(
         }
         
         
-        mod_grange <- GRanges(seqnames=mod_data[, 1], ranges=IRanges(
-            start=mod_data[, 2], end=mod_data[, 3]), effect=mod_data[, 4], 
-            pval=mod_data[, 5], type=mod_type)
+        mod_grange <- GenomicRanges::GRanges(seqnames=mod_data[, 1], 
+            ranges=IRanges::IRanges(start=mod_data[, 2], end=mod_data[, 3]), 
+            effect=mod_data[, 4], pval=mod_data[, 5], type=mod_type)
         
 		temp_annotation <- unlist(slot(pvalue_annotation, "annotation"))
         
-		overlap_mods <- findOverlaps(temp_annotation, mod_grange)
+		overlap_mods <- GenomicRanges::findOverlaps(temp_annotation, mod_grange)
         mod_grange_overlaps <- mod_grange[subjectHits(overlap_mods)]
         mcols(mod_grange_overlaps) <- cbind(mcols(
             temp_annotation[as.numeric(
-            queryHits(overlap_mods))]), mcols(mod_grange_overlaps))
+                S4Vectors::queryHits(overlap_mods))]),
+            mcols(mod_grange_overlaps))
         mod_grange_overlaps <- split(mod_grange_overlaps, mod_grange_overlaps$name)
         temp_annotation <- split(temp_annotation, temp_annotation$name)
+        
+		
+        #sorted the Grange to get a better idea
+        #gr <- GenomeInfoDb::sortSeqlevels(mod_grange)
+		#gr <- GenomicRanges::sort(gr)
+		#GenomicRanges::follow(gr[27482],gr)
+        
+        ### this is the problem, the ends of chr produce NAs in precede
+        #the beginning of chrs produce NAs in follow 
+        #GenomicRanges::precede(mod_grange[7619],mod_grange)
+		#GenomicRanges::precede(mod_grange[26219],mod_grange)
         
         if(mod_corr == TRUE){
             if(verbose == TRUE){ 
                 message("Computing correlation matrices")
             }
-            mod_grange_corr <- mod_grange[c(precede(mod_grange, mod_grange),
-                                          follow(mod_grange, mod_grange))]
-            mod_grange_corr$distance <- distance(c(mod_grange, mod_grange), 
-                                               mod_grange_corr)
+            mod_grange_corr <- mod_grange[c(GenomicRanges::precede(mod_grange), #BTW GenomicRanges::precede(mod_grange) is the same as GenomicRanges::precede(mod_grange,mod_grange)
+                                            GenomicRanges::follow(mod_grange))] #This is broken because you can't subset with the NAs that are produced. 
+            mod_grange_corr$distance <- IRanges::distance(c(mod_grange, 
+                                                                  mod_grange), 
+                                                                mod_grange_corr)
             mod_grange_corr$pval2 <- c(mod_grange, mod_grange)$pval
-            quantile_distances_mod_corr <- cut2(mod_grange_corr$distance, g=500, onlycuts=TRUE) 
+            quantile_distances_mod_corr <- Hmisc::cut2(mod_grange_corr$distance, g=500, onlycuts=TRUE) 
             quantile_distances_mod_corr[length(quantile_distances_mod_corr)] <- 250000000
             mod_grange_corr$cat <- cut(mod_grange_corr$distance, breaks=quantile_distances_mod_corr)
             mod_grange_corr <- split(mod_grange_corr, mod_grange_corr$cat)

@@ -27,18 +27,25 @@ importFrom("goseq", nullp)
 importFrom("scales", rescale)
 importFrom("Hmisc",cut2)
 importFrom("plyr", join)
-importClassesFrom(igraph)
+importClassesFrom("igraph")
 importFrom("igraph", simplify,clusters,
             as_adjacency_matrix ,
            graph_from_adjacency_matrix,
-           induced_subgraph,V,E,
+           induced_subgraph, V, E,
            graph_from_graphnel,as_graphnel,
            layout_in_circle,layout_with_fr,vcount,
            cluster_spinglass, 'V<-', 'E<-')
 
-import(GenomicRanges, AnnotationDbi, org.Hs.eg.db,ggplot2,
-       Biobase,methods)
+import("GenomicRanges")
+import("AnnotationDbi")
+import("org.Hs.eg.db")
+import("ggplot2")
+import("Biobase")
+import("methods")
 importFrom("IRanges", IRanges)
-importFrom( "KEGG.db",KEGGEXTID2PATHID, KEGGPATHID2NAME) 
-importFrom( "reactome.db",reactomeEXTID2PATHID, reactomePATHID2NAME)
+import("S4Vectors")
+import("BiocGenerics")
+importFrom("KEGG.db",KEGGEXTID2PATHID, KEGGPATHID2NAME) 
+importFrom("reactome.db", reactomeEXTID2PATHID, reactomePATHID2NAME)
 importFrom("BioNet",runFastHeinz, subNetwork, rmSelfLoops)
+import("tools")

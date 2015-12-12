@@ -12,10 +12,11 @@ Description: This package builds on the Epimods framework which facilitates
              associated with p-values and effect sizes and scores from any 
              researchers prior statistical results to find functional modules.
 License: GPL (>=2)
-Depends:R (>= 3.2.2), igraph
+Depends:R (>= 3.2.2)
 Imports: 
     scales, plyr, Hmisc, AnnotationDbi, org.Hs.eg.db, ggplot2, reactome.db,
-    KEGG.db, BioNet, goseq, methods, IRanges, Biobase, GenomicRanges
+    KEGG.db, BioNet, goseq, methods, IRanges, Biobase, GenomicRanges, igraph,
+    S4Vectors, tools, BiocGenerics
 Suggests: knitr
 VignetteBuilder: knitr
 biocViews: 
