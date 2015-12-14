@@ -39,8 +39,8 @@ setMethod(
             if(is.null(strand_col)){
                 strand_col <- which(data[1, ] %in% c("+", "-"))[1]
             }
-            data_grange <- GRanges(seqnames=data[, 1],
-                                   ranges=IRanges(start=data[, 2], end=data[, 3]),
+            data_grange <- GenomicRanges::GRanges(seqnames=data[, 1],
+                                   ranges=IRanges::IRanges(start=data[, 2], end=data[, 3]),
                                    name=data[, gene_name_col], 
                                    strand=data[, strand_col])
         }
@@ -84,9 +84,10 @@ setMethod(
             other <- do.call(c, sapply(1:length(other_data), function(i){
 			    
 				if(!inherits(other_data[[i]], "GRanges")){
-                temp_other<-c(GRanges(seqnames=other_data[[i]][, 1], 
-                                     ranges=IRanges(start=other_data[[i]][, 2], 
-									 end=other_data[[i]][, 3])))
+                temp_other<-c(GenomicRanges::GRanges(
+                    seqnames=other_data[[i]][, 1],
+                    ranges=IRanges::IRanges(start=other_data[[i]][, 2],
+                                   end=other_data[[i]][, 3])))
                 }
 				else { 
 				temp_other <- other_data[[i]] 
@@ -503,7 +504,8 @@ setMethod(
             message("Quantile permuting scores")
         }
         combined_pvalues_list <- lapply(combined_pvalues_list, function(each_feature){		
-            categories <- data.frame(categories=as.numeric(cut2(each_feature[, 3], g=100)))
+            categories <- data.frame(categories=as.numeric(
+                Hmisc::cut2(each_feature[, 3], g=100)))
             categories_table <- data.frame(table(categories))
             
             trans_p <- cbind(trans=qnorm(1-each_feature[, 2]/2), 
@@ -563,15 +565,15 @@ setMethod(
             newmetadata$m_summary <- output_m_summary
         } 
         else{
-            newmetadata$m_summary <- merge(newmetadata$m_summary, output_m_summary, by=0, 
-                                         all=TRUE)
+            newmetadata$m_summary <- merge(newmetadata$m_summary, 
+                                           output_m_summary, by=0, all=TRUE)
             rownames(newmetadata$m_summary) <- newmetadata$m_summary[, 1]
-            newmetadata$m_summary<-newmetadata$m_summary[, -1]
+            newmetadata$m_summary <- newmetadata$m_summary[, -1]
         }
         newmetadata[["elements"]][[mod_type]]$weight_by <- weight_by
         newmetadata[["elements"]][[mod_type]]$weight_by_method <- weight_by_method
-        newmetadata$elementnames <- c(newmetadata$elementnames, paste(mod_type, 
-                                                                    mod_included, sep="_"))
+        newmetadata$elementnames <- c(newmetadata$elementnames, 
+                                      paste(mod_type, mod_included, sep="_"))
        
 	    slot(newmods, "metadata") <- newmetadata
 	    slot(pvalue_annotation, "modifications") <- newmods
@@ -648,7 +650,8 @@ setMethod(
         }
         
         
-        exp_ind <- ifelse(nrow(pData(pvalue_annotation@expression)) > 0, 1, 0)
+        exp_ind <- ifelse(nrow(Biobase::pData(pvalue_annotation@expression)) > 
+                              0, 1, 0)
         
         total_num_factor <- length(effect_directions)
         
@@ -786,7 +789,7 @@ setMethod(
                    )){
                     p_temp <- temp_pval_data[[grep(i, names_temp_pval_data)]]
                     logit_temp <- log(p_temp/(1-p_temp))
-                    logit_temp <- rescale(logit_temp, to=range(logit_ref, 
+                    logit_temp <- scales::rescale(logit_temp, to=range(logit_ref, 
                                                                     na.rm=TRUE))
                     temp_pval_data[[grep(i, 
                                            names_temp_pval_data
@@ -869,7 +872,7 @@ setMethod(
                 if(any(grepl("exp", names(each)))){
                     # there is expression data
                     exp_index <- grep("exp", names(each))
-                    forreturn <- (sum( #ARI Holy fuck, nest more? any way to make some temp objects?
+                    forreturn <- (sum( #ARI clean-up
                         abs(sum(c(as.numeric(each[[exp_index]]), 
                                   as.numeric(each[-exp_index]))*
                                     c(1, unidirectional)*weights[c(exp_index, which(!grepl("exp",names(each))))], na.rm=TRUE)), 
@@ -937,11 +940,13 @@ setMethod(
         }
         
         if(simplify == TRUE){
-            network <- igraph::simplify(network,remove.multiple=TRUE, 
+            network <- igraph::simplify(network, remove.multiple=TRUE, 
                                         remove.loops=TRUE)
         }
-        genes_in_network <- subset(slot(slot(pvalue_annotation, "score_data"), "genes"), 
-                                   slot(slot(pvalue_annotation, "score_data"), "genes") %in% 
+        genes_in_network <- subset(slot(slot(pvalue_annotation, "score_data"), 
+                                        "genes"), 
+                                   slot(slot(pvalue_annotation, "score_data"), 
+                                        "genes") %in% 
                                        igraph::V(network)$name)
         scores_in_network <- extractScores(pvalue_annotation)[genes_in_network]
         
@@ -953,20 +958,20 @@ setMethod(
             genes_in_network <- names(scores_in_network)     
         }
         
-        nodes_with_scores <- intersect(genes_in_network, igraph::V(network)$name)
-        network <- induced_subgraph(network, nodes_with_scores)
-        network_clusters <- clusters(network)
+        nodes_with_scores <- intersect(genes_in_network, igraph::V(network)$name) #ARI is this instersect from the base package or BiocGenerics?
+        network <- igraph::induced_subgraph(network, nodes_with_scores)
+        network_clusters <- igraph::clusters(network)
         
         ## choose largest connected nodes ## may want include > minsize		  
         maxclust <- which(network_clusters$csize == 
                               max(network_clusters$csize))[1]
-        network <- induced_subgraph(network, 
+        network <- igraph::induced_subgraph(network, 
                                     which(network_clusters$membership == maxclust)) 
-        rm(network_clusters) #ARI is this necessary?
+        rm(network_clusters) 
         genes_in_network <- intersect(genes_in_network, igraph::V(network)$name) #ARI, isn't genes_in_network already defined as nodes_with_scores (see above)
         
         scores_in_network <- scores_in_network[genes_in_network]
-        network.adj <- as_adjacency_matrix(network)
+        network.adj <- igraph::as_adjacency_matrix(network)
         
         ## order of scores has to match order of adjacency rows 	   
         scores_in_network <- scores_in_network[rownames(network.adj)]
@@ -980,8 +985,8 @@ setMethod(
         gc()
         W_vec <- (-2*log(1-pchisq(as.vector(W_for_spinglass),4)))
         
-        
-            W_vec<-replace(W_vec, is.infinite(W_vec), max(subset(W_vec,!is.infinite(W_vec))) )
+        W_vec <- replace(W_vec, is.infinite(W_vec), 
+                         max(subset(W_vec, !is.infinite(W_vec))) )
             
         W_for_spinglass <- matrix(W_vec, nrow=nrow(W_for_spinglass))
         rm(W_vec)
@@ -989,7 +994,9 @@ setMethod(
         colnames(W_for_spinglass) <- genes_in_network
         gc()
         final_network <- 
-            graph_from_adjacency_matrix(W_for_spinglass, mode = "undirected", weighted=TRUE)
+            igraph::graph_from_adjacency_matrix(W_for_spinglass, 
+                                                mode = "undirected", 
+                                                weighted=TRUE)
         igraph::V(final_network)$weight <- stat_scores
         network <- final_network
         rm(final_network)
@@ -1003,7 +1010,7 @@ setMethod(
             message(paste("Computing modules: Vertex",sig_genes_counter[j],"of",
                           length(sig_genes), "significant genes is", j))
             genes_in_network[
-                cluster_spinglass(network, weights = E(network)$weight, 
+                cluster_spinglass(network, weights = igraph::E(network)$weight, 
                                   vertex=j, gamma=gam)$community]
             })
         names(spin_glass_out) <- sig_genes 
@@ -1015,23 +1022,23 @@ setMethod(
         
         Modularity.edges = function(v, network)
         { 
-            h <- induced_subgraph(network, v);
-            c(sum( E(h)$weight ))
+            h <- igraph::induced_subgraph(network, v);
+            c(sum(igraph::E(h)$weight))
         }
         edge_sum <- do.call(c,lapply(spin_glass_out, function(j) { 
-            Modularity.edges(j, network)
+            Modularity.edges(j, network) 
         }));
         
         nspin_glass_out <- length(spin_glass_out);
         random_edges <- lapply(1:nspin_glass_out, function(i) {
             each_spin_result <- spin_glass_out[[i]]
-            subnetwork <- induced_subgraph(network, each_spin_result);
-            adjacency_of_subnetwork <- as_adjacency_matrix(subnetwork, sparse=FALSE);
+            subnetwork <- igraph::induced_subgraph(network, each_spin_result);
+            adjacency_of_subnetwork <- igraph::as_adjacency_matrix(subnetwork, sparse=FALSE);
             sapply(1:num_iterations, function(k){
                 message(paste("Testing significance: module", i, "of", 
                               nspin_glass_out, "Randomization", k, "of", num_iterations))
                 random_sample_of_scores = sample(stat_scores, nrow(adjacency_of_subnetwork) , replace=TRUE)
-                random_network_with_scores = apply(adjacency_of_subnetwork , 1, function(v) v*random_sample_of_scores)
+                random_network_with_scores = apply(adjacency_of_subnetwork, 1, function(v) v*random_sample_of_scores)
                 W_random <- (random_network_with_scores + t(random_network_with_scores));
                 W_random <- apply(W_random, 2, function(i){ 
                     replace(i, i>0, (-2*log(1-pchisq(subset(i,i>0),4))))
@@ -1056,7 +1063,7 @@ setMethod(
         output[[1]] <- subset(spin_glass_out, do.call(c,random_p) < random_alpha);
         output[[2]] <- pval_scores;
         output[[3]] <- stat_scores;
-        output[[4]] <- induced_subgraph(network, as.character(
+        output[[4]] <- igraph::induced_subgraph(network, as.character(
             unlist(output[[1]]))) ;
         output[[6]] <- "spinglass";
         
@@ -1352,7 +1359,7 @@ setMethod(
             stop("No expression data loaded.")
         } 
         temp_exp <- slot(pvalue_annotation,"expression")
-        pData(temp_exp)
+        Biobase::pData(temp_exp)
     }
 )
 

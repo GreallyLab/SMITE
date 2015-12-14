@@ -8,8 +8,9 @@ setMethod (
         }
         else {      
             cat("* Expression data :"); 
-            print(pData(slot(x,"expression"))); 
-            print(paste("Expression has",nrow(pData(slot(x, "expression"))),
+            print(Biobase::pData(slot(x,"expression"))); 
+            print(paste("Expression has",
+                        nrow(Biobase::pData(slot(x, "expression"))),
                         "entries"))
         }
         readline()

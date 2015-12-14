@@ -4,11 +4,12 @@ setMethod(
     signature="PvalueAnnotation",
     function(object){
         cat("*** Class P-Value Annotation, method Show *** \n")
-        lengthexpdata <- min(10, nrow(pData(slot(object, "expression"))))
+        lengthexpdata <- min(10, 
+                             nrow(Biobase::pData(slot(object, "expression"))))
         nrowShow <- min(10,nrow(unlist(slot(object,"modifications"))))
         if(lengthexpdata != 0){ 
             cat(" First 10 Expression data are shown: \n")      
-            print(pData(slot(object,"expression"))[1:lengthexpdata,],
+            print(Biobase::pData(slot(object,"expression"))[1:lengthexpdata,],
                         quote=FALSE)
         } 
         else{}

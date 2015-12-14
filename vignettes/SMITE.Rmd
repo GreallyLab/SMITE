@@ -99,7 +99,7 @@ head(h3k4me1)
 In `makePvalueAnnotation`, we create a `GRangesList` object where each gene is associated with a promoter region (+/- 1000bp from TSS), gene body region (TSS+1000bp to TES), and putative "enhancers" using H3K4me1 ChIP-seq peaks (+/- 5000bp from TSS).  Note: These are the sizes of regions of the genome for which we are interested in calculating scores, but the user can easily alter the parameters. Additionally, the argument otherdata can be an unlimited list of bed files that will be associated with genes and then scored in functional modules. The argument other_d is the distance from the TSS that will be used to associate each otherdata dataset with a gene.  If different distances are required for otherdata, then you must provide a distance for each dataset.
 
 ```{r, tidy=TRUE, tidy.opts=list(blank=FALSE, width.cutoff=50), eval=TRUE}
-test_annotation <- SMITE::makePvalueAnnotation(data=hg19_genes, other_data=list(h3k4me1=h3k4me1), 
+test_annotation <- makePvalueAnnotation(data=hg19_genes, other_data=list(h3k4me1=h3k4me1), 
                                         gene_name_col=5, other_tss_distance=5000, 
                                         promoter_upstream_distance=1000, promoter_downstream_distance=1000) 
 ```
@@ -195,7 +195,8 @@ We can use keywords such as "cell cycle" to find within the goseq output which m
 ## search goseq output for keywords ##
 searchGOseq(test_annotation, search_string="cell cycle")
 ## Draw a network ##
-plotModule(test_annotation, which_network=6, layout="fr", label_scale=TRUE)
+plotModule(test_annotation, which_network=c(4,6), layout="fr", label_scale=TRUE, compare_plot = TRUE)
+
 ```
 ```{r, tidy=TRUE, tidy.opts=list(blank=FALSE, width.cutoff=60), eval=TRUE, fig.width=12,fig.height=6}
 ## Draw a network with goseq analysis ##

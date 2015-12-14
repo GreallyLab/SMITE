@@ -4,7 +4,7 @@ setMethod(
     signature="PvalueAnnotation", 
     definition=function(pvalue_annotation, x_name, y_name, ...)
     {
-        pval_data <- slot(slot(pvalue_annotation, "score_data"), "pval_data") #ARI hopefully this won't slow down the code too much?
+        pval_data <- slot(slot(pvalue_annotation, "score_data"), "pval_data") 
         pval_col_names <- colnames(pval_data)
         effect_data <-  slot(slot(pvalue_annotation, "score_data"), "effect_data")
         effect_col_names <- colnames(effect_data)
@@ -87,13 +87,15 @@ setMethod(
             pval <- exp(stat/(-2))
 
             if(class(network) == "graphNEL"){
-                network <- graph_from_graphnel(network)
+                network <- igraph::graph_from_graphnel(network)
                 adj_mat_network <- igraph::as_adjacency_matrix(network)
-                stat.v <- stat[which(names(stat) %in% rownames(adj_mat_network))]
+                stat.v <- stat[which(names(stat) %in% 
+                                         rownames(adj_mat_network))]
                 stat.v <- stat.v[order(names(stat.v))]
                 adj_mat_network <- adj_mat_network[order(
-                    rownames(adj_mat_network)),order(colnames(adj_mat_network))]
-                temp1 <- apply(adj_mat_network, 1, function(v) return(v*stat.v)) #ARI variable name
+                    rownames(adj_mat_network)), 
+                    order(colnames(adj_mat_network))]
+                temp1 <- apply(adj_mat_network, 1, function(v) return(v*stat.v)) #ARI variable name temp1
                 W <- (temp1 + t(temp1))/2
                 Graph_adj_mat <- igraph::graph_from_adjacency_matrix(
                     W, mode ="undirected", weighted=TRUE)
@@ -138,11 +140,12 @@ setMethod(
             igraph::V(h)$color[which(1-pchisq(igraph::V(h)$weight,2) < p_thresh)] <- "red"
             igraph::E(h)$color[which(1-pchisq(igraph::E(h)$weight,4) < p_thresh)] <- "red"
             
-            if(layout == "circle"){layout1 <- layout_in_circle(h)}
-            if(layout == "fr"){layout1 <- layout_with_fr(h)}
+            if(layout == "circle"){layout1 <- igraph::layout_in_circle(h)}
+            if(layout == "fr"){layout1 <- igraph::layout_with_fr(h)}
             ## if two side by side plots are not needed
             if(compare_plot == FALSE){
                 ## no pdf
+                par(mfrow=c(1,1))
                 if(is.null(pdf_out)){
                     ##no goseq
                     if(goseq == FALSE){
@@ -178,8 +181,8 @@ setMethod(
                 par(mfrow=c(1,2))
             }
             
-            layout1_scaled <- cbind(rescale(layout1[, 1], to=c(-1, 1)),
-                                    rescale(layout1[, 2], to=c(-1, 1)))
+            layout1_scaled <- cbind(scales::rescale(layout1[, 1], to=c(-1, 1)),
+                                    scales::rescale(layout1[, 2], to=c(-1, 1)))
             
             counter <- 0
             while(counter < 2){
@@ -352,8 +355,8 @@ setMethod(
                         igraph::E(h)$weight >= qchisq(1-p_thresh, 4))) > 0){
                         
                         edgePalette.v[which(
-                            edgeBreaks.v >= min(E(h)$weight[which(
-                                E(h)$weight >= qchisq(1-p_thresh, 4))]))-1] <- "red"
+                            edgeBreaks.v >= min(igraph::E(h)$weight[which(
+                                igraph::E(h)$weight >= qchisq(1-p_thresh, 4))]))-1] <- "red"
                     }
                     points(seq(-1.45, -1.05, length.out=50), rep(1.15, 50), 
                            col=edgePalette.v, pch=15, cex=2.5)
@@ -365,12 +368,11 @@ setMethod(
     
                 addShadowText(layout1_scaled[, 1], layout1_scaled[, 2], vl, font=2, 
                               cex=if(label_scale == TRUE){
-                                  rescale(stat.v, to=(c(.5, 2)))
+                                  scales::rescale(stat.v, to=(c(.5, 2)))
                               }
                               else{.5},
                               bg="white", col="black")
-    
-    
+        
                 if(namestyle == "refseq"){
                     ref2eg <- AnnotationDbi::as.list(org.Hs.eg.db::org.Hs.egREFSEQ2EG)
                     eg2sym <- AnnotationDbi::as.list(org.Hs.eg.db::org.Hs.egSYMBOL)
@@ -436,7 +438,7 @@ setMethod(
 setMethod(
     f="plotDensityPval", 
     signature="PvalueAnnotation", 
-    definition=function(pvalue_annotation, ref="expression_pvalue", ...) #ARI ref is for?
+    definition=function(pvalue_annotation, ref="expression_pvalue", ...) #ARI change ref to more clear argument name
     {
         palette(c("red", "green", "blue", "gold", "orange", 
                         "purple", "magenta"))
