@@ -1,5 +1,5 @@
 setGeneric(
-    name="stoufferTest", 
+    name="stoufferTest",
     def=function(pvalues, weights)
     {
         standardGeneric("stoufferTest")
@@ -7,7 +7,7 @@ setGeneric(
 )
 
 setGeneric(
-    name="annotationOutput", 
+    name="annotationOutput",
     def=function(pvalue_annotation)
     {
         standardGeneric("annotationOutput")
@@ -15,7 +15,7 @@ setGeneric(
 )
 
 setGeneric(
-    name="returnPvalueCol", 
+    name="returnPvalueCol",
     def=function(pval_object, col_name)
     {
         standardGeneric("returnPvalueCol")
@@ -23,9 +23,9 @@ setGeneric(
 )
 
 setGeneric(
-    name="makePvalueAnnotation", 
-    def=function(data, other_data=NULL, other_tss_distance=10000, 
-                 promoter_upstream_distance=1000, promoter_downstream_distance=1000, 
+    name="makePvalueAnnotation",
+    def=function(data, other_data=NULL, other_tss_distance=10000,
+                 promoter_upstream_distance=1000, promoter_downstream_distance=1000,
                  strand_col=NULL, gene_name_col=NULL)
     {
         standardGeneric("makePvalueAnnotation")
@@ -33,7 +33,7 @@ setGeneric(
 )
 
 setGeneric(
-    name="convertGeneIds", 
+    name="convertGeneIds",
     def=function(gene_IDs, ID_type, ID_convert_to, delim=NULL, verbose=FALSE)
     {
         standardGeneric("convertGeneIds")
@@ -42,7 +42,7 @@ setGeneric(
 
 
 setGeneric(
-    name="annotateExpression", 
+    name="annotateExpression",
     def=function(pvalue_annotation, expr_data, effect_col=NULL, pval_col=NULL)
     {
         standardGeneric("annotateExpression")
@@ -51,9 +51,9 @@ setGeneric(
 
 
 setGeneric(
-    name="annotateModification", 
-    def=function(pvalue_annotation, mod_data, weight_by=NULL, 
-                 weight_by_method="Stouffer", mod_included=NULL, mod_corr=TRUE, 
+    name="annotateModification",
+    def=function(pvalue_annotation, mod_data, weight_by=NULL,
+                 weight_by_method="Stouffer", mod_included=NULL, mod_corr=TRUE,
                  mod_type="methylation", verbose=FALSE)
     {
         standardGeneric("annotateModification")
@@ -62,7 +62,7 @@ setGeneric(
 
 
 setGeneric(
-    name="removeModification", 
+    name="removeModification",
     def=function(pvalue_annotation, mod_type="methylation")
     {
         standardGeneric("removeModification")
@@ -71,7 +71,7 @@ setGeneric(
 
 
 setGeneric(
-    name="makePvalueObject", 
+    name="makePvalueObject",
     def=function(pvalue_annotation, effect_directions=NULL)
     {
         standardGeneric("makePvalueObject")
@@ -88,7 +88,7 @@ setGeneric(
 )
 
 setGeneric(
-    name="normalizePval", 
+    name="normalizePval",
     def=function(pvalue_annotation, trans, ref="expression_pvalue", method="rescale")
     {
         standardGeneric("normalizePval")
@@ -97,7 +97,7 @@ setGeneric(
 
 
 setGeneric(
-    name="scorePval", 
+    name="scorePval",
     def=function(pvalue_annotation, weights)
     {
         standardGeneric("scorePval")
@@ -105,8 +105,8 @@ setGeneric(
 )
 
 setGeneric(
-    name="runSpinglass", 
-    def=function(pvalue_annotation, network, random_alpha = 0.05, gam = 0.5, 
+    name="runSpinglass",
+    def=function(pvalue_annotation, network, random_alpha = 0.05, gam = 0.5,
                  node_alpha = 0.05, maxsize = 500, minsize = 8, num_iterations = 1000,
                  simplify=TRUE)
     {
@@ -117,7 +117,7 @@ setGeneric(
 
 
 setGeneric(
-    name="runBioNet", 
+    name="runBioNet",
     def=function(pvalue_annotation, network, alpha = 0.05)
     {
         standardGeneric("runBioNet")
@@ -125,13 +125,13 @@ setGeneric(
 )
 
 setGeneric(
-    name="plotModule", 
-    def=function(pvalue_annotation, p_thresh=0.05, which_network=1, goseq=FALSE, 
-                 layout="fr",legend=TRUE, namestyle="symbol", 
-                 suppress_details=FALSE, 
-                 meth_hi_col="blue", meth_low_col="yellow1", 
-                 meth_mid_col="gray90", exp_hi_col="red1", 
-                 exp_low_col="chartreuse1", exp_mid_col="gray90", 
+    name="plotModule",
+    def=function(pvalue_annotation, p_thresh=0.05, which_network=1, goseq=FALSE,
+                 layout="fr",legend=TRUE, namestyle="symbol",
+                 suppress_details=FALSE,
+                 meth_hi_col="blue", meth_low_col="yellow1",
+                 meth_mid_col="gray90", exp_hi_col="red1",
+                 exp_low_col="chartreuse1", exp_mid_col="gray90",
                  label_scale=TRUE,compare_plot=FALSE, pdf_out=NULL) #Change
     {
         standardGeneric("plotModule")
@@ -140,7 +140,7 @@ setGeneric(
 
 
 setGeneric(
-    name="runGOseq", 
+    name="runGOseq",
     def=function(pvalue_annotation, p_thresh=0.05, coverage, type="reactome")
     {
         standardGeneric("runGOseq")
@@ -149,7 +149,7 @@ setGeneric(
 
 
 setGeneric(
-    name="searchGOseq", 
+    name="searchGOseq",
     def=function(pvalue_annotation, search_string, wholeword=FALSE)
     {
         standardGeneric("searchGOseq")
@@ -159,7 +159,7 @@ setGeneric(
 
 
 setGeneric(
-    name="extractGOseq", 
+    name="extractGOseq",
     def=function(pvalue_annotation, which_network=NULL)
     {
         standardGeneric("extractGOseq")
@@ -168,7 +168,7 @@ setGeneric(
 
 
 setGeneric(
-    name="plotCompareScores", 
+    name="plotCompareScores",
     def=function(pvalue_annotation, x_name, y_name, ...)
     {
         standardGeneric("plotCompareScores")
@@ -177,7 +177,7 @@ setGeneric(
 
 
 setGeneric(
-    name="extractModification", 
+    name="extractModification",
     def=function(pvalue_annotation, mod_type="methylation")
     {
         standardGeneric("extractModification")
@@ -185,7 +185,7 @@ setGeneric(
 )
 
 setGeneric(
-    name="extractExpression", 
+    name="extractExpression",
     def=function(pvalue_annotation)
     {
         standardGeneric("extractExpression")
@@ -193,7 +193,7 @@ setGeneric(
 )
 
 setGeneric(
-    name="extractModSummary", 
+    name="extractModSummary",
     def=function(pvalue_annotation)
     {
         standardGeneric("extractModSummary")
@@ -201,7 +201,7 @@ setGeneric(
 )
 
 setGeneric(
-    name="extractScores", 
+    name="extractScores",
     def=function(pvalue_annotation)
     {
         standardGeneric("extractScores")
@@ -209,7 +209,7 @@ setGeneric(
 )
 
 setGeneric(
-    name="addShadowText", 
+    name="addShadowText",
     def=function(x, y=NULL, labels, col='white', bg='black',
                  theta=seq(pi/4, 2*pi, length.out=8), r=0.1, ...)
     {
@@ -219,7 +219,7 @@ setGeneric(
 
 
 setGeneric(
-    name="extractModules", 
+    name="extractModules",
     def=function(pvalue_annotation, which_module=NULL)
     {
         standardGeneric("extractModules")
@@ -227,7 +227,7 @@ setGeneric(
 )
 
 setGeneric(
-    name="highScores", 
+    name="highScores",
     def=function(pvalue_annotation, alpha=0.05)
     {
         standardGeneric("highScores")

@@ -48,24 +48,24 @@ p-values.  Must be one of:
     "Stouffer"  (DEFAULT)
                 Stouffer's method for combing pvalues involves first taking the 
                 inverse standard normal
-    			CDF transformation of a vector of p-values followed by a 
+                CDF transformation of a vector of p-values followed by a 
                 weighted sum
-				creating a new Z score with a standard normal distribution
-	"Fisher"
+                creating a new Z score with a standard normal distribution
+    "Fisher"
     "fisher"
     "chisq"
     "chi"
-				Fisher's method involves summing the -2ln(p) for each of k p's
+                Fisher's method involves summing the -2ln(p) for each of k p's
                 which follows an approximate
-				chi square distribution with 2k degrees of freedom
+                chi square distribution with 2k degrees of freedom
     "Sidak"
     "sidak"
     "minimum"
-				Sidak's adjustment is essentially the minimum p-value, with an 
+                Sidak's adjustment is essentially the minimum p-value, with an 
                 added transformation to account for
-				multiple comparisons.
+                multiple comparisons.
     "binomial"
-				The binomial probability assesses the probability of observing 
+                The binomial probability assesses the probability of observing 
                 the observed number of p-value below a threshold (alpha=0.05) 
                 given the total number of p values and the probability of a 
                 false positive.

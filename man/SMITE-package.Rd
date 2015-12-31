@@ -22,9 +22,10 @@ License: \tab GPL (>=2)\cr
 }
 }
 \author{
-N. Ari Wijetunga
+Neil Ari Wijetunga
+Andrew Damon Johnston
 
-Maintainer: Neil.Wijetunga@med.einstein.yu.edu
+Maintainer: Neil.Wijetunga@med.einstein.yu.edu, Andrew.Johnston@med.einstein.yu.edu
 }
 
 \keyword{ package }

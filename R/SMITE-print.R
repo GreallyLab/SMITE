@@ -6,9 +6,9 @@ setMethod (
         if(nrow(exprs(slot(x,"expression"))) == 0){
             cat("* Expression data :"); print("0 entries")
         }
-        else {      
-            cat("* Expression data :"); 
-            print(Biobase::pData(slot(x,"expression"))); 
+        else {
+            cat("* Expression data :");
+            print(Biobase::pData(slot(x,"expression")));
             print(paste("Expression has",
                         nrow(Biobase::pData(slot(x, "expression"))),
                         "entries"))
@@ -20,7 +20,7 @@ setMethod (
         else{
             for(i in unique(unlist(slot(x, "modifications"))$type)){
                 cat(paste("*", i, "data :"));
-                print(subset(unlist(slot(x, "modifications")), 
+                print(subset(unlist(slot(x, "modifications")),
                              unlist(slot(x, "modifications"))$type==i));
                 print(paste(i,"has", length(
                     subset(unlist(slot(x, "modifications")),
@@ -31,9 +31,9 @@ setMethod (
         if(nrow(slot(slot(x,"score_data"), "pval_data")) == 0){
             cat("* Score data :"); print("0 entries")
         }
-        else {                                
+        else {
             cat("* Score data :"); print(slot(slot(x,"score_data"),"scores"))
-            print(paste("Score data has", 
+            print(paste("Score data has",
                         nrow(slot(slot(x, "score_data"), "scores")),
                         "entries"))
         }
