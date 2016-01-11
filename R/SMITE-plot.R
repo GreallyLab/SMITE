@@ -192,8 +192,6 @@ setMethod(
                      vertex.frame.color="black",
                      vertex.label.dist=.1,
                      vertex.label.font=3, vertex.label.color="black",
-                     ##vertex.size = 15*13/length(V(h)),
-                     ##edge.width = 160/length(V(h))
                      vertex.size =
                          if(length(igraph::V(h)) < 50) { 15 }
                          else {15*13/length(igraph::V(h))},
@@ -420,7 +418,6 @@ setMethod(
 
                 if(counter == 1){break}
                 counter <- 2
-                #if(compare_plot == TRUE){counter <- 1}
             }
 
             if(is.null(pdf_out)){
