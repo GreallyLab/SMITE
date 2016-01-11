@@ -114,7 +114,7 @@ To load in modification data, we have provided a function that can be used multi
 ```{r, tidy=TRUE, tidy.opts=list(blank=FALSE, width.cutoff=45), eval=FALSE}
 test_annotation <- annotateModification(test_annotation, methylation, weight_by_method="Stouffer", 
                                       weight_by=c(promoter="distance", body="distance", h3k4me1="distance"),
-                                      verbose=TRUE, mod_corr=TRUE, mod_type="methylation")
+                                      verbose=TRUE, mod_corr=FALSE, mod_type="methylation")
 ```
 
 We can view the loaded data using the following functions:
@@ -194,7 +194,11 @@ We can use keywords such as "cell cycle" to find within the goseq output which m
 ```{r, tidy=TRUE, tidy.opts=list(blank=FALSE, width.cutoff=60), eval=TRUE, fig.width=10, fig.height=9}
 ## search goseq output for keywords ##
 searchGOseq(test_annotation, search_string="cell cycle")
+```
+```{r, tidy=TRUE, tidy.opts=list(blank=FALSE, width.cutoff=60), eval=TRUE, fig.width=10, fig.height=9}
 ## Draw a network ##
+plotModule(test_annotation, which_network=6, layout="fr", label_scale=TRUE, compare_plot = FALSE)
+## Compare two networks ##
 plotModule(test_annotation, which_network=c(4,6), layout="fr", label_scale=TRUE, compare_plot = TRUE)
 
 ```

@@ -357,19 +357,24 @@ setMethod(
             if(verbose == TRUE){
                 message("Computing correlation matrices")
             }
-            temp_split_mod_grange<-split(mod_grange, seqnames(mod_grange))
-            precede_follow_each_element<-lapply(temp_split_mod_grange, function(chr){
-                temp_chr<-IRanges(start(chr), end(chr))
-                temp_precede<-precede(temp_chr)
-                temp_follow<-follow(temp_chr)
-                temp_precede[which(is.na(temp_precede))]<-which(is.na(temp_precede))
-                temp_follow[which(is.na(temp_follow))]<-which(is.na(temp_follow))
-                chr[c(temp_follow, temp_precede)]})
-            mod_grange_corr<-unlist(GRangesList(precede_follow_each_element))
+            temp_split_mod_grange <- split(mod_grange, seqnames(mod_grange))
+            precede_follow_each_element <- lapply(temp_split_mod_grange,
+                                                  function(chr){
+                temp_chr <- IRanges(start(chr), end(chr))
+                temp_precede <- precede(temp_chr)
+                temp_follow <- follow(temp_chr)
+                temp_precede[which(is.na(temp_precede))] <-
+                    which(is.na(temp_precede))
+                temp_follow[which(is.na(temp_follow))] <-
+                    which(is.na(temp_follow))
+                chr[c(temp_follow, temp_precede)]
+            })
+            mod_grange_corr <- unlist(GRangesList(precede_follow_each_element))
             
-            duplicate_each_chr<-lapply(temp_split_mod_grange, function(chr){
-                c(chr,chr)})
-            duplicate_each_chr<-unlist(GRangesList(duplicate_each_chr))
+            duplicate_each_chr <- lapply(temp_split_mod_grange, function(chr){
+                c(chr,chr)
+            })
+            duplicate_each_chr <- unlist(GRangesList(duplicate_each_chr))
             mod_grange_corr$distance <- IRanges::distance(duplicate_each_chr,
                                                           mod_grange_corr)
             
@@ -874,14 +879,16 @@ setMethod(
                 if(any(grepl("exp", names(each)))){
                     # there is expression data
                     exp_index <- grep("exp", names(each))
-                    forreturn <- (sum( #ARI clean-up
+                    forreturn <- (sum(
                         abs(sum(c(as.numeric(each[[exp_index]]),
                                   as.numeric(each[-exp_index]))*
-                                    c(1, unidirectional)*weights[c(exp_index, which(!grepl("exp",names(each))))], na.rm=TRUE)),
+                                    c(1, unidirectional)*
+                                    weights[c(exp_index, 
+                                              which(!grepl("exp", names(each))))],
+                                na.rm=TRUE)),
                         (abs(as.numeric(each[-exp_index])*bidirectional)*
                              weights[-exp_index]),
                         na.rm=TRUE)/sum(weights^2)^.5)
-
                 }
                 else {
 
@@ -889,7 +896,9 @@ setMethod(
 
                     forreturn <- (
                         sum(abs(sum(as.numeric(each)*unidirectional*weights,
-                                    na.rm=TRUE)),(abs(as.numeric(each)*bidirectional)*weights),
+                                    na.rm=TRUE)), (abs(as.numeric(each)*
+                                                           bidirectional)*
+                                                       weights),
                             na.rm=TRUE)/sum(weights^2)^.5)
                 }
             }
@@ -970,7 +979,7 @@ setMethod(
         network <- igraph::induced_subgraph(network,
                                     which(network_clusters$membership == maxclust))
         rm(network_clusters)
-        genes_in_network <- intersect(genes_in_network, igraph::V(network)$name) #ARI, isn't genes_in_network already defined as nodes_with_scores (see above)
+        genes_in_network <- intersect(genes_in_network, igraph::V(network)$name) #ARI, isn't genes_in_network already defined as nodes_with_scores (see line 972 above)
 
         scores_in_network <- scores_in_network[genes_in_network]
         network.adj <- igraph::as_adjacency_matrix(network)

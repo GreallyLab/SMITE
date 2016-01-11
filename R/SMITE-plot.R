@@ -72,8 +72,47 @@ setMethod(
                 pdf(pdf_out, width=16, height=8.5)
             }
         }
-
-        for(n_plot in which_network){
+        
+        ## if two side by side plots are not needed
+        if(compare_plot == FALSE){
+            ## no pdf
+            par(mfrow=c(1,1))
+            if(is.null(pdf_out)){
+                ##no goseq
+                if(goseq == FALSE){
+                    ##yes legend
+                    if(legend == TRUE){
+                        if(!names(dev.cur()) %in% c("RStudioGD","pdf")){
+                            dev.new(height=10, width=12)
+                        }
+                    }
+                    ##no legend
+                    else{
+                        if(!names(dev.cur()) %in% c("RStudioGD","pdf")){
+                            dev.new(height=8, width=8)
+                        }
+                    }
+                }
+                ##yes goseq and legend
+                else {
+                    if(!names(dev.cur()) %in% c("RStudioGD","pdf")){
+                        dev.new(height=10, width=16)
+                    }
+                }
+            }
+        }
+        ##compare plot is TRUE
+        else{
+            legend <- FALSE
+            goseq <- FALSE
+            suppress_details <- TRUE
+            if(!names(dev.cur()) %in% c("RStudioGD","pdf")){
+                dev.new(height=10, width=20)
+            }
+            par(mfrow=c(1,2))
+        }
+        
+        for(n_plot in which_network){ # This is the big loop, with n_plot being the chosen GoSeq networks
             if(goseq == TRUE){
                 if(length(module_output$goseqOut) == 0){
                 stop("Goseq analysis has not been performed.")
@@ -94,8 +133,8 @@ setMethod(
                 adj_mat_network <- adj_mat_network[order(
                     rownames(adj_mat_network)),
                     order(colnames(adj_mat_network))]
-                temp1 <- apply(adj_mat_network, 1, function(v) return(v*stat.v)) #ARI variable name temp1
-                W <- (temp1 + t(temp1))/2
+                temp_vstat <- apply(adj_mat_network, 1, function(v) return(v*stat.v)) 
+                W <- (temp_vstat + t(temp_vstat))/2
                 Graph_adj_mat <- igraph::graph_from_adjacency_matrix(
                     W, mode ="undirected", weighted=TRUE)
                 igraph::V(Graph_adj_mat)$weight <- stat.v
@@ -141,44 +180,7 @@ setMethod(
 
             if(layout == "circle"){layout1 <- igraph::layout_in_circle(h)}
             if(layout == "fr"){layout1 <- igraph::layout_with_fr(h)}
-            ## if two side by side plots are not needed
-            if(compare_plot == FALSE){
-                ## no pdf
-                par(mfrow=c(1,1))
-                if(is.null(pdf_out)){
-                    ##no goseq
-                    if(goseq == FALSE){
-                        ##yes legend
-                        if(legend == TRUE){
-                            if(!names(dev.cur()) %in% c("RStudioGD","pdf")){
-                                dev.new(height=10, width=12)
-                            }
-                        }
-                        ##no legend
-                        else{
-                            if(!names(dev.cur()) %in% c("RStudioGD","pdf")){
-                                dev.new(height=8, width=8)
-                            }
-                        }
-                    }
-                        ##yes goseq and legend
-                    else {
-                        if(!names(dev.cur()) %in% c("RStudioGD","pdf")){
-                            dev.new(height=10, width=16)
-                        }
-                    }
-                }
-            }
-            ##compare plot is TRUE
-            else{
-                legend <- FALSE
-                goseq <- FALSE
-                suppress_details <- TRUE
-                if(!names(dev.cur()) %in% c("RStudioGD","pdf")){
-                    dev.new(height=10, width=20)
-                }
-                par(mfrow=c(1,2))
-            }
+            
 
             layout1_scaled <- cbind(scales::rescale(layout1[, 1], to=c(-1, 1)),
                                     scales::rescale(layout1[, 2], to=c(-1, 1)))
@@ -418,7 +420,7 @@ setMethod(
 
                 if(counter == 1){break}
                 counter <- 2
-                if(compare_plot == TRUE){counter <- 1}
+                #if(compare_plot == TRUE){counter <- 1}
             }
 
             if(is.null(pdf_out)){
@@ -437,7 +439,7 @@ setMethod(
 setMethod(
     f="plotDensityPval",
     signature="PvalueAnnotation",
-    definition=function(pvalue_annotation, ref="expression_pvalue", ...) #ARI change ref to more clear argument name
+    definition=function(pvalue_annotation, ref="expression_pvalue", ...)
     {
         palette(c("red", "green", "blue", "gold", "orange",
                         "purple", "magenta"))
