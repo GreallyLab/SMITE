@@ -969,7 +969,7 @@ setMethod(
             genes_in_network <- names(scores_in_network)
         }
 
-        nodes_with_scores <- intersect(genes_in_network, igraph::V(network)$name) #ARI is this instersect from the base package or BiocGenerics?
+        nodes_with_scores <- base::intersect(genes_in_network, igraph::V(network)$name) 
         network <- igraph::induced_subgraph(network, nodes_with_scores)
         network_clusters <- igraph::clusters(network)
 
@@ -979,8 +979,8 @@ setMethod(
         network <- igraph::induced_subgraph(network,
                                     which(network_clusters$membership == maxclust))
         rm(network_clusters)
-        genes_in_network <- intersect(genes_in_network, igraph::V(network)$name) #ARI, isn't genes_in_network already defined as nodes_with_scores (see line 972 above)
-
+        genes_in_network <- intersect(genes_in_network, igraph::V(network)$name) 
+        
         scores_in_network <- scores_in_network[genes_in_network]
         network.adj <- igraph::as_adjacency_matrix(network)
 
