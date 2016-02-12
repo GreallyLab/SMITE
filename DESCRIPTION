@@ -1,0 +1,30 @@
+Package: SMITE
+Type: Package
+Title: Significance-based Modules Integrating the Transcriptome and
+        Epigenome
+Version: 0.99.91
+Date: 2016-01-01
+Author: Neil Ari Wijetunga, Andrew Damon Johnston
+Maintainer: Neil Ari Wijetunga <Neil.Wijetunga@med.einstein.yu.edu>,
+        Andrew Damon Johnston <Andrew.Johnston@med.einstein.yu.edu>
+Description: This package builds on the Epimods framework which
+        facilitates finding weighted subnetworks ("modules") on
+        Illumina Infinium 27k arrays using the SpinGlass algorithm, as
+        implemented in the iGraph package. We have created a class of
+        gene centric annotations associated with p-values and effect
+        sizes and scores from any researchers prior statistical results
+        to find functional modules.
+License: GPL (>=2)
+Depends: R (>= 3.3)
+Imports: scales, plyr, Hmisc, AnnotationDbi, org.Hs.eg.db, ggplot2,
+        reactome.db, KEGG.db, BioNet, goseq, methods, IRanges, Biobase,
+        GenomicRanges, igraph, tools, S4Vectors, geneLenDataBase,
+        grDevices, graphics, stats, utils
+Suggests: knitr
+VignetteBuilder: knitr
+biocViews: DifferentialMethylation, DifferentialExpression,
+        SystemsBiology, NetworkEnrichment,GenomeAnnotation,Network,
+        Sequencing, RNASeq, Coverage
+URL: https://github.com/GreallyLab/SMITE
+BugReports: https://github.com/GreallyLab/SMITE/issues
+NeedsCompilation: no
