@@ -26,7 +26,7 @@ annotations are removed.
 
 }
   \item{other_data}{
-A list of BED files corresponding to each additional interval file to be 
+A list of BED files corresponding to each additional interval file to be
 associated with genes.  The function will use the other_tss_distance variable
 and the gene transcription start site (TSS) to find for each gene all intervals
 within [tss-other_tss_distance, tss+other_tss_distance].
