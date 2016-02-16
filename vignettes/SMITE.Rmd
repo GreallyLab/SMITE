@@ -61,13 +61,13 @@ expression <- expression[-which(is.na(expression[, 1])), ]
 expression <- split(expression, expression[, 1])
 expression <- lapply(expression, function(i){
     if(nrow(as.data.frame(i)) > 1){
-        i <- i[which(i[, 3] == min(i[, 3], na.rm=TRUE))[1],]
+        i <- i[which(i[, 3] == min(i[, 3], na.rm=TRUE))[1], ]
         }
     return(i)}) 
 expression <- do.call(rbind, expression)
 expression <- expression[,-1]
-expression[,2] <- replace(expression[,2],expression[,2] == 0, 
-                          min(subset(expression[, 2], expression[,2] != 0), na.rm=TRUE))
+expression[, 2] <- replace(expression[, 2],expression[, 2] == 0, 
+                          min(subset(expression[, 2], expression[, 2] != 0), na.rm=TRUE))
 ```
 
 ```{r, warning=FALSE, tidy=TRUE, tidy.opts=list(blank=FALSE, width.cutoff=60), eval=TRUE}
@@ -137,8 +137,7 @@ Having loaded gene expression and DNA methylation data into the `PvalueAnnotatio
 
 ```{r,  tidy=TRUE, tidy.opts=list(blank=FALSE, width.cutoff=35), eval=FALSE}
 test_annotation <- makePvalueObject(test_annotation, effect_directions=c(methylation_promoter="decrease", 
-                                                                       methylation_body="decrease", 
-                                                                       methylation_h3k4me1="bidirectional"))
+                                                                         methylation_body="decrease", methylation_h3k4me1="bidirectional"))
 ```   
 
 P-values/scores that are combined and then randomized will have a different range than gene expression, or one another, which can skew the identified modules toward a particular modification-context pairing.  Using the `plotDensityPval` function we view the distribution and then normalize using the `normalizePval` function if necessary.  Using the (DEFAULT) `rescale` procedure, p-values are logit transformed before rescaling resulting in a shifting of an approximately normal distribution and no effect on the order of p-values within a modification-context pairing.
