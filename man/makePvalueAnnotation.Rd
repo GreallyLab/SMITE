@@ -26,16 +26,16 @@ annotations are removed.
 
 }
   \item{other_data}{
-A list of BED files corresponding to each additional interval file to be 
-associated with genes.  The function will use the other_d variable and the gene 
-transcription start site (TSS) to find for each gene all intervals
+A list of BED files corresponding to each additional interval file to be
+associated with genes.  The function will use the other_tss_distance variable
+and the gene transcription start site (TSS) to find for each gene all intervals
 within [tss-other_tss_distance, tss+other_tss_distance].
 }
   \item{other_tss_distance}{
 A vector specifying for each element of otherdata a distance from the gene
-TSS to consider that interval as related to a gene.  If the length of other_d
-does not match the length of the otherdata list, then the first value is used
-for all datasets in the otherdata list. DEFAULTS to 10,000 base pairs.
+TSS to consider that interval as related to a gene.  If the length of 
+other_tss_distance does not match the length of the otherdata list, then the 
+first value is used for all datasets in the otherdata list. DEFAULTS to 10,000 base pairs.
 }
   \item{promoter_upstream_distance}{
 A numeric specifying how far upstream from the gene TSS is considered part of
