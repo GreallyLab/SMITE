@@ -14,20 +14,20 @@ the data it into the PvalueAnnotation.
 annotateExpression(pvalue_annotation, expr_data, effect_col = NULL, pval_col = NULL)
 }
 \arguments{
-  \item{pvalue_annotation}{
+    \item{pvalue_annotation}{
 An S4 object of class PvalueAnnotation
 }
-  \item{expr_data}{
+    \item{expr_data}{
 An object of class data.frame or matrix with row names corresponding to 
 genes and atleast two columns with an effect and p-value for expression.
 
 }
-  \item{effect_col}{
+    \item{effect_col}{
 A numeric specifying the column with an effect direction.  If not specified the 
 function will grep for a single named column from: "effect", "odds",
 "coeff" or "B"
 }
-  \item{pval_col}{
+    \item{pval_col}{
 A numeric specifying the column with p-values.  If not specified the 
 function will grep for a single named column from: "pval","p.val","p_val"
 or "sig"

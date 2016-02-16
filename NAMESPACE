@@ -42,8 +42,19 @@ import("org.Hs.eg.db")
 import("ggplot2")
 import("Biobase")
 import("methods")
+import("geneLenDataBase")
+importFrom("S4Vectors", queryHits)
 importFrom("IRanges", IRanges)
 importFrom("KEGG.db",KEGGEXTID2PATHID, KEGGPATHID2NAME) 
 importFrom("reactome.db", reactomeEXTID2PATHID, reactomePATHID2NAME)
 importFrom("BioNet",runFastHeinz, subNetwork, rmSelfLoops)
 import("tools")
+importFrom("grDevices", "colorRampPalette", "dev.cur", "dev.new",
+             "dev.off", "palette", "pdf", "xy.coords")
+importFrom("graphics", "axis", "box", "legend", "lines", "par", "plot",
+             "plot.new", "plot.window", "points", "polygon", "strheight",
+             "strwidth", "text", "title")
+importFrom("stats", "cor", "density", "dist", "pbinom", "pchisq",
+             "pnorm", "qchisq", "qnorm", "sd", "weighted.mean",
+             "wilcox.test")
+importFrom("utils", "data")

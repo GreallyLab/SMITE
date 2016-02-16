@@ -13,31 +13,30 @@ addShadowText(x, y = NULL, labels, col = "white", bg = "black",
 theta = seq(pi/4, 2 * pi, length.out = 8), r = 0.1, ...)
 }
 \arguments{
-  \item{x}{
+    \item{x}{
 A numeric vector of x coordinates
 }
-  \item{y}{
+    \item{y}{
 A numeric vector of y coordinates
 }
-  \item{labels}{
+    \item{labels}{
 A character vector to be plotted at the specified coordinates
 }
-  \item{col}{
+    \item{col}{
 The text color
 }
-  \item{bg}{
+    \item{bg}{
 The color of the outline
 }
-  \item{theta}{
+    \item{theta}{
 The number of shadows to plot
 }
-  \item{r}{
+    \item{r}{
 The radius for the shadows
 }
- \item{...}{
+    \item{...}{
  Additional plotting arguments
- }
-}
+}}
 \details{
 The function creates its effect by plotting theta shadows at r radius around the
 text to create the illusion of a text shadow
