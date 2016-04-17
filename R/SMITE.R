@@ -77,7 +77,7 @@ setMethod(
             }
         }
 
-        tss <- shift(flank(data_grange, width=2), 1)
+        tss <- GenomicRanges::shift(GenomicRanges::flank(data_grange, width=2), 1)
         tss$feature <- "tss"
 
         if(!is.null(other_data)){
@@ -91,17 +91,17 @@ setMethod(
                 }
                 else {
                 temp_other <- other_data[[i]]
-                mcols(temp_other) <- NULL
+                GenomicRanges::mcols(temp_other) <- NULL
                 }
                 temp_other <- unique(temp_other)
 
 
                 suppressWarnings(
-                    overlap <- findOverlaps(flank(data_grange,
+                    overlap <- findOverlaps(GenomicRanges::flank(data_grange,
                                                  other_tss_distance[otherdata_names[i]],
                                                  start=TRUE), temp_other)
                 )
-                temp_other <- temp_other[as.numeric(subjectHits(overlap))]
+                temp_other <- temp_other[as.numeric(S4Vectors::subjectHits(overlap))]
                 temp_other$name <-
                     data_grange$name[queryHits(overlap)]
                 temp_other$feature <- otherdata_names[i]
@@ -109,16 +109,17 @@ setMethod(
             })
             )
         }
-        promoters_downstream <- flank(data_grange, -promoter_downstream_distance,
-                                    start=TRUE)
-        promoters_upstream <- flank(data_grange, promoter_upstream_distance, start=TRUE)
+        promoters_downstream <- GenomicRanges::flank(data_grange, 
+            -promoter_downstream_distance, start=TRUE)
+        promoters_upstream <- GenomicRanges::flank(data_grange, 
+            promoter_upstream_distance, start=TRUE)
         end(promoters_upstream) <- end(promoters_upstream)+1
 
-        promoters <- punion(promoters_upstream, promoters_downstream)
+        promoters <- GenomicRanges::punion(promoters_upstream, promoters_downstream)
         promoters$name <- data_grange$name
         promoters$feature <- "promoter"
 
-        body <- psetdiff(data_grange, promoters_downstream)
+        body <- GenomicRanges::psetdiff(data_grange, promoters_downstream)
         body$name <- data_grange$name
         body$feature <- "body"
 
@@ -344,7 +345,7 @@ setMethod(
         temp_annotation <- unlist(slot(pvalue_annotation, "annotation"))
 
         overlap_mods <- GenomicRanges::findOverlaps(temp_annotation, mod_grange)
-        mod_grange_overlaps <- mod_grange[subjectHits(overlap_mods)]
+        mod_grange_overlaps <- mod_grange[S4Vectors::subjectHits(overlap_mods)]
         mcols(mod_grange_overlaps) <- cbind(mcols(
             temp_annotation[as.numeric(
                 S4Vectors::queryHits(overlap_mods))]),
@@ -357,7 +358,7 @@ setMethod(
             if(verbose == TRUE){
                 message("Computing correlation matrices")
             }
-            temp_split_mod_grange <- split(mod_grange, seqnames(mod_grange))
+            temp_split_mod_grange <- split(mod_grange, GenomicRanges::seqnames(mod_grange))
             precede_follow_each_element <- lapply(temp_split_mod_grange,
                                                   function(chr){
                 temp_chr <- IRanges(start(chr), end(chr))
