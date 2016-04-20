@@ -77,7 +77,7 @@ setMethod(
             }
         }
 
-        tss <- shift(flank(data_grange, width=2), 1)
+        tss <- GenomicRanges::shift(GenomicRanges::flank(data_grange, width=2), 1)
         tss$feature <- "tss"
 
         if(!is.null(other_data)){
@@ -91,34 +91,35 @@ setMethod(
                 }
                 else {
                 temp_other <- other_data[[i]]
-                mcols(temp_other) <- NULL
+                GenomicRanges::mcols(temp_other) <- NULL
                 }
                 temp_other <- unique(temp_other)
 
 
                 suppressWarnings(
-                    overlap <- findOverlaps(flank(data_grange,
+                    overlap <- findOverlaps(GenomicRanges::flank(data_grange,
                                                  other_tss_distance[otherdata_names[i]],
                                                  start=TRUE), temp_other)
                 )
-                temp_other <- temp_other[as.numeric(subjectHits(overlap))]
+                temp_other <- temp_other[as.numeric(S4Vectors::subjectHits(overlap))]
                 temp_other$name <-
-                    data_grange$name[queryHits(overlap)]
+                    data_grange$name[S4Vectors::queryHits(overlap)]
                 temp_other$feature <- otherdata_names[i]
                 temp_other
             })
             )
         }
-        promoters_downstream <- flank(data_grange, -promoter_downstream_distance,
+        promoters_downstream <- GenomicRanges::flank(data_grange, -promoter_downstream_distance,
                                     start=TRUE)
-        promoters_upstream <- flank(data_grange, promoter_upstream_distance, start=TRUE)
+        promoters_upstream <- GenomicRanges::flank(data_grange, 
+            promoter_upstream_distance, start=TRUE)
         end(promoters_upstream) <- end(promoters_upstream)+1
 
-        promoters <- punion(promoters_upstream, promoters_downstream)
+        promoters <- GenomicRanges::punion(promoters_upstream, promoters_downstream)
         promoters$name <- data_grange$name
         promoters$feature <- "promoter"
 
-        body <- psetdiff(data_grange, promoters_downstream)
+        body <- GenomicRanges::psetdiff(data_grange, promoters_downstream)
         body$name <- data_grange$name
         body$feature <- "body"
 
@@ -182,7 +183,7 @@ setMethod(
         else
             if(ID_type == "ensembleprot"){
                 genes_old <- subset(genes_old, genes_old %in%
-                                        (AnnotationDbi::ls(org.Hs.eg.db::org.Hs.egENSEMBLPROT2EG)))
+                            (AnnotationDbi::ls(org.Hs.eg.db::org.Hs.egENSEMBLPROT2EG)))
 
                 if(ID_convert_to == "symbol"){
                     eg <- unlist(AnnotationDbi::mget(genes_old,
@@ -323,7 +324,7 @@ setMethod(
             mod_included <- names(weight_by)
             if(!all(mod_included %in% unique_feature_names)){
                 stop("Provided weight names must match those in
-                     unique(mcols(unlist(pvalue_annotation@annotation))$feature)")
+                     unique(GenomicRanges::mcols(unlist(pvalue_annotation@annotation))$feature)")
             }
         }
 
@@ -344,11 +345,11 @@ setMethod(
         temp_annotation <- unlist(slot(pvalue_annotation, "annotation"))
 
         overlap_mods <- GenomicRanges::findOverlaps(temp_annotation, mod_grange)
-        mod_grange_overlaps <- mod_grange[subjectHits(overlap_mods)]
-        mcols(mod_grange_overlaps) <- cbind(mcols(
+        mod_grange_overlaps <- mod_grange[S4Vectors::subjectHits(overlap_mods)]
+        GenomicRanges::mcols(mod_grange_overlaps) <- cbind(GenomicRanges::mcols(
             temp_annotation[as.numeric(
                 S4Vectors::queryHits(overlap_mods))]),
-            mcols(mod_grange_overlaps))
+            GenomicRanges::mcols(mod_grange_overlaps))
         mod_grange_overlaps <- split(mod_grange_overlaps, mod_grange_overlaps$name)
         temp_annotation <- split(temp_annotation, temp_annotation$name)
 
@@ -357,7 +358,7 @@ setMethod(
             if(verbose == TRUE){
                 message("Computing correlation matrices")
             }
-            temp_split_mod_grange <- split(mod_grange, seqnames(mod_grange))
+            temp_split_mod_grange <- split(mod_grange, GenomicRanges::seqnames(mod_grange))
             precede_follow_each_element <- lapply(temp_split_mod_grange,
                                                   function(chr){
                 temp_chr <- IRanges(start(chr), end(chr))
@@ -380,7 +381,8 @@ setMethod(
             
             mod_grange_corr$pval2 <- duplicate_each_chr$pval
             
-            quantile_distances_mod_corr <- Hmisc::cut2(mod_grange_corr$distance, g=500, onlycuts=TRUE)
+            quantile_distances_mod_corr <- Hmisc::cut2(mod_grange_corr$distance, 
+                g=500, onlycuts=TRUE)
             quantile_distances_mod_corr[length(quantile_distances_mod_corr)] <- 250000000
             mod_grange_corr$cat <- cut(mod_grange_corr$distance, breaks=quantile_distances_mod_corr)
             mod_grange_corr <- split(mod_grange_corr, mod_grange_corr$cat)
@@ -547,7 +549,8 @@ setMethod(
             message("Scores have been adjusted")
         }
 
-        newmods <- c(unlist(slot(pvalue_annotation, "modifications")), unlist(mod_grange_overlaps))
+        newmods <- c(unlist(slot(pvalue_annotation, "modifications")), 
+            unlist(mod_grange_overlaps))
         names(newmods) <- NULL
         newmods <- split(newmods, newmods$name)
 
@@ -749,9 +752,11 @@ setMethod(
                                            rev(1/seq(.05, .95, .05))),
                                            function(i){
                                                c(i,wilcox.test(logit_ref,
-                                                               as.numeric(logit_temp)*i)$p_value)
+                                                        as.numeric(logit_temp)*i)$p_value)
                                                }))
-                        nonparametric_comparison <-  subset(nonparametric_comparison, nonparametric_comparison[, 2] == max( nonparametric_comparison[, 2])[1])[, 1]
+                        nonparametric_comparison <-  subset(nonparametric_comparison, 
+                        nonparametric_comparison[, 2] == max( 
+                        nonparametric_comparison[, 2])[1])[, 1]
                         p_temp <-
                                (exp(logit_temp)^( nonparametric_comparison))/(1+exp(logit_temp)^( nonparametric_comparison))
                     }
