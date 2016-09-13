@@ -132,7 +132,7 @@ setGeneric(
                  meth_hi_col="blue", meth_low_col="yellow1",
                  meth_mid_col="gray90", exp_hi_col="red1",
                  exp_low_col="chartreuse1", exp_mid_col="gray90",
-                 label_scale=TRUE,compare_plot=FALSE, pdf_out=NULL)
+                 label_scale=TRUE, label_shadow=FALSE, compare_plot=FALSE, pdf_out=NULL)
     {
         standardGeneric("plotModule")
     }
