@@ -15,7 +15,7 @@ plotModule(pvalue_annotation, p_thresh = 0.05, which_network = 1, goseq = FALSE,
 layout = "fr", legend = TRUE, namestyle = "symbol", suppress_details = FALSE, 
 meth_hi_col = "blue", meth_low_col = "yellow1", 
 meth_mid_col = "gray90", exp_hi_col = "red1", exp_low_col = "chartreuse1", 
-exp_mid_col = "gray90", label_scale = TRUE, compare_plot=FALSE, 
+exp_mid_col = "gray90", label_scale = TRUE, label_shadow = FALSE, compare_plot=FALSE, 
 pdf_out=NULL)
 }
 \arguments{
@@ -76,8 +76,12 @@ A logical (TRUE/FALSE(DEFAULT)) indicating whether two plots should be drawn
 side by side, one with raw data and one without
 }
   \item{label_scale}{
-A logical (TRUE/FALSE(DEFAULT)) indicating whether whether the node label should
+A logical (TRUE(DEFAULT)/FALSE) indicating whether whether the node label should
 be scaled with the node score
+}
+  \item{label_shadow}{
+A logical (TRUE/FALSE(DEFAULT)) indicating whether whether the node label should
+have a white text shadow for easier label reading
 }
   \item{pdf_out}{
 A string indicating a location to which the function should output a pdf.  If 

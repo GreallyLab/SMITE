@@ -57,7 +57,7 @@ setMethod(
                         suppress_details=FALSE, meth_hi_col="blue",
                         meth_low_col="yellow1", meth_mid_col="gray90",
                         exp_hi_col="red1", exp_low_col="chartreuse1",
-                        exp_mid_col="gray90", label_scale=TRUE,
+                        exp_mid_col="gray90", label_scale=TRUE, label_shadow=FALSE,
                         compare_plot=FALSE, pdf_out=NULL)
     {
         
@@ -366,12 +366,18 @@ setMethod(
                     text(-1.07, 1.095, paste(">", round(qchisq(1-p_thresh,4), 2), sep=""))
                 }
                 
-                addShadowText(layout1_scaled[, 1], layout1_scaled[, 2], vl, font=2,
-                              cex=if(label_scale == TRUE){
-                                  scales::rescale(stat.v, to=(c(.5, 2)))
-                              }
-                              else{.5},
-                              bg="white", col="black")
+                if(label_shadow==T){addShadowText(layout1_scaled[, 1], layout1_scaled[, 2], vl, font=2,
+                                                  cex=if(label_scale == TRUE){
+                                                      scales::rescale(stat.v, to=(c(.5, 2)))
+                                                  }
+                                                  else{.5},
+                                                  bg="white", col="black")}
+                if(label_shadow==F){text(layout1_scaled[, 1], layout1_scaled[, 2], vl, font=2,
+                                         cex=if(label_scale == TRUE){
+                                             scales::rescale(stat.v, to=(c(.5, 2)))
+                                         }
+                                         else{.5},
+                                         bg="white", col="black")}
                 
                 if(namestyle == "refseq"){
                     ref2eg <- AnnotationDbi::as.list(org.Hs.eg.db::org.Hs.egREFSEQ2EG)
@@ -431,7 +437,6 @@ setMethod(
         if(!is.null(pdf_out)){dev.off()}
     }
 )
-
 
 
 setMethod(
