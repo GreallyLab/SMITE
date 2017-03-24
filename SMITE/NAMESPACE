@@ -1,0 +1,60 @@
+export(stoufferTest)
+export(scorePval)
+export(runGOseq)
+export(runSpinglass)
+export(runBioNet)
+export(plotModule)
+export(highScores)
+export(extractScores)
+export(extractModules)
+export(extractGOseq)
+export(searchGOseq)
+export(removeModification)
+export(plotDensityPval)
+export(plotCompareScores)
+export(normalizePval)
+export(makePvalueObject)
+export(makePvalueAnnotation)
+export(extractModSummary)
+export(extractModification)
+export(extractExpression)
+export(convertGeneIds)
+export(annotateModification)
+export(annotateExpression)
+export(addShadowText)
+importFrom("goseq", goseq)
+importFrom("goseq", nullp)
+importFrom("scales", rescale)
+importFrom("Hmisc",cut2)
+importFrom("plyr", join)
+importClassesFrom("igraph")
+importFrom("igraph", simplify,clusters,
+            as_adjacency_matrix ,
+           graph_from_adjacency_matrix,
+           induced_subgraph, V, E,
+           graph_from_graphnel,as_graphnel,
+           layout_in_circle,layout_with_fr,vcount,
+           cluster_spinglass, 'V<-', 'E<-')
+
+import("GenomicRanges")
+import("AnnotationDbi")
+import("org.Hs.eg.db")
+import("ggplot2")
+import("Biobase")
+import("methods")
+import("geneLenDataBase")
+importFrom("S4Vectors", queryHits)
+importFrom("IRanges", IRanges)
+importFrom("KEGG.db",KEGGEXTID2PATHID, KEGGPATHID2NAME) 
+importFrom("reactome.db", reactomeEXTID2PATHID, reactomePATHID2NAME)
+importFrom("BioNet",runFastHeinz, subNetwork, rmSelfLoops)
+import("tools")
+importFrom("grDevices", "colorRampPalette", "dev.cur", "dev.new",
+             "dev.off", "palette", "pdf", "xy.coords")
+importFrom("graphics", "axis", "box", "legend", "lines", "par", "plot",
+             "plot.new", "plot.window", "points", "polygon", "strheight",
+             "strwidth", "text", "title")
+importFrom("stats", "cor", "density", "dist", "pbinom", "pchisq",
+             "pnorm", "qchisq", "qnorm", "sd", "weighted.mean",
+             "wilcox.test")
+importFrom("utils", "data")
