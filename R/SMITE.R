@@ -520,7 +520,7 @@ setMethod(
             
             trans_p <- cbind(trans=qnorm(1-each_feature[, 2]/2),
                              plyr::join(categories, categories_table, by="categories"))
-            
+
             trans_p[, 1] <- replace(trans_p[, 1],is.infinite(trans_p[, 1]),
                                     max(subset(trans_p, !is.infinite(
                                         trans_p[, 1])), na.rm=TRUE))
