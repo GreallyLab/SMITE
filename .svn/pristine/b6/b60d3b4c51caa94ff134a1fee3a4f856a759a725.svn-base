@@ -1,7 +1,0 @@
-Reactome.Symbol.Igraph: REACTOME
-curated_expressiondata: expression_curated
-hg19_genes_bed: hg19_genes
-histone_h3k4me1: h3k4me1
-methylationdata: methylation
-test_annotation_score_data: test_annotation
-genes_for_conversiontest: genes
