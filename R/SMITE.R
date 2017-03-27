@@ -1171,7 +1171,7 @@ setMethod(
 setMethod(
     f="runGOseq",
     signature="PvalueAnnotation",
-    definition=function(pvalue_annotation, p_thresh=0.05, coverage, type="reactome")
+    definition=function(pvalue_annotation, p_thresh=0.05, supply_cov=TRUE, coverage=NULL, type="reactome")
     {
         while(!names(dev.cur()) %in% c("pdf","null device")){
             dev.off()
@@ -1221,23 +1221,39 @@ setMethod(
         nl[, 1] <- gsub("[0-9]*$", "", nl[, 1])
         nl <- split(nl[, 1], nl[, 2])
         nl <- lapply(nl, function(i){unique(i)})
-
-        if(inherits(coverage, what="data.frame")){
-            a <- coverage
-            a <- a[, 4:5]
+        if (supply_cov == FALSE) {
+            annotations <- slot(slot(pvalue_annotation, "annotation"),"unlistData") # pvalue_annotation@annotation@unlistData
+            annotations_split <- split(annotations, slot(annotations,"elementMetadata")$name)
+            anntation_red <- reduce(annotations_split)
+            
+            # make granges for modification
+            red_meth <- reduce(slot(slot(pvalue_annotation, "modifications"),"unlistData")) # pvalue_annotation@modifications@unlistData
+            anno_CpGs2 <- countOverlaps(anntation_red,red_meth)
+            a <- data.frame(id=names(anno_CpGs2), Overlaps=anno_CpGs2)
         }
-        if(inherits(coverage, what="character")){
-            if(coverage == "refseq"){
-                hg19.refGene.LENGTH <- NULL
-                data(hg19.refGene.LENGTH,package="geneLenDataBase",
-                     envir=environment())
-                a <- hg19.refGene.LENGTH[, c(1, 3)]}
+        if (supply_cov == TRUE & is.null(coverage)) {
+            stop("Supply coverage marked TRUE, but no coverage supplied. Please 
+                supply coverage as a data.frame (bed file) or a character vector (gene Symbol or RefSeq)")
+        }
+        if (supply_cov == TRUE) {
+            if(inherits(coverage, what="data.frame")){
+                a <- coverage
+                a <- a[, 4:5]
+            }
+            if(inherits(coverage, what="character")){
+                if(coverage == "refseq"){
+                    hg19.refGene.LENGTH <- NULL
+                    data(hg19.refGene.LENGTH,package="geneLenDataBase",
+                         envir=environment())
+                    a <- hg19.refGene.LENGTH[, c(1, 3)]
+                }
 
-            if(coverage == "symbol"){
-                hg19.geneSymbol.LENGTH <- NULL
-                data(hg19.geneSymbol.LENGTH,package="geneLenDataBase",
-                     envir=environment())
-                a <- hg19.geneSymbol.LENGTH[, c(1, 3)]
+                if(coverage == "symbol"){
+                    hg19.geneSymbol.LENGTH <- NULL
+                    data(hg19.geneSymbol.LENGTH,package="geneLenDataBase",
+                        envir=environment())
+                    a <- hg19.geneSymbol.LENGTH[, c(1, 3)]
+                }
             }
         }
         if(any(duplicated(a[, 1]))){
